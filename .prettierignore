@@ -1,0 +1,6 @@
+.next
+node_modules
+pnpm-lock.yaml
+SPEC.md
+PLAN.md
+CLAUDE.md

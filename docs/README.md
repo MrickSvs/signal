@@ -1,0 +1,1 @@
+Documentation du projet : ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT, BUILD_LOG.
