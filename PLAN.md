@@ -97,10 +97,10 @@ Aucune logique métier. Un test trivial suffit pour vérifier la chaîne.
 
 **Test** :
 
-- [ ] `pnpm install` puis `pnpm dev` démarrent.
-- [ ] Avec `SITE_PASSWORD` défini, le navigateur demande le mot de passe.
-- [ ] `pnpm lint && pnpm typecheck && pnpm test` passent.
-- [ ] La CI est verte sur GitHub.
+- [x] `pnpm install` puis `pnpm dev` démarrent.
+- [x] Avec `SITE_PASSWORD` défini, le navigateur demande le mot de passe.
+- [x] `pnpm lint && pnpm typecheck && pnpm test` passent.
+- [x] La CI est verte sur GitHub.
 - [ ] Un projet Vercel (Root Directory = racine du repo) déploie sans erreur ; `APP_BASE_URL` renseignée dans Vercel et dans `.env`.
 
 **Commit** : `chore: project skeleton, CI and basic auth`
