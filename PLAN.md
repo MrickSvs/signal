@@ -386,8 +386,8 @@ Tests : e-mail connu, domaine inconnu, adresse gmail, note sales citant un prosp
 
 **Test** :
 
-- [ ] Tests verts sur les 7 cas.
-- [ ] Les retours S2b sont rattachés aux bons comptes Enterprise ; les retours S4 au prospect Forgeval ; les retours E7 restent sans compte.
+- [x] Tests verts sur les 7 cas.
+- [x] Les retours S2b sont rattachés aux bons comptes Enterprise ; les retours S4 au prospect Forgeval ; les retours E7 restent sans compte.
 
 **Commit** : `feat(pipeline): customer linking and business signals`
 
