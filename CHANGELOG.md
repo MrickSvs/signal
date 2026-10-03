@@ -5,17 +5,19 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 1 (le monde de Jalon) terminée** : étapes 1.1 à 1.4. Prochaine étape : 2.1 (triage des retours).
-- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement. Le jeu réservé (77 retours) reste hors base.
+- **Phase 2 (pipeline) en cours** : 2.1 faite (triage). Prochaine étape : 2.2 (rattachement client et signaux business).
+- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 132 tests.
-- Coût LLM cumulé : ~2,3 € (génération des tickets ~0,21 €, des retours ~2,1 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 154 tests.
+- Coût LLM cumulé : ~2,7 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €).
 
 ## Points d'attention
 
 - **Écart avec PLAN 0.3 — températures** : Sonnet 5.5 et Opus 5.5 rejettent toute `temperature` non par défaut. Seul le triage (Haiku) a `temperature: 0` ; les autres rôles tournent en réflexion adaptive. Conséquence pour 6.3 : la stabilité du juge repose sur la calibration, pas sur la température. → ADR-003
 - **Sorties structurées** : natives (`output_config.format`), pas d'appel d'outil forcé (refusé par Sonnet/Opus 5.5). Tout passe par `invokeStructured()`. → ADR-003
-- **Cache de prompt sur Haiku** : préfixe minimal de 4 096 tokens. À vérifier en 2.1 : le préfixe du triage (skill `triage-taxonomy` + `product.md`) doit dépasser ce seuil, sinon le cache ne sert pas.
+- **Cache de prompt sur Haiku** : vérifié en 2.1, le préfixe du triage (~5 900 tokens) dépasse le minimum de 4 096 ; le run complet lit le cache à chaque appel. → ADR-008
+- **Enums des sorties structurées** : jusqu'à 2.1, `transformJSONSchema` du SDK les retirait du schéma (ils n'étaient pas imposés). Corrigé dans `invokeStructured()` ; la nouvelle tentative après une sortie invalide reçoit maintenant les erreurs. → ADR-008
+- **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
 - **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 (permissions 0,49–0,52, notifications 0,45–0,56, suivi du temps ≤ 0,37). À confirmer en 2.4. → ADR-005
 - **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
@@ -23,6 +25,15 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.1] Triage des retours — 2026-10-03
+
+ADR-008
+
+- `src/pipeline/nodes/triage.ts` : un appel Haiku structuré par retour (langue, sentiment, urgence, churn, injection, confiance, puis 1 à 3 items avec type, domaine, tags, demande exprimée, problème sous-jacent, résumé, fonctionnalité existante). Skill `triage-taxonomy` et `product.md` en préfixe mis en cache ; retour encapsulé par `wrapAsData()` ; texte tronqué à 6 000 caractères (début et fin) pour le modèle, `raw_text` intact.
+- `pnpm pipeline:triage [--model haiku|sonnet] [--sample N] [--run-id X] [--retry-failed] [--concurrency N]` : 8 appels en parallèle, échecs marqués `failed` sans arrêter le run, run suivi dans `pipeline_runs` (durée, tokens, coût, trace Langfuse).
+- Run complet : 214 retours, 0 échec restant, ~1 min 30, 0,26 €. S6 signalé (R-144) sans faux positif ; E1 → 2 items ; E3 en français ; E4 `autre` ; E5 `existing_feature`. Accord avec la vérité terrain : type 210/222, domaine 202/222.
+- Couche LLM corrigée : enums imposés dans le schéma strict, nouvelle tentative guidée par les erreurs de validation.
 
 ## [1.4] Scénario maître, cas limites, jeu réservé — 2026-10-03
 

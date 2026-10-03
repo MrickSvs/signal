@@ -91,3 +91,18 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Garde-fous de la règle 4 : `no-restricted-syntax` ESLint sur les chemins `evals/ground-truth` et `evals/holdout` dans `src/`, et un test qui parcourt `src/` (chemins découpés compris).
   - `received_at` = `DEMO_NOW` − `days_ago`, à une heure de bureau à Paris stable par retour ; un retour du jour n'est jamais dans le futur.
 - **Conséquences** : modifier un angle du jeu de développement invalide tout le cache du jeu réservé (son prompt liste ces angles pour les éviter). Le test des fichiers versionnés échoue tant que les fichiers ne suivent plus le plan : il faut régénérer.
+
+## ADR-008 — Triage : une passe par retour, enums imposés, correction guidée
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 2.1. Trier ~215 retours avec Haiku de façon reproductible, peu chère et sans bloquer le run sur un échec (CL-11).
+- **Décision** :
+  - **Un appel structuré par retour** (`src/pipeline/nodes/triage.ts`) : niveau retour + 1 à 3 items. Préfixe système en cache, dans un ordre fixe : consigne, skill `triage-taxonomy`, `product.md` (~5 900 tokens, au-dessus du minimum de 4 096 de Haiku : vérifié, 1 043 436 tokens lus en cache sur le run complet). Le message utilisateur porte les métadonnées (canal, source, compte, note NPS, troncature) puis le retour dans `wrapAsData()`, objet compris.
+  - **Troncature (CL-06)** : seul le texte envoyé au modèle est tronqué (moitié début, moitié fin, marqueur du nombre de caractères coupés, 6 000 caractères au plus d'après `weighting.yaml`). `raw_text` reste intact en base, puisque c'est la preuve ; `feedbacks.truncated` passe à `true`.
+  - **Écriture idempotente** : `feedback_analyses` en upsert par (feedback_id, run_id) ; en cas de succès, les items du retour sont remplacés (upsert par (feedback_id, item_index), puis suppression des index en trop) et `feedbacks.language` est renseignée. Un échec garde les items précédents. `feedback_items` n'ayant pas de `run_id`, un nouveau triage remplace les items.
+  - **Sélection** : retours sans analyse `ok` ; ceux en échec seulement avec `--retry-failed`. `--sample N` prend N retours répartis sur toute la plage d'ID (déterministe). `--model sonnet` utilise le rôle `reasoning`.
+  - **Robustesse** : 8 appels en parallèle ; les erreurs d'API, déjà retentées par le SDK, ont une seconde série de tentatives (2 s puis 4 s) ; échec définitif → analyse `failed` avec l'erreur, le run continue. Une erreur d'écriture en base arrête le run (statut `echec`).
+  - **Correction de la couche LLM (0.3)** : `transformJSONSchema` (SDK 0.122) relègue `enum` en description, donc les enums n'étaient pas imposés par le décodage contraint (1 domaine inventé sur 40). `toStrictJsonSchema()` les remet en place. La nouvelle tentative après une sortie invalide renvoie désormais au modèle sa réponse et les erreurs zod : le même prompt redonnait la même erreur (résumé de 21 mots).
+  - Le résumé est limité à 20 mots en code (refine zod) ; tags normalisés en code (minuscules, sans doublon, sans le domaine).
+- **Conséquences** : un run complet coûte ~0,27 € et dure ~1 min 30. Les 8 premiers appels écrivent le cache en parallèle (surcoût de quelques centimes, non optimisé). Lancé seul, `pipeline:triage` enregistre son run en `kind = full` avec `stats.step = "triage"` ; le graphe de 2.6 reprendra la gestion des runs.

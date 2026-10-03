@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "db:push": "supabase db push",
     "db:types": "supabase gen types typescript --linked --schema public > src/lib/db/types.ts && prettier --write src/lib/db/types.ts",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "pipeline:triage": "tsx scripts/pipeline-triage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.122.0",

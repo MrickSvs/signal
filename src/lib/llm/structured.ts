@@ -1,7 +1,7 @@
 import { transformJSONSchema } from "@anthropic-ai/sdk/lib/transform-json-schema";
-import type { AIMessage, BaseMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage, type BaseMessage } from "@langchain/core/messages";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
-import type { z } from "zod";
+import { z } from "zod";
 import { addUsage, costEur, EMPTY_USAGE, usageFromMessage, type RunCost, type Usage } from "./cost";
 import { getModel } from "./index";
 import { MODELS, type ModelRole } from "./models";
@@ -55,17 +55,16 @@ export async function invokeStructured<T>(
 ): Promise<StructuredResult<T>> {
   const modelId = MODELS[role];
   const model = getModel(role).withConfig({
-    outputConfig: {
-      format: { type: "json_schema", schema: transformJSONSchema(toJsonSchema(schema)) },
-    },
+    outputConfig: { format: { type: "json_schema", schema: toStrictJsonSchema(schema) } },
   });
 
   let usage = EMPTY_USAGE;
   let lastIssue = "";
+  let conversation = messages;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     let message: AIMessage;
     try {
-      message = await model.invoke(messages, {
+      message = await model.invoke(conversation, {
         runName: options.name,
         callbacks: langfuseCallbacks(),
         metadata: { ...options.metadata, role, attempt: String(attempt) },
@@ -83,17 +82,65 @@ export async function invokeStructured<T>(
     usage = addUsage(usage, callUsage);
     options.runCost?.add(modelId, callUsage);
 
-    const result = schema.safeParse(parseJson(textOf(message)));
+    const text = textOf(message);
+    const result = schema.safeParse(parseJson(text));
     if (result.success) {
       return { data: result.data, usage, costEur: costEur(modelId, usage), attempts: attempt };
     }
     lastIssue = result.error.message;
+    // The new attempt sees its invalid answer and the issues: the same prompt would give the same error.
+    conversation = [
+      ...messages,
+      new AIMessage(text || "(réponse vide)"),
+      new HumanMessage(
+        `Ta réponse ne respecte pas le schéma attendu :\n${z.prettifyError(result.error)}\n` +
+          "Renvoie l'objet JSON complet, corrigé.",
+      ),
+    ];
   }
 
   throw new StructuredOutputError(
     `Sortie invalide après ${MAX_ATTEMPTS} tentatives (${options.name}) : ${lastIssue}`,
     { kind: "validation", attempts: MAX_ATTEMPTS, usage },
   );
+}
+
+type JsonSchema = { [key: string]: unknown };
+
+const isSchema = (value: unknown): value is JsonSchema =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Copies `enum` from the source schema onto the strict one, walking both trees in parallel. */
+function restoreEnums(source: JsonSchema, strict: JsonSchema): void {
+  if (Array.isArray(source.enum)) strict.enum = source.enum;
+  for (const key of ["properties", "$defs"] as const) {
+    const from = source[key];
+    const to = strict[key];
+    if (!isSchema(from) || !isSchema(to)) continue;
+    for (const [name, child] of Object.entries(from)) {
+      if (isSchema(child) && isSchema(to[name])) restoreEnums(child, to[name]);
+    }
+  }
+  if (isSchema(source.items) && isSchema(strict.items)) restoreEnums(source.items, strict.items);
+  const variants = (source.anyOf ?? source.oneOf ?? source.allOf) as unknown;
+  const strictVariants = (strict.anyOf ?? strict.allOf) as unknown;
+  if (Array.isArray(variants) && Array.isArray(strictVariants)) {
+    variants.forEach((v, i) => {
+      if (isSchema(v) && isSchema(strictVariants[i])) restoreEnums(v, strictVariants[i]);
+    });
+  }
+}
+
+/**
+ * JSON schema for output_config.format. transformJSONSchema (SDK 0.122) drops the keywords
+ * that structured outputs reject (min/max, maxItems, pattern) into the description, but it also
+ * drops `enum`, which constrained decoding supports: it is put back so enums are enforced.
+ */
+export function toStrictJsonSchema(schema: z.ZodType): JsonSchema {
+  const source = toJsonSchema(schema) as JsonSchema;
+  const strict = transformJSONSchema(source) as JsonSchema;
+  restoreEnums(source, strict);
+  return strict;
 }
 
 /** Text blocks only: thinking blocks come first when adaptive thinking is on. */

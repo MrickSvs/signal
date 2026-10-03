@@ -1,9 +1,9 @@
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage, type BaseMessage } from "@langchain/core/messages";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { RunCost } from "./cost";
 import { getModel } from "./index";
-import { invokeStructured, StructuredOutputError } from "./structured";
+import { invokeStructured, StructuredOutputError, toStrictJsonSchema } from "./structured";
 
 vi.mock("./index", () => ({ getModel: vi.fn() }));
 
@@ -69,6 +69,10 @@ describe("invokeStructured", () => {
     });
     expect(result.data).toEqual({ type: "question", sentiment: 0 });
     expect(result.attempts).toBe(2);
+    const retry = invoke.mock.calls[1][0] as BaseMessage[];
+    expect(retry).toHaveLength(3);
+    expect(retry[1].content).toBe('{"type":"bug","sentiment":7}');
+    expect(retry[2].content).toMatch(/ne respecte pas le schéma[\s\S]*sentiment/);
     expect(result.usage.inputTokens).toBe(220);
     expect(runCost.tokensIn).toBe(220);
     expect(result.costEur).toBeGreaterThan(0);
@@ -95,5 +99,31 @@ describe("invokeStructured", () => {
     expect(error.kind).toBe("api");
     expect(error.cause).toBeInstanceOf(Error);
     expect(invoke).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("toStrictJsonSchema", () => {
+  it("keeps enums (nested, in arrays and nullable unions) and drops unsupported keywords", () => {
+    const strict = toStrictJsonSchema(
+      z.object({
+        level: z.enum(["basse", "haute"]),
+        items: z.array(z.object({ area: z.enum(["taches", "autre"]) })).max(3),
+        maybe: z.enum(["a", "b"]).nullable(),
+        score: z.number().min(0).max(1),
+      }),
+    ) as {
+      properties: {
+        level: { enum: string[] };
+        items: { items: { properties: { area: { enum: string[] } } }; maxItems?: number };
+        maybe: { anyOf: { enum?: string[] }[] };
+        score: { minimum?: number; description: string };
+      };
+    };
+    expect(strict.properties.level.enum).toEqual(["basse", "haute"]);
+    expect(strict.properties.items.items.properties.area.enum).toEqual(["taches", "autre"]);
+    expect(strict.properties.items.maxItems).toBeUndefined();
+    expect(strict.properties.maybe.anyOf.some((v) => v.enum?.includes("a"))).toBe(true);
+    expect(strict.properties.score.minimum).toBeUndefined();
+    expect(strict.properties.score.description).toContain("minimum");
   });
 });
