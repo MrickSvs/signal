@@ -5,7 +5,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème), 2.4 (estimation par analogie) et 2.5 (scoring RICE hybride) faites. Prochaine étape : 2.6 (pipeline en graphe LangGraph).
+- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème), 2.4 (estimation par analogie) et 2.5 (scoring RICE hybride) faites, checklists validées par le PO. Prochaine étape : 2.6 (pipeline en graphe LangGraph), qui enchaîne tous ces nœuds.
 - Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension ; les 11 classés ont un score courant (mode MRR, dernier run) et une estimation en cache. Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
 - CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 310 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
@@ -21,7 +21,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Seuil de regroupement** : 0,28 et non 0,35 (valeur initiale), mesuré sur voyage-4 : tout fusionne dès 0,35. Seuil d'appariement par centroïdes : 0,9. → ADR-010
 - **Insights fusionnés** : ils gardent leurs `insight_items`, figés, comme mémoire pour rejouer la fusion au run suivant. Toute lecture des items d'un insight filtre sur son statut. → ADR-010
 - **Bruit classé** : trois petits sujets du bruit se regroupent légitimement au-delà de 5 retours (« recréer les mêmes tâches » 7, filtre par assigné E5 + S6 5, usage mobile 5) et sont classés. **Décision du PO : accepté**, ce sont de vrais problèmes récurrents ; la règle des 5 retours reste inchangée. S3 sort aussi émergent (×2,25) à côté de S7 (×14). → ADR-010
-- **Voyage sans moyen de paiement** : 3 requêtes/min et 10 000 tokens/min ; le premier embedding des 234 items a dû passer par petits lots espacés. Ajouter un moyen de paiement avant 2.6 (run complet sur base vide).
+- **Voyage sans moyen de paiement** : 3 requêtes/min et 10 000 tokens/min ; le premier embedding des 234 items a dû passer par petits lots espacés. Le scoring contourne la limite en vectorisant les besoins de tous les insights en un seul appel. Ajouter un moyen de paiement avant 2.6 (run complet sur base vide).
 - **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
 - **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 ; confirmé en 2.4 (permissions 0,49–0,59, notifications 0,50–0,56, suivi du temps ≤ 0,37). → ADR-005, ADR-011
@@ -43,6 +43,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - `src/pipeline/nodes/score.ts` (Sonnet) : un jugement par insight classé — Impact, justification, 2 à 5 preuves limitées aux retours de l'insight, contradictions, alignement et OKRs, recommandation MoSCoW. Le modèle ne produit aucun score. Effort par l'estimation en cache, calculs, rang et nouvelle version dans `scores`.
 - Migration `0003` : `overrides.feedback_ids`, `scores.overridden`.
 - `pnpm pipeline:score [--reach-mode comptes|mrr]` : en mode comptes, le Gantt (I-01) passe devant les permissions (I-07) ; en MRR, l'inverse. I-07 Must (engagement Atelier Mercure, J+75) ; I-11 (S4) hors stratégie, Won't. Must à 27 % de la capacité. 0,66 € le premier run, 0,15 € ensuite.
+- Checklist validée par le PO (`e6fe09f`). Étapes 2.4 et 2.5 enchaînées dans la même session, à sa demande.
 
 ## [2.4] Estimation par analogie — 2026-10-03
 
