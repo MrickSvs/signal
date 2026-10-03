@@ -79,6 +79,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | Commande                                                                                                                                                             | Effet                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `pnpm dev`                                                                                                                                 | Lancer l'app                |
+| `pnpm tsx scripts/smoke-llm.ts` | Vérifier la couche LLM (Haiku structuré + embedding + trace Langfuse) |
 | `pnpm lint` · `pnpm typecheck` · `pnpm test`                                                                                                                         | Qualité                        |
 | `pnpm db:push` · `pnpm db:types` · `pnpm db:seed`                                                                                                                    | Base                           |
 | `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:cluster` · `pipeline:score` · `digest`                                  | Pipeline                       |

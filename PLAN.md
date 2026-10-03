@@ -173,9 +173,9 @@ Tests Vitest, sans aucun appel réseau (clients simulés) : wrapAsData et wrapEx
 
 **Test** :
 
-- [ ] `pnpm tsx scripts/smoke-llm.ts` affiche réponse, coût et lien.
-- [ ] La trace apparaît dans Langfuse avec le modèle et les tokens.
-- [ ] Tests verts sans clé d'API dans l'environnement.
+- [x] `pnpm tsx scripts/smoke-llm.ts` affiche réponse, coût et lien.
+- [x] La trace apparaît dans Langfuse avec le modèle et les tokens.
+- [x] Tests verts sans clé d'API dans l'environnement.
 
 **Commit** : `feat(llm): model routing, structured outputs, embeddings and langfuse tracing`
 
