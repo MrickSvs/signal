@@ -46,13 +46,13 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [3.2] Écran Digest — 2026-10-03
 
-ADR-016
+`7e84c22` · ADR-016
 
 - Page d'accueil : le dernier digest dans l'ordre de SPEC §12.2, structuré depuis les faits calculés en code ; ID cliquables, chiffres vers leurs preuves, sparklines 6 semaines, comptes à risque avec MRR, décisions en attente avec un lien vers l'écran qui les traite (fusions et scissions comprises, CL-15).
 - Recommandations en cartes : le schéma passe d'`action` à `titre` + `justification` (les anciens digests restent lisibles) ; « En parler à Signal » désactivé jusqu'à 4.2.
 - Premier run (CL-18) : pas de section « Mouvements », « Pas encore d'historique ».
 - « Régénérer » avec confirmation (server action sous le verrou du pipeline, ~25 s, ~0,03 €) ; lien vers le digest précédent ; `po_state.last_seen_at` mis à jour à chaque visite.
-- Checklist : écran sans historique vérifié ; « se lit en 30 secondes » laissé au jugement du PO.
+- Checklist 3.2 validée (écran sans historique vérifié ; lecture en 30 secondes validée par le PO). Poussée sur `main`.
 
 ## [3.1] Shell et composants transverses — 2026-10-03
 
