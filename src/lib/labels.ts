@@ -1,0 +1,109 @@
+// French display labels for database enums (SPEC §7). Records keyed by the generated enum types,
+// so a new enum value fails the typecheck until it has a label.
+import type { Database } from "@/lib/db/types";
+
+type Enums = Database["public"]["Enums"];
+
+export const CHANNEL_LABELS: Record<Enums["feedback_channel"], string> = {
+  email_client: "E-mail client",
+  ticket_support: "Ticket support",
+  commentaire_in_app: "Commentaire in-app",
+  nps: "NPS",
+  note_csm: "Note CSM",
+  note_sales: "Note sales",
+  slack_interne: "Slack interne",
+};
+
+export const PLAN_LABELS: Record<Enums["customer_plan"], string> = {
+  free: "Free",
+  pro: "Pro",
+  business: "Business",
+  enterprise: "Enterprise",
+};
+
+export const HEALTH_LABELS: Record<Enums["customer_health"], string> = {
+  vert: "Santé verte",
+  orange: "Santé orange",
+  rouge: "Santé rouge",
+};
+
+export const SEGMENT_LABELS: Record<Enums["customer_segment"], string> = {
+  agence_com: "Agence de communication",
+  agence_digitale: "Agence digitale",
+  conseil: "Conseil",
+  pme_services: "PME de services",
+  hors_cible: "Hors cible",
+};
+
+export const BACKLOG_KIND_LABELS: Record<Enums["backlog_kind"], string> = {
+  story: "Story",
+  bug: "Bug",
+  tache: "Tâche",
+};
+
+export const BACKLOG_STATUS_LABELS: Record<Enums["backlog_status"], string> = {
+  brouillon: "Brouillon",
+  valide: "Validé",
+  envoye: "Envoyé",
+  modifie_notion: "Modifié dans Notion",
+  rejete: "Rejeté",
+};
+
+export const INSIGHT_STATUS_LABELS: Record<Enums["insight_status"], string> = {
+  propose: "À valider",
+  actif: "Actif",
+  fusionne: "Fusionné",
+  rejete: "Rejeté",
+  archive: "Archivé",
+};
+
+export const PRODUCT_AREA_LABELS: Record<Enums["product_area"], string> = {
+  taches: "Tâches",
+  tableau_kanban: "Tableau kanban",
+  notifications: "Notifications",
+  permissions_partage: "Permissions et partage",
+  reporting_export: "Reporting et export",
+  planification: "Planification",
+  integrations: "Intégrations",
+  facturation_temps: "Facturation et temps",
+  personnalisation: "Personnalisation",
+  performance: "Performance",
+  autre: "Autre",
+};
+
+export const ALERT_KIND_LABELS: Record<Enums["alert_kind"], string> = {
+  nouveau_sujet: "Nouveau sujet",
+  emergent: "Tendance émergente",
+  churn: "Risque de churn",
+  bug_critique: "Bug critique",
+  engagement: "Engagement contractuel",
+};
+
+export const RUN_KIND_LABELS: Record<Enums["run_kind"], string> = {
+  full: "Run complet",
+  incremental: "Run incrémental",
+  digest: "Digest",
+  eval: "Éval",
+};
+
+export const RUN_STATUS_LABELS: Record<Enums["run_status"], string> = {
+  en_cours: "en cours",
+  termine: "terminé",
+  echec: "en échec",
+};
+
+export type ModelFamily = "Haiku" | "Sonnet" | "Opus";
+
+/** Model family from a model id (claude-sonnet-5-5 → Sonnet), null if unknown. */
+export function modelFamily(modelId: string): ModelFamily | null {
+  const id = modelId.toLowerCase();
+  if (id.includes("haiku")) return "Haiku";
+  if (id.includes("sonnet")) return "Sonnet";
+  if (id.includes("opus")) return "Opus";
+  return null;
+}
+
+/** Public URL of a Notion page from its id (with or without dashes). */
+export function notionPageUrl(pageId: string): string {
+  return `https://www.notion.so/${pageId.replaceAll("-", "")}`;
+}

@@ -1,7 +1,10 @@
-export default function Home() {
+import { Newspaper } from "lucide-react";
+import { EmptyState } from "@/components/shell/states";
+
+export default function DigestPage() {
   return (
-    <main className="flex flex-1 items-center justify-center">
-      <h1 className="text-2xl font-semibold tracking-tight">Signal — en construction</h1>
-    </main>
+    <EmptyState icon={Newspaper} title="Bonjour Léa">
+      <p>Ce qui a changé depuis ta dernière visite s&apos;affichera ici.</p>
+    </EmptyState>
   );
 }

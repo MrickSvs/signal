@@ -206,3 +206,19 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Premier digest réel : S7 (I-29) émergent, les 3 comptes Enterprise à risque + Clim'Ouest (Business, santé rouge), « pas encore d'historique », 27 s, 0,04 €. Second digest (cron local) : période depuis le premier, aucun mouvement, 24 s, 0,02 €.
   - Les retours en échec de triage ne sont pas retentés par le cron ; le run complet (`pnpm pipeline:run`) le fait.
   - Les dossiers d'alerte sont vides jusqu'à 4.5 : le digest les annonce « en cours ».
+
+## ADR-015 — Shell du cockpit : aperçus chargés à l'ouverture, heure de Paris en code
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 3.1. Tout ID et tout chiffre doit ouvrir sa preuve (SPEC §12.1, P2), sans client Supabase dans le navigateur, et l'affichage doit rester en heure de Paris même présenté depuis un autre fuseau (CL-44).
+- **Décision** :
+  - **Aperçus des ID** (`EvidenceChip`, `InsightChip`, `BacklogItemChip`) : composants client qui appellent, à la première ouverture du popover, des server functions en lecture seule (`src/server/actions/evidence.ts` → `src/server/queries/evidence.ts`, service role). L'ID est validé par expression régulière avant toute requête. Une liste de 50 puces ne coûte donc rien tant qu'on n'en ouvre pas une ; résultat mis en mémoire dans le composant, nouvelle tentative après une erreur.
+  - **`MetricWithSource`** reçoit des valeurs déjà calculées et formatées côté serveur (`lib/scoring`) : aucun calcul côté client.
+  - **Dates** : `src/lib/format.ts` impose `timeZone: "Europe/Paris"` à tous les formats ; les dates relatives comptent les jours calendaires à Paris et reçoivent `now` en paramètre (`getDemoNow()` côté serveur, transmis au client), pour suivre l'horloge du scénario et éviter tout écart d'hydratation.
+  - **Shell** : layout racine = sidebar (client, section active), en-tête avec statut du dernier run et alertes ouvertes (Server Component sous `Suspense`, `connection()` pour un rendu à la requête, erreurs absorbées en « indisponible »), panneau de chat repliable (vide jusqu'à 4.2). `error.tsx` (Next 16 : `retry`), `loading.tsx`, `not-found.tsx` communs.
+  - **Design** : Inter (`next/font/google`, remplace Geist du scaffolding 0.1, Geist Mono gardé pour les ID), palette neutre, accent vert `--signal` ; texte courant à 14 px minimum, badges à 13 px ; largeur minimale 1 024 px pour tenir à 1 280 px zoomé à 110 % (~1 164 px utiles).
+- **Conséquences** :
+  - Les badges (`ChannelBadge`, `PlanBadge`, `HealthBadge`, `ModelBadge`, `BacklogKindBadge`) sont de simples `span` sans hook : utilisables depuis un Server Component.
+  - Les liens des aperçus pointent vers `/retours?retour=R-xxx`, `/insights/I-xx` et `/backlog?element=US-xxx`, à honorer en 3.3, 3.4 et 4.3.
+  - En local, `SITE_PASSWORD` active la Basic Auth : la configuration `signal-dev-noauth` de `.claude/launch.json` lance un serveur sans mot de passe sur le port 3001 pour les vérifications.

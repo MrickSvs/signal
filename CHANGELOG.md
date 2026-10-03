@@ -5,10 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous). Prochaine étape : 3.1 (shell du cockpit).
+- **Phase 3 (cockpit) commencée** : 3.1 faite (shell, composants de preuve, formatage en heure de Paris). Prochaine étape : 3.2 (écran Digest).
+- **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 2 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
-- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction » ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 362 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 374 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
 - Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €, digests ~0,06 €).
 
 ## Points d'attention
@@ -42,6 +43,15 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
 - **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [3.1] Shell et composants transverses — 2026-10-03
+
+ADR-015
+
+- Layout : sidebar (Digest, Retours, Insights, Priorisation, Backlog, Évals, Contexte), en-tête avec statut du dernier run et badge des alertes ouvertes (liste avec insight, preuves et état du dossier), panneau de chat repliable (vide jusqu'à 4.2). États vide, de chargement, d'erreur et 404 communs.
+- `src/lib/format.ts` : nombres, euros, coûts, pourcentages, dates et dates relatives en français, toujours en heure de Paris (CL-44) ; `src/lib/labels.ts` : libellés des enums.
+- Composants de preuve : `EvidenceChip` (verbatim, canal, compte, plan, santé, date, liens), `InsightChip`, `BacklogItemChip`, `MetricWithSource`, badges canal / plan / santé / modèle / type. Aperçus chargés à l'ouverture par des server functions en lecture seule.
+- Inter et accent vert ; texte courant ≥ 14 px, vérifié à 1 280 × 800 et à 110 % de zoom (CL-47).
 
 ## [2.7] Digest — 2026-10-03
 
