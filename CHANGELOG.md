@@ -46,12 +46,13 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [3.1] Shell et composants transverses — 2026-10-03
 
-ADR-015
+`da46dbf` · ADR-015
 
 - Layout : sidebar (Digest, Retours, Insights, Priorisation, Backlog, Évals, Contexte), en-tête avec statut du dernier run et badge des alertes ouvertes (liste avec insight, preuves et état du dossier), panneau de chat repliable (vide jusqu'à 4.2). États vide, de chargement, d'erreur et 404 communs.
 - `src/lib/format.ts` : nombres, euros, coûts, pourcentages, dates et dates relatives en français, toujours en heure de Paris (CL-44) ; `src/lib/labels.ts` : libellés des enums.
 - Composants de preuve : `EvidenceChip` (verbatim, canal, compte, plan, santé, date, liens), `InsightChip`, `BacklogItemChip`, `MetricWithSource`, badges canal / plan / santé / modèle / type. Aperçus chargés à l'ouverture par des server functions en lecture seule.
 - Inter et accent vert ; texte courant ≥ 14 px, vérifié à 1 280 × 800 et à 110 % de zoom (CL-47).
+- Checklist 3.1 validée (navigation, verbatim réel de R-215, heure de Paris depuis America/Buenos_Aires). Poussée sur `main` pour un test en production par le PO.
 
 ## [2.7] Digest — 2026-10-03
 

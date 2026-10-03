@@ -599,9 +599,9 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 
 **Test** :
 
-- [ ] Navigation entre les 7 sections (pages vides acceptées).
-- [ ] Un EvidenceChip affiche le vrai verbatim depuis la base.
-- [ ] Avec le fuseau du système réglé sur un autre continent, les heures affichées restent celles de Paris.
+- [x] Navigation entre les 7 sections (pages vides acceptées).
+- [x] Un EvidenceChip affiche le vrai verbatim depuis la base.
+- [x] Avec le fuseau du système réglé sur un autre continent, les heures affichées restent celles de Paris.
 
 **Commit** : `feat(ui): app shell and evidence components`
 
