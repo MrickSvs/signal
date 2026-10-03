@@ -314,11 +314,11 @@ IMPORTANT : avant la génération complète, montre-moi 5 retours d'exemple pour
 
 **Test** :
 
-- [ ] 👤 Exemples S1, S3 et E1 validés avant la génération complète.
-- [ ] ~225 retours de développement en base et ~80 retours réservés hors base ; répartitions conformes à `scenario.yaml`.
-- [ ] Aucun identifiant de pattern ou de cas limite (S1…S7, E1…E8), ni le mot « pattern », ni nom de jour ou de mois dans les textes (vérification par grep).
-- [ ] 👤 Relecture : 30 retours crédibles et variés, sans tics d'écriture d'IA ; 30 étiquettes de vérité terrain justes (sinon corriger ou élargir `acceptable_types`).
-- [ ] Aucun fichier de `src` ne référence `evals/ground-truth` ni `evals/holdout`.
+- [x] 👤 Exemples S1, S3 et E1 validés avant la génération complète.
+- [x] ~225 retours de développement en base et ~80 retours réservés hors base ; répartitions conformes à `scenario.yaml`.
+- [x] Aucun identifiant de pattern ou de cas limite (S1…S7, E1…E8), ni le mot « pattern », ni nom de jour ou de mois dans les textes (vérification par grep).
+- [x] 👤 Relecture : 30 retours crédibles et variés, sans tics d'écriture d'IA ; 30 étiquettes de vérité terrain justes (sinon corriger ou élargir `acceptable_types`).
+- [x] Aucun fichier de `src` ne référence `evals/ground-truth` ni `evals/holdout`.
 
 **Commit** : `feat(data): master scenario, edge cases, holdout set and ground truth`
 
