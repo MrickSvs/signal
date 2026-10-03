@@ -120,6 +120,25 @@ export const PRODUCT_AREA_LABELS: Record<Enums["product_area"], string> = {
   autre: "Autre",
 };
 
+export const MOSCOW_LABELS: Record<Enums["moscow"], string> = {
+  must: "Must",
+  should: "Should",
+  could: "Could",
+  wont: "Won't",
+};
+
+export const ALIGNMENT_LABELS: Record<Enums["alignment"], string> = {
+  aligne: "Aligné",
+  neutre: "Neutre",
+  hors_strategie: "Hors stratégie",
+};
+
+export const ROBUSTNESS_LABELS: Record<Enums["robustness"], string> = {
+  robuste: "Robuste",
+  sensible: "Sensible",
+  fragile: "Fragile",
+};
+
 export const ALERT_KIND_LABELS: Record<Enums["alert_kind"], string> = {
   nouveau_sujet: "Nouveau sujet",
   emergent: "Tendance émergente",

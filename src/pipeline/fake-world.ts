@@ -154,6 +154,10 @@ export function memoryDb(tables: MemoryTables) {
       }),
       alerts: () => ({ id: `alert-${++n}`, created_at: new Date().toISOString() }),
       digests: () => ({ id: `digest-${++n}`, created_at: new Date().toISOString() }),
+      decisions: (_row, table) => ({
+        id: `D-${String(table.length + 1).padStart(3, "0")}`,
+        created_at: new Date().toISOString(),
+      }),
       pipeline_runs: () => ({ id: `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}` }),
     },
   });

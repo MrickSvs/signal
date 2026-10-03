@@ -221,7 +221,7 @@ const check = (error: { message: string } | null, what: string) => {
   if (error) throw new Error(`Incrémental : ${what} en échec (${error.message})`);
 };
 
-async function currentReachMode(db: Db, fallback: ReachMode): Promise<ReachMode> {
+export async function currentReachMode(db: Db, fallback: ReachMode): Promise<ReachMode> {
   const { data, error } = await db
     .from("scores")
     .select("reach_mode, created_at")
