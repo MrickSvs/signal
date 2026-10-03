@@ -17,3 +17,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Contexte** : étape 0.1, création du squelette.
 - **Décision** : Next.js 16.3.8 (App Router, `src/proxy.ts` à la place de `middleware`), React 19.2, Tailwind 4, shadcn/ui (style base-nova, base neutral, composants Base UI), Vitest 5, ESLint 9 + Prettier, pnpm 12. Polices via le paquet `geist` (locales) plutôt que `next/font/google`, pour que le build ne dépende pas d'un accès réseau. Le script `typecheck` lance `next typegen` avant `tsc` (les types globaux comme `LayoutProps` sont générés). pnpm 12 fait échouer l'installation si un script de build n'est pas arbitré : `pnpm-workspace.yaml` autorise `esbuild` et refuse `sharp` et `unrs-resolver`.
 - **Conséquences** : la Basic Auth du proxy s'exécute sur le runtime Node (comparaison en temps constant). Les routes `/api/cron/*`, `/api/notion/webhook` et `/api/mcp` en sont exclues via le `matcher` et devront vérifier leur propre secret.
+
+## ADR-002 — Schéma Supabase, dimension d'embedding et accès
+
+- **Date** : 2026-10-02
+- **Statut** : acceptée
+- **Contexte** : étape 0.2. La dimension des colonnes `vector` est figée dans la migration ; en changer impose une nouvelle migration et un recalcul de tous les embeddings.
+- **Décision** :
+  - **Dimension 1024.** La doc Voyage (vérifiée le 2026-10-02) donne 1024 comme dimension par défaut de toute la série actuelle (`voyage-4-large`, `voyage-4`, `voyage-4-lite`) comme de `voyage-3.5` cité par le plan. Le choix du modèle se fait à l'étape 0.3 sans toucher au schéma. Index HNSW en distance cosinus (`vector_cosine_ops`).
+  - **Identifiants lisibles** générés en base : une séquence par entité et `format_readable_id(prefix, n, largeur)`, qui ne tronque jamais au-delà de la largeur (R-999 → R-1000). Les items (`R-042.1`) sont une colonne générée à partir de `feedback_id` et `item_index`. Les éléments du backlog reçoivent `US-`, `BUG-` ou `TT-` par trigger selon `kind`, chacun avec sa propre séquence. Les tickets de référence démarrent à `T-101`.
+  - **Enums Postgres** pour toutes les valeurs listées en SPEC §7 (types TypeScript générés en unions). Une valeur nouvelle passe par `alter type … add value` dans une nouvelle migration.
+  - **Accès serveur uniquement.** RLS activée sur toutes les tables sans aucune policy, droits retirés à `anon` et `authenticated` : la clé publique ne lit rien, la clé service role passe outre la RLS.
+  - Choix non précisés par SPEC : `feedback_analyses` a pour clé `(feedback_id, run_id)` ; `pipeline_runs.status` ∈ `en_cours` / `termine` / `echec` ; une seule ligne `scores.is_current` et un seul override actif par paramètre (index uniques partiels) ; un bug ne peut pas avoir d'epic (contrainte) ; le dossier d'alerte est stocké en `dossier` (jsonb) et `dossier_markdown`.
+- **Conséquences** : la migration est testée sans réseau sur PGlite + pgvector (`src/lib/db/schema.test.ts`), avec des substituts pour les objets propres à Supabase (rôles, schéma `extensions`, `storage.buckets`). Le CLI Supabase est une devDependency du projet.

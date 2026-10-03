@@ -135,9 +135,9 @@ Documente le choix de dimension d'embedding dans docs/DECISIONS.md.
 
 **Test** :
 
-- [ ] Migration appliquée sur le projet Supabase, toutes les tables visibles.
-- [ ] Insertion manuelle d'un feedback → ID `R-001` généré.
-- [ ] Types générés, `pnpm typecheck` passe.
+- [x] Migration appliquée sur le projet Supabase, toutes les tables visibles.
+- [x] Insertion manuelle d'un feedback → ID `R-001` généré.
+- [x] Types générés, `pnpm typecheck` passe.
 
 **Commit** : `feat(db): supabase schema, pgvector and typed client`
 
