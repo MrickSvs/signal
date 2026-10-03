@@ -459,10 +459,10 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 
 **Test** :
 
-- [ ] « Permissions par projet et invités clients » → fourchette haute, composants Permissions et Paramètres, analogues sur les permissions, risque « contrôles dispersés » signalé.
-- [ ] « Corriger les notifications d'assignation » → fourchette basse, composant Notifications, confiance haute ou moyenne.
-- [ ] « Ajouter un suivi du temps » (aucun analogue proche) → fourchette élargie, confiance basse, signalée.
-- [ ] Une seconde estimation du même insight est instantanée et ne coûte rien (cache).
+- [x] « Permissions par projet et invités clients » → fourchette haute, composants Permissions et Paramètres, analogues sur les permissions, risque « contrôles dispersés » signalé.
+- [x] « Corriger les notifications d'assignation » → fourchette basse, composant Notifications, confiance haute ou moyenne.
+- [x] « Ajouter un suivi du temps » (aucun analogue proche) → fourchette élargie, confiance basse, signalée.
+- [x] Une seconde estimation du même insight est instantanée et ne coûte rien (cache).
 
 **Commit** : `feat(estimation): estimation by analogy with reference tickets, bias correction and cache`
 
