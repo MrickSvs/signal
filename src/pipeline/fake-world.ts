@@ -244,7 +244,14 @@ export function fakeInvoke() {
             classement: "",
             a_trancher: "Revue en lot des sujets proposés.",
             recommandations: first
-              ? [{ action: "Valider les sujets proposés", preuves: [first], confiance: "moyenne" }]
+              ? [
+                  {
+                    titre: "Valider les sujets proposés",
+                    justification: `Premier classement, appuyé sur ${first}.`,
+                    preuves: [first],
+                    confiance: "moyenne",
+                  },
+                ]
               : [],
           },
           usage: EMPTY_USAGE,

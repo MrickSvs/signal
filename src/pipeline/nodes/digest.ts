@@ -17,6 +17,7 @@ import type { Json, Tables } from "@/lib/db/types";
 import { buildCachedSystem } from "@/lib/llm/caching";
 import type { RunCost } from "@/lib/llm/cost";
 import { wrapExternal } from "@/lib/llm/data";
+import { MODELS } from "@/lib/llm/models";
 import { invokeStructured } from "@/lib/llm/structured";
 import { fetchAll } from "@/pipeline/insights";
 import { computeSignals } from "@/pipeline/nodes/enrich";
@@ -497,7 +498,8 @@ export function digestWritingSchema(known: ReadonlySet<string>) {
       recommandations: z
         .array(
           z.object({
-            action: text.min(1),
+            titre: text.min(1).max(90).describe("L'action à mener, en une phrase courte"),
+            justification: text.min(1).describe("Pourquoi, en une ou deux phrases, avec les ID"),
             preuves: z.array(z.string()).min(1).max(6).describe("ID tirés des faits"),
             confiance: z.enum(CONFIDENCE),
           }),
@@ -507,7 +509,10 @@ export function digestWritingSchema(known: ReadonlySet<string>) {
     .superRefine((w, ctx) => {
       const lines = [
         ...SECTIONS.flatMap(([key]) => w[key].split("\n").map((line) => ({ key, line }))),
-        ...w.recommandations.map((r, i) => ({ key: `recommandations.${i}`, line: r.action })),
+        ...w.recommandations.flatMap((r, i) => [
+          { key: `recommandations.${i}`, line: r.titre },
+          { key: `recommandations.${i}`, line: r.justification },
+        ]),
       ].filter((l) => l.line.trim());
       for (const { key, line } of lines) {
         for (const id of line.match(ID) ?? []) {
@@ -671,7 +676,8 @@ export function renderDigest(facts: DigestFacts, writing: DigestWriting): string
     parts.push(
       `## Mes recommandations\n${writing.recommandations
         .map(
-          (r, i) => `${i + 1}. ${r.action} — ${r.preuves.join(", ")} — confiance ${r.confiance}.`,
+          (r, i) =>
+            `${i + 1}. **${r.titre}** ${r.justification} — ${r.preuves.join(", ")} — confiance ${r.confiance}.`,
         )
         .join("\n")}`,
     );
@@ -739,7 +745,13 @@ export async function runDigest(
     .insert({
       period_start: facts.period.start ?? facts.period.end,
       period_end: facts.period.end,
-      content: { facts, writing, writer, error } as unknown as Json,
+      content: {
+        facts,
+        writing,
+        writer,
+        error,
+        model: writer === "modele" ? MODELS.reasoning : null,
+      } as unknown as Json,
       markdown,
       run_id: options.runId,
     })

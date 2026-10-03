@@ -632,7 +632,7 @@ Page d'accueil : le dernier digest, sections dans l'ordre de SPEC §12.2 (alerte
 **Test** :
 
 - [ ] L'écran se lit en 30 secondes et raconte S7, S2b et 3 recommandations.
-- [ ] Sur une base sans historique, l'écran reste propre.
+- [x] Sur une base sans historique, l'écran reste propre.
 
 **Commit** : `feat(ui): digest page`
 

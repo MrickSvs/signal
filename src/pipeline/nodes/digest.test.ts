@@ -164,7 +164,8 @@ const writing = (w: Partial<DigestWriting> = {}): DigestWriting => ({
   a_trancher: "- 1 nouveau sujet à valider : I-12.\n- Fusion : I-02 a absorbé I-05.",
   recommandations: [
     {
-      action: "Prévenir le CSM de Studio Bastide avant J+38",
+      titre: "Prévenir le CSM de Studio Bastide avant J+38",
+      justification: "Santé rouge et churn dans R-088.",
       preuves: ["C-013", "R-088"],
       confiance: "moyenne",
     },
@@ -194,10 +195,17 @@ describe("digestWritingSchema (skill digest, rules 1, 2, 5, 7, 10)", () => {
     expect(issues({ a_trancher: "- Depuis le 3 juin (I-12)." })[0]).toMatch(/date absolue/);
     expect(
       issues({
-        recommandations: [{ action: "Faire", preuves: ["R-404"], confiance: "haute" }],
+        recommandations: [
+          { titre: "Faire", justification: "Parce que.", preuves: ["R-404"], confiance: "haute" },
+        ],
       }),
     ).toEqual(["R-404 n'existe pas dans les faits"]);
-    const four = Array(4).fill({ action: "Faire", preuves: ["I-07"], confiance: "basse" });
+    const four = Array(4).fill({
+      titre: "Faire",
+      justification: "Parce que.",
+      preuves: ["I-07"],
+      confiance: "basse",
+    });
     expect(schema.safeParse(writing({ recommandations: four })).success).toBe(false);
     const long = Array.from({ length: 26 }, (_, i) => `- ligne ${i} (I-07)`).join("\n");
     expect(issues({ tendances: long })[0]).toMatch(/au plus hors alertes/);
@@ -225,7 +233,7 @@ describe("renderDigest", () => {
     ]);
     expect(md).toMatch(/^Bonjour Léa\. Voici ce qui a changé depuis ta dernière visite\./);
     expect(md).toContain(
-      "1. Prévenir le CSM de Studio Bastide avant J+38 — C-013, R-088 — confiance moyenne.",
+      "1. **Prévenir le CSM de Studio Bastide avant J+38** Santé rouge et churn dans R-088. — C-013, R-088 — confiance moyenne.",
     );
   });
 

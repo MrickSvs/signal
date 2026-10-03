@@ -222,3 +222,21 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Les badges (`ChannelBadge`, `PlanBadge`, `HealthBadge`, `ModelBadge`, `BacklogKindBadge`) sont de simples `span` sans hook : utilisables depuis un Server Component.
   - Les liens des aperçus pointent vers `/retours?retour=R-xxx`, `/insights/I-xx` et `/backlog?element=US-xxx`, à honorer en 3.3, 3.4 et 4.3.
   - En local, `SITE_PASSWORD` active la Basic Auth : la configuration `signal-dev-noauth` de `.claude/launch.json` lance un serveur sans mot de passe sur le port 3001 pour les vérifications.
+
+## ADR-016 — Écran Digest : structure tirée des faits, recommandations en titre + justification
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 3.2. L'écran d'accueil doit se lire en 30 secondes (SPEC §12.2) : sections dans l'ordre fixe, ID cliquables, sparklines, comptes à risque avec MRR, décisions en attente avec un lien vers l'endroit où les traiter, recommandations en cartes (titre, justification, preuves). Le schéma de 2.7 ne donnait qu'une ligne `action` par recommandation.
+- **Décision** :
+  - **Sections 1 à 6 rendues depuis les faits** (`digests.content.facts`, calculés en code), pas depuis la prose du modèle : chaque chiffre est un `MetricWithSource` ou porte ses ID. La prose de Signal reste lisible en entier dans « Texte rédigé par Signal » (repliée) ; la voix de Signal porte sur les recommandations.
+  - **Recommandations** : `titre` (≤ 90 caractères) + `justification` + `preuves` + `confiance` remplacent `action` ; la validation (ID connus, pas de chiffre sans ID, pas de date absolue) couvre titre et justification. Les digests antérieurs restent lisibles (`readDigestContent` : `action` → titre). Le modèle rédacteur est enregistré dans `content.model` (badge).
+  - **Alertes** : le dernier digest affiche les alertes ouvertes maintenant, avec le dossier rédigé depuis (§10.10) ; un ancien digest affiche celles qu'il voyait.
+  - **Sparklines** : `insights.trend.weekly` (6 semaines, calculé par le pipeline), sans nouveau calcul.
+  - **Premier run (CL-18)** : pas de section « Mouvements », mention « Pas encore d'historique » ; « dont N confirment un sujet connu » masqué.
+  - **Fusions et scissions (CL-15)** : `pendingDecisions()` (pur, testé) produit chaque décision en attente avec son lien (`/insights?statut=propose`, `/backlog?statut=brouillon`, `/backlog?conflits=notion`, `/insights/<absorbant>`, `/priorisation?insight=…`).
+  - **`last_seen_at`** mis à jour à chaque visite de l'écran, via `after()` (après l'envoi de la réponse).
+  - **« Régénérer »** : server action avec confirmation, sous le verrou du pipeline, identique à `pnpm digest` (pas d'incrémental) ; `maxDuration = 60` sur la page.
+- **Conséquences** :
+  - Un digest régénéré couvre la période depuis le digest précédent : sans nouveau retour, ses sections « nouveaux retours » et « mouvements » sont vides, les sections d'état (alertes, tendances, comptes) restent pleines.
+  - Les liens vers Insights, Backlog et Priorisation sont à honorer en 3.4, 3.5 et 4.3.

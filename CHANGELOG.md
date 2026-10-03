@@ -5,12 +5,12 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 3 (cockpit) commencée** : 3.1 faite (shell, composants de preuve, formatage en heure de Paris). Prochaine étape : 3.2 (écran Digest).
+- **Phase 3 (cockpit) commencée** : 3.1 (shell, composants de preuve, formatage en heure de Paris) et 3.2 (écran Digest) faites. Prochaine étape : 3.3 (écran Retours).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
-- Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 2 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
+- Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 374 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
-- Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €, digests ~0,06 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 381 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €, digests ~0,09 €).
 
 ## Points d'attention
 
@@ -43,6 +43,16 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
 - **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [3.2] Écran Digest — 2026-10-03
+
+ADR-016
+
+- Page d'accueil : le dernier digest dans l'ordre de SPEC §12.2, structuré depuis les faits calculés en code ; ID cliquables, chiffres vers leurs preuves, sparklines 6 semaines, comptes à risque avec MRR, décisions en attente avec un lien vers l'écran qui les traite (fusions et scissions comprises, CL-15).
+- Recommandations en cartes : le schéma passe d'`action` à `titre` + `justification` (les anciens digests restent lisibles) ; « En parler à Signal » désactivé jusqu'à 4.2.
+- Premier run (CL-18) : pas de section « Mouvements », « Pas encore d'historique ».
+- « Régénérer » avec confirmation (server action sous le verrou du pipeline, ~25 s, ~0,03 €) ; lien vers le digest précédent ; `po_state.last_seen_at` mis à jour à chaque visite.
+- Checklist : écran sans historique vérifié ; « se lit en 30 secondes » laissé au jugement du PO.
 
 ## [3.1] Shell et composants transverses — 2026-10-03
 
