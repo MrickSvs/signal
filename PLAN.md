@@ -355,10 +355,10 @@ Tests (API simulée) : construction des messages (wrapAsData présent, skill cha
 
 **Test** :
 
-- [ ] `--sample 20` : classements cohérents à la lecture.
-- [ ] Run complet : durée et coût notés dans BUILD_LOG ; aucun échec restant après `--retry-failed`.
-- [ ] Le retour S6 a `injection_suspected = true` et un classement normal.
-- [ ] Les retours E1 donnent 2 items ; les réponses automatiques E4 sont de type `autre` ; les retours en anglais E3 ont des champs en français ; les demandes E5 ont `existing_feature = true`.
+- [x] `--sample 20` : classements cohérents à la lecture.
+- [x] Run complet : durée et coût notés dans BUILD_LOG ; aucun échec restant après `--retry-failed`.
+- [x] Le retour S6 a `injection_suspected = true` et un classement normal.
+- [x] Les retours E1 donnent 2 items ; les réponses automatiques E4 sont de type `autre` ; les retours en anglais E3 ont des champs en français ; les demandes E5 ont `existing_feature = true`.
 
 **Commit** : `feat(pipeline): feedback triage with multi-topic items`
 
