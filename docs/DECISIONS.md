@@ -136,4 +136,4 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Conséquences** :
   - Premier run : 25 insights (11 classés), 78 s, 0,23 €. Second run sans nouvelle donnée : mêmes ID, mêmes items, même tension, 0 appel, ~25 s (écritures séquentielles).
   - Les écritures ne sont pas transactionnelles (supabase-js) : un échec au milieu de la phase d'écriture laisse un état partiel, que le run suivant recalcule. Tous les appels au modèle ont lieu avant la première écriture.
-  - Trois petits sujets du bruit dépassent 5 retours en se regroupant légitimement (même problème, formulé par des sujets voisins du scénario) et sont classés : voir BUILD_LOG 2.3.
+  - Trois petits sujets du bruit dépassent 5 retours en se regroupant légitimement (même problème, formulé par des sujets voisins du scénario) et sont classés. Décision du PO (2026-10-03) : accepté, `ranking.min_feedbacks` reste à 5.

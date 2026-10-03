@@ -419,13 +419,13 @@ Règle le seuil sur les données jusqu'à retrouver les patterns ; note la valeu
 
 **Test** :
 
-- [ ] S1 forme un seul insight couvrant les 4 canaux.
-- [ ] S3 est titré comme un besoin de reporting client, pas comme « export Excel ».
-- [ ] S5a et S5b forment deux insights reliés par une tension.
-- [ ] S7 est marqué émergent ; aucun insight classé ne vient du bruit (les petits regroupements sont des signaux faibles).
-- [ ] Les deux items d'un retour E1 sont dans deux insights différents.
-- [ ] Relancer `pnpm pipeline:cluster` sans nouvelle donnée garde exactement les mêmes ID d'insights.
-- [ ] Les nouveaux insights sont au statut « propose » ; un insight passé à la main en « rejete » le reste au run suivant ; un titre verrouillé n'est pas réécrit.
+- [x] S1 forme un seul insight couvrant les 4 canaux.
+- [x] S3 est titré comme un besoin de reporting client, pas comme « export Excel ».
+- [x] S5a et S5b forment deux insights reliés par une tension.
+- [x] S7 est marqué émergent ; aucun insight classé ne vient du bruit (les petits regroupements sont des signaux faibles). Écart accepté par le PO : trois sujets du bruit se regroupent légitimement au-delà de 5 retours et restent classés (ADR-010).
+- [x] Les deux items d'un retour E1 sont dans deux insights différents.
+- [x] Relancer `pnpm pipeline:cluster` sans nouvelle donnée garde exactement les mêmes ID d'insights.
+- [x] Les nouveaux insights sont au statut « propose » ; un insight passé à la main en « rejete » le reste au run suivant ; un titre verrouillé n'est pas réécrit.
 
 **Commit** : `feat(pipeline): problem-based clustering, cross-run stability and tensions`
 
