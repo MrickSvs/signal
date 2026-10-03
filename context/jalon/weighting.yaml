@@ -54,7 +54,7 @@ effort:
 # §8.4 Estimation par analogie.
 estimation:
   analogues_count: 3 # tickets de référence les plus proches fournis au modèle
-  close_analogue_min_similarity: 0.45 # cosinus voyage-4 ; mesuré en 1.3 : analogues pertinents 0,45-0,56, sans analogue < 0,37 ; à confirmer en 2.4
+  close_analogue_min_similarity: 0.45 # cosinus voyage-4 (requête « query ») ; confirmé en 2.4 : permissions 0,49-0,59, notifications 0,50-0,56, suivi du temps ≤ 0,37
   no_close_analogue_range_factor: 1.5 # fourchette élargie (min ÷ f, max × f, arrondis Fibonacci) (CL-20)
   bias_min_tickets: 3 # tickets livrés minimum par composant pour corriger le biais
 

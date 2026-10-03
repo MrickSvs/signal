@@ -9,6 +9,7 @@ import type { Database } from "@/lib/db/types";
 import { getScriptDb, type Db } from "@/lib/db/script-client";
 import { addDays, getDemoNow, toIsoDate } from "@/lib/demo-now";
 import { embed } from "@/lib/embeddings";
+import { ticketEmbeddingText } from "@/lib/estimation/reference";
 import { RunCost } from "@/lib/llm/cost";
 import { initTracing, shutdownTracing } from "@/lib/llm/tracing";
 import { CUSTOMERS_FILE, type CustomerRow } from "./generate-customers";
@@ -48,9 +49,7 @@ export function customerRows(csv: Record<string, string>[], now: Date): Customer
   });
 }
 
-/** Text embedded for the semantic search of analogues (SPEC §8.4). */
-export const ticketEmbeddingText = (t: Pick<ReferenceTicket, "title" | "description">) =>
-  `${t.title} — ${t.description}`;
+export { ticketEmbeddingText };
 
 export function ticketRows(tickets: ReferenceTicket[], now: Date): TicketInsert[] {
   return tickets.map(({ shipped_days_ago, ...t }) => ({

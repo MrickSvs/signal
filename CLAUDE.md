@@ -85,7 +85,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm tsx scripts/generate-customers.ts` · `pnpm tsx scripts/generate-reference-tickets.ts` | Régénérer `data/customers.csv` et `data/reference_tickets.json` |
 | `pnpm tsx scripts/generate-feedbacks.ts` (`--preview`, `--dataset development\|holdout\|all`) · `pnpm tsx scripts/review-sample.ts` | Générer les retours et leur vérité terrain (cache dans `.cache/`) ; échantillon de relecture humaine |
 | `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:enrich` · `pipeline:cluster` · `pipeline:score` · `digest`                                  | Pipeline                       |
-| `pnpm estimate "<besoin>"` (`--force`)                                                                                                                               | Tester l'estimation   |
+| `pnpm estimate "<besoin>"` ou `pnpm estimate I-07` (`--force`)                                                                                                       | Tester l'estimation (cache par énoncé) |
 | `pnpm notion:setup` · `pnpm notion:push`                                                                                                                             | Notion                         |
 | `pnpm eval:triage` (`--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` · `eval:guardrails` (`--tools`) · `eval:backlog` · `eval:judge-calibration` | Evals (`--sample N`, `--full`) |
 | `pnpm demo:snapshot` · `pnpm demo:reset`                                                                                                                             | Démo                           |

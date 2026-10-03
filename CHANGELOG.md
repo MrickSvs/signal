@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes) et 2.3 (regroupement par problème) faites. Prochaine étape : 2.4 (estimation par analogie).
+- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème) et 2.4 (estimation par analogie) faites. Prochaine étape : 2.5 (scoring RICE hybride).
 - Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension. Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 234 tests.
-- Coût LLM cumulé : ~3,0 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 260 tests.
+- Coût LLM cumulé : ~3,1 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €).
 
 ## Points d'attention
 
@@ -24,12 +24,21 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Voyage sans moyen de paiement** : 3 requêtes/min et 10 000 tokens/min ; le premier embedding des 234 items a dû passer par petits lots espacés. Ajouter un moyen de paiement avant 2.6 (run complet sur base vide).
 - **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
-- **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 (permissions 0,49–0,52, notifications 0,45–0,56, suivi du temps ≤ 0,37). À confirmer en 2.4. → ADR-005
+- **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 ; confirmé en 2.4 (permissions 0,49–0,59, notifications 0,50–0,56, suivi du temps ≤ 0,37). → ADR-005, ADR-011
+- **Biais de l'équipe dilué** : le facteur est la moyenne sur tous les tickets qui touchent les composants retenus ; quand le modèle liste beaucoup de modules par ricochet, celui des permissions (× 1,65) tombe à × 1,31. À mesurer avec `eval:estimation` (6.2). → ADR-011
 - **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
 - **Régénérer les retours** : le cache `.cache/feedback-texts/` évite de repayer, mais modifier un angle de `scenario.yaml` invalide tout le jeu réservé (~0,7 €). Le test des fichiers versionnés échoue tant qu'ils ne suivent plus le plan. → ADR-007
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.4] Estimation par analogie — 2026-10-03
+
+ADR-011
+
+- `src/lib/estimation/reference.ts` (sans LLM) : les 3 tickets livrés les plus proches (cosinus, sur un jeu de tickets passé en paramètre pour le leave-one-out), analogue proche à partir de 0,45, biais de l'équipe (points réels ÷ estimés, au moins 3 tickets), correction et élargissement sur l'échelle de Fibonacci, T-shirt.
+- `src/services/estimate.ts` : un seul appel Sonnet structuré (skill `estimation` + `architecture.md` en préfixe mis en cache, besoin dans `wrapExternal()`). Composants limités aux modules de la carte, analogies limitées aux tickets fournis, revalidées en code. Correction de biais et élargissement sans analogue proche (confiance forcée à basse, signalée) faits par le code. Cache par `problem_hash`. `estimateBacklogItems` : une passe pour tous les éléments d'un insight.
+- `pnpm estimate "<besoin>" | I-xx [--force]` : permissions et invités 13–21 (L–XL) ; notifications d'assignation 3–5 (M) ; suivi du temps 5–21, confiance basse, signalé ; seconde estimation de I-07 depuis le cache (1 s, 0 €). ~0,025 € par estimation.
 
 ## [2.3] Regroupement par problème, stabilité et tensions — 2026-10-03
 
