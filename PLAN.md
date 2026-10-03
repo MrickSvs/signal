@@ -564,10 +564,10 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 
 **Test** :
 
-- [ ] Le digest met S7 en tendance émergente et liste les 3 comptes Enterprise à risque.
-- [ ] Chaque affirmation chiffrée porte au moins un ID.
-- [ ] Sur une base sans historique, le digest se génère sans erreur et le dit.
-- [ ] La route cron refuse un appel sans secret.
+- [x] Le digest met S7 en tendance émergente et liste les 3 comptes Enterprise à risque.
+- [x] Chaque affirmation chiffrée porte au moins un ID.
+- [x] Sur une base sans historique, le digest se génère sans erreur et le dit.
+- [x] La route cron refuse un appel sans secret.
 
 **Commit** : `feat(pipeline): daily digest and cron`
 
