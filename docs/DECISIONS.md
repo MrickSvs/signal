@@ -45,3 +45,14 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Cache de prompt** : `buildCachedSystem` place un seul point de cache sur le dernier bloc stable. Le préfixe minimal est de 4 096 tokens sur Haiku 4.5 (512 sur Sonnet 5.5 et Opus 5.5) : pour que le triage profite du cache, son préfixe (skill + product.md) devra dépasser ce seuil, à vérifier à l'étape 2.1.
   - **Garde-fou** : règle ESLint `no-restricted-imports` sur `@langchain/anthropic` et `@anthropic-ai/sdk` hors de `src/lib/llm`.
 - **Conséquences** : les retours de type refus (`stop_reason: "refusal"`) aboutissent à un échec de validation puis à `failed` ; le repli automatique côté serveur (`fallbacks`) n'est pas activé, à reconsidérer si des refus apparaissent au triage ou dans l'agent. Le compte Langfuse étant récent, la lecture des traces passe par l'API `v2/observations` (l'ancienne API `traces` est fermée aux nouvelles organisations).
+
+## ADR-004 — Pack de contexte : format et chargement
+
+- **Date** : 2026-10-02
+- **Statut** : acceptée
+- **Contexte** : étape 1.1. Le pack (`context/jalon/`) est lu par le pipeline, l'agent et l'écran Contexte ; ses paramètres pilotent tous les calculs de §8.
+- **Décision** :
+  - **Identifiants de modules** : SPEC §4.3 ne donne que des libellés. Le tableau « Modules » d'`architecture.md` fixe des slugs stables (`taches`, `tableau`, `liste`, `notifications`, `permissions`, `export`, `champs_personnalises`, `parametres`), avec leur couplage. `loadContextPack()` les extrait (`modules`) : ce sont les composants autorisés de `reference_tickets.components` et des estimations.
+  - **`weighting.yaml`** parsé par `yaml` 2.9.1 et validé par un schéma zod strict (clé inconnue refusée, poids de Confidence de somme 1, niveaux et échelles ordonnés, ordre MoSCoW complet). Il contient aussi les seuils d'alerte de §10.10 et la capacité (développeurs, semaines, part roadmap) : les 42 semaines-personne sont calculées en code.
+  - Lecture disque à l'exécution depuis `process.cwd()/context/jalon` ; `outputFileTracingIncludes` embarque le pack dans les fonctions Vercel.
+- **Conséquences** : renommer un module impose de régénérer les tickets de référence. Changer de plans tarifaires demande d'adapter le schéma zod.

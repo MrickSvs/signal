@@ -1,0 +1,125 @@
+# Paramètres de pondération et seuils de Signal pour Jalon (SPEC §8, §10.10).
+# Le code lit ce fichier (src/lib/context.ts, validé par zod) et fait tous les calculs.
+# Changer une valeur ici change le comportement de Signal sans toucher au code.
+
+version: 1
+
+# §8.1 Reach : comptes concernés estimés = Σ comptes distincts par plan × facteur du plan.
+reach:
+  default_mode: comptes # comptes | mrr
+  extrapolation_factors: # un compte qui se plaint représente N comptes concernés
+    free: 6
+    pro: 4
+    business: 2.5
+    enterprise: 1.5
+  unidentified_account: # retour sans compte identifiable (CL-07)
+    comptes: 1 # compté une fois, sans extrapolation
+    mrr: 0
+  prospect_weight: 0 # un prospect ne compte pas dans le Reach (CL-08)
+
+# Fiabilité des sources : alimente la « qualité » de la Confidence.
+source_weights:
+  client_direct: 1
+  support: 1
+  interne: 0.5 # interne relayé (notes CSM, sales, Slack)
+
+# §8.3 Confidence : c = 0,4 × volume + 0,3 × diversité + 0,3 × qualité.
+confidence:
+  weights:
+    volume: 0.4
+    diversity: 0.3
+    quality: 0.3
+  volume_saturation: 10 # volume = min(comptes ou auteurs DISTINCTS ÷ 10 ; 1)
+  diversity_saturation: 4 # diversité = min(canaux ÷ 4 ; 1)
+  levels: # du plus haut au plus bas : premier seuil atteint
+    - { min: 0.7, value: 1 }
+    - { min: 0.45, value: 0.8 }
+    - { min: 0, value: 0.5 }
+  contradiction_downgrade: 1 # niveaux perdus si le modèle signale des preuves contradictoires
+
+# §8.2 Impact : échelle RICE estimée par le modèle (critères dans la skill rice-scoring).
+impact:
+  scale: [3, 2, 1, 0.5, 0.25]
+
+# §4.6 et §8.4 Effort.
+effort:
+  velocity_points_per_dev_week: 3 # semaines-personne = points ÷ 3
+  fibonacci: [1, 2, 3, 5, 8, 13, 21]
+  tshirt_upper_bounds: # borne haute exclue ; au-delà de L : XL
+    S: 3
+    M: 8
+    L: 20
+  default_range_multiplier: 1.5 # robustesse : effort × 1,5 quand il n'est pas une fourchette
+
+# §8.4 Estimation par analogie.
+estimation:
+  analogues_count: 3 # tickets de référence les plus proches fournis au modèle
+  close_analogue_min_similarity: 0.6 # similarité cosinus ; valeur initiale, à régler en 2.4
+  no_close_analogue_range_factor: 1.5 # fourchette élargie (min ÷ f, max × f, arrondis Fibonacci) (CL-20)
+  bias_min_tickets: 3 # tickets livrés minimum par composant pour corriger le biais
+
+# §8.8 Tendance émergente.
+trend:
+  history_weeks: 6
+  recent_days: 7
+  baseline_days: 21 # croissance = 7 derniers jours ÷ max(21 jours précédents ÷ 3 ; plancher)
+  denominator_floor: 1 # CL-19
+  emerging_min_growth: 2
+  emerging_min_recent_feedbacks: 5
+  new_max_age_days: 14 # « nouveau » si le premier retour a moins de 14 jours
+
+# §8 Qui est classé. Les autres sont des signaux faibles (CL-17).
+# Toujours classés aussi : insight couvert par un engagement contractuel, insight manuel.
+ranking:
+  min_feedbacks: 5
+  churn_plans: [business, enterprise] # un signal de churn sur ces plans suffit à classer
+  tie_breakers: [mrr_exposed, accounts_count, id] # CL-21
+
+# §8.5 Robustesse : un paramètre dégradé à la fois, top 5 uniquement.
+robustness:
+  top_n: 5
+  reach_degradation: 0.3 # Reach − 30 %
+  rank_shift_tolerance: 1 # le rang « bouge » s'il varie de plus d'une place
+  sensible_max_moves: 1 # 0 scénario → robuste ; 1 → sensible ; 2 ou plus → fragile
+
+# §8.5 Overrides.
+overrides:
+  context_changed_share: 0.3 # « contexte modifié » si plus de 30 % des retours ont changé (CL-22)
+
+# §4.6 Capacité du trimestre (semaines-personne calculées en code).
+capacity:
+  developers: 5
+  quarter_weeks: 12
+  roadmap_share: 0.7
+
+# §8.6 MoSCoW : règles dures appliquées en code, dans cet ordre (CL-24).
+moscow:
+  horizon_days: 90 # engagements et renouvellements pris en compte
+  rule_order: [engagement_contractuel, hors_strategie, signal_churn, bug_critique, quartiles]
+  must_churn_min_impact: 2
+  must_churn_plans: [business, enterprise]
+  must_critical_bug_min_feedbacks: 3
+  should_quartile: 1 # premier quartile RICE
+  wont_confidence: 0.5 # Won't si Confidence 50 % ET Reach dans le dernier quartile
+  must_capacity_share: 0.6 # règle DSDM : Must ≤ 60 % de la capacité roadmap
+
+# §6.1 Triage, clustering et appariement entre runs.
+triage:
+  truncation_chars: 6000 # début et fin conservés (CL-06)
+  max_items_per_feedback: 3 # CL-01
+
+clustering:
+  distance_threshold: 0.35 # distance cosinus, average linkage ; valeur initiale, à régler en 2.3
+  min_cluster_size: 2 # en dessous : item isolé, pas d'insight
+  run_matching_jaccard: 0.5 # appariement des insights entre deux runs (CL-14)
+  watch_queue_min_items: 3 # file « à surveiller » → insight proposé (CL-16)
+
+# §10.10 Alertes et enquêtes.
+alerts:
+  dedup_window_hours: 24 # une alerte par insight et par type (CL-55)
+  churn_plans: [business, enterprise]
+  churn_renewal_max_days: 90
+  critical_bug_min_feedbacks: 3
+  critical_bug_window_hours: 48
+  investigation_max_tool_calls: 10
+  investigation_max_cost_eur: 0.05
