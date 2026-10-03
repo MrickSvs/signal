@@ -533,12 +533,12 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 
 **Test** :
 
-- [ ] Sur une base remise à zéro (hors clients et tickets), `pnpm pipeline:run` va au bout ; coût et durée enregistrés.
-- [ ] Un nouveau retour proche de S1 envoyé à `/api/pipeline/incremental` est rattaché à l'insight S1 en moins de 15 s.
-- [ ] Trois nouveaux retours sur un sujet inédit → un nouvel insight « propose » après le troisième, et une alerte `nouveau_sujet`.
-- [ ] Un retour de compte Enterprise à risque avec signal de churn → une alerte `churn` ; un second retour du même compte dans l'heure enrichit l'alerte au lieu d'en créer une autre.
-- [ ] Un run lancé pendant un autre est refusé proprement ; un run interrompu reprend avec `--resume`.
-- [ ] Le graphe Mermaid est dans `docs/ARCHITECTURE.md`.
+- [x] Sur une base remise à zéro (hors clients et tickets), `pnpm pipeline:run` va au bout ; coût et durée enregistrés.
+- [ ] Un nouveau retour proche de S1 envoyé à `/api/pipeline/incremental` est rattaché à l'insight S1 en moins de 15 s. _(Rattaché à I-27, mais réponse en 18–22 s en local : à remesurer depuis Vercel, région à rapprocher de Supabase.)_
+- [x] Trois nouveaux retours sur un sujet inédit → un nouvel insight « propose » après le troisième, et une alerte `nouveau_sujet`.
+- [x] Un retour de compte Enterprise à risque avec signal de churn → une alerte `churn` ; un second retour du même compte dans l'heure enrichit l'alerte au lieu d'en créer une autre.
+- [x] Un run lancé pendant un autre est refusé proprement ; un run interrompu reprend avec `--resume`.
+- [x] Le graphe Mermaid est dans `docs/ARCHITECTURE.md`.
 
 **Commit** : `feat(pipeline): langgraph pipeline, locking, resume, incremental mode and alerts`
 
@@ -558,7 +558,7 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 Étape 2.7 — Digest. Lis SPEC §8.8, §12.2, §16 et la skill digest.
 
 1. pipeline/nodes/digest.ts : faits calculés en code sur la période du digest (depuis le digest précédent, ou depuis po_state.last_seen_at si c'est plus ancien ; tendances sur 7 jours glissants) — alertes ouvertes en tête, nouveaux retours par canal (dont ceux qui ont seulement confirmé un sujet connu), insights émergents et nouveaux, mouvements de rang depuis la version précédente (« pas encore d'historique » au premier run), comptes à risque (renouvellement < 90 jours + signal négatif), décisions en attente (nouveaux insights à valider, éléments du backlog à valider, conflits Notion, fusions et scissions d'insights, overrides au contexte modifié). Puis le rôle reasoning rédige le digest avec la voix de Signal : sections fixes, chaque affirmation accompagnée d'ID, 3 recommandations maximum. Stockage dans digests (jsonb + markdown).
-2. Route GET /api/cron/digest protégée par CRON_SECRET : pipeline incrémental sur les retours non traités, puis digest. Cette requête quotidienne garde aussi le projet Supabase actif. vercel.json : cron quotidien à 6 h, heure de Paris, exprimée en UTC.
+2. Route GET /api/cron/digest protégée par CRON_SECRET : pipeline incrémental sur les retours non traités, puis digest. Cette requête quotidienne garde aussi le projet Supabase actif. vercel.json : cron quotidien à 6 h, heure de Paris, exprimée en UTC ; regions: ["dub1"] pour rapprocher les fonctions de Supabase (eu-west-1), puis remesurer l'incrémental en ligne (budget 15 s, écart noté en 2.6).
 3. CLI : pnpm digest.
 ```
 
