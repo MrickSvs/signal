@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 à 2.6 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`), avec un verrou contre les runs simultanés, un mode incrémental (`POST /api/pipeline/incremental`) et des alertes. Checklist 2.6 validée sauf la latence de l'incrémental (voir ci-dessous). Prochaine étape : 2.7 (digest et cron).
-- Base Supabase remise à zéro puis reconstruite par un run complet : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai ajoutés en incrémental (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50 : les séquences ne réutilisent pas les ID), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible, voir ci-dessous). 3 alertes d'essai ouvertes (2 `churn`, 1 `nouveau_sujet`). Le jeu réservé (77 retours) reste hors base.
-- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction » ; les routes `/api/pipeline/*` partent au prochain déploiement.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 346 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
-- Coût LLM cumulé : ~5,4 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €).
+- **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous). Prochaine étape : 3.1 (shell du cockpit).
+- Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 2 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
+- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction » ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 362 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €, digests ~0,06 €).
 
 ## Points d'attention
 
@@ -32,14 +32,24 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
 - **Régénérer les retours** : le cache `.cache/feedback-texts/` évite de repayer, mais modifier un angle de `scenario.yaml` invalide tout le jeu réservé (~0,7 €). Le test des fichiers versionnés échoue tant qu'ils ne suivent plus le plan. → ADR-007
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
-- **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` ajoutée en 2.6, prise en compte au prochain déploiement.
+- **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` (2.6) et `CRON_SECRET` (2.7, généré, aussi dans `.env`) ajoutées.
 - **`DATABASE_URL` = pooler Supabase en mode session** (port 5432) : la connexion directe n'existe qu'en IPv6 (injoignable en local comme depuis Vercel) et le mode transaction (6543) ne garde pas le verrou de session du pipeline. Les migrations, elles, passent par la CLI Supabase, pas par cette variable. → ADR-013
-- **Latence de l'incrémental** : 15 à 25 s par retour en local (triage Haiku 5–7 s, Voyage ~2 s, ~0,2 s par requête Supabase depuis le poste), au-dessus du budget de 15 s (SPEC §15). **Région Vercel à rapprocher de Supabase (eu-west-1) : `regions: ["dub1"]` dans `vercel.json`, à faire en 2.7 quand le fichier sera créé pour le cron** (décision du PO), puis remesurer en ligne. Un insight qui devient classé déclenche sa première estimation et son premier jugement (~48 s). → ADR-013
+- **Latence de l'incrémental** : 15 à 25 s par retour en local (triage Haiku 5–7 s, Voyage ~2 s, ~0,2 s par requête Supabase depuis le poste), au-dessus du budget de 15 s (SPEC §15). **Région Vercel passée en `dub1` (près de Supabase eu-west-1) en 2.7 ; reste à remesurer en ligne** (le PO, l'app déployée étant protégée par mot de passe). Un insight qui devient classé déclenche sa première estimation et son premier jugement (~48 s). → ADR-013
 - **Incrémental sans rejugement** : un retour ajouté reprend le jugement stocké du modèle (`scores.judgment`, migration 0004) et recalcule les faits en code (Reach, Confidence, règles MoSCoW, rang). Le run de nuit rejuge tout, ~0,8 € même sans changement (dette : étendre la réutilisation au run complet). → ADR-013
 - **Pas d'alerte au premier run** sur une base sans insight : tout y est nouveau, le digest en rend compte. L'alerte `churn` porte sur le compte, pas sur l'insight. → ADR-013
 - **S4 en signal faible** après le run sur base vide : le triage Haiku a classé deux retours de Forgeval (R-122, R-213) en « autre » ; I-39 n'a plus que 4 retours, il n'est donc ni scoré ni Won't. Variance du triage, à mesurer avec `eval:triage` (6.2), pas corrigée à la main.
-- **Test instable** : `src/lib/context.test.ts` « names the missing file » échoue parfois (lecture parallèle des fichiers du pack). Proposé en tâche séparée.
+- **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
+- **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.7] Digest — 2026-10-03
+
+`0a837b3` · ADR-014
+
+- `src/pipeline/nodes/digest.ts` : faits de la période en code (alertes ouvertes, retours par canal dont sujets connus, tendances émergentes, nouveaux insights, mouvements de rang, comptes à risque, décisions en attente dont fusions et scissions), rédaction par Signal (skill `digest`) vérifiée en code, ordre fixe, « Pas encore d'historique » imposé au premier classement, repli sur un rendu brut si la rédaction échoue. Stockage dans `digests` et `po_state.last_digest_id`.
+- Nœud `digest` en fin de graphe ; `pnpm digest` ; `GET /api/cron/digest` (Bearer `CRON_SECRET`) : incrémental sur les retours non traités par lots de 10 dans 200 s, puis digest. `vercel.json` : cron quotidien, région `dub1`.
+- Vérifié en réel : premier digest avec S7 (I-29) émergent, Studio Bastide, Atelier Mercure, Groupe Hélix (+ Clim'Ouest) à risque, sans historique ; route refusée sans secret, second digest avec historique.
+- Enchaînée dans la même session que 2.6, à la demande du PO. Correction au passage d'un test instable (`8001d0f`).
 
 ## [2.6] Le pipeline en graphe LangGraph — 2026-10-03
 
