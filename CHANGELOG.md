@@ -5,19 +5,59 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 0 (fondations) terminée** : étapes 0.1 à 0.3. Prochaine étape : 1.1 (pack de contexte Jalon).
+- **Phase 1 (le monde de Jalon) terminée** : étapes 1.1 à 1.4. Prochaine étape : 2.1 (triage des retours).
+- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement. Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions verte (lint, typecheck, tests, sans aucune clé).
-- Coût LLM cumulé : ~0,002 €.
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 132 tests.
+- Coût LLM cumulé : ~2,3 € (génération des tickets ~0,21 €, des retours ~2,1 €).
 
 ## Points d'attention
 
 - **Écart avec PLAN 0.3 — températures** : Sonnet 5.5 et Opus 5.5 rejettent toute `temperature` non par défaut. Seul le triage (Haiku) a `temperature: 0` ; les autres rôles tournent en réflexion adaptive. Conséquence pour 6.3 : la stabilité du juge repose sur la calibration, pas sur la température. → ADR-003
 - **Sorties structurées** : natives (`output_config.format`), pas d'appel d'outil forcé (refusé par Sonnet/Opus 5.5). Tout passe par `invokeStructured()`. → ADR-003
-- **Cache de prompt sur Haiku** : préfixe minimal de 4 096 tokens. À vérifier en 2.1 : le préfixe du triage (skill + product.md) doit dépasser ce seuil, sinon le cache ne sert pas.
-- **Séquences d'ID** : l'insertion de test de 0.2 a consommé `R-001`. Les seeds (1.3, 1.4) qui fixent des ID explicites devront recaler les séquences (`setval`).
+- **Cache de prompt sur Haiku** : préfixe minimal de 4 096 tokens. À vérifier en 2.1 : le préfixe du triage (skill `triage-taxonomy` + `product.md`) doit dépasser ce seuil, sinon le cache ne sert pas.
+- **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
+- **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 (permissions 0,49–0,52, notifications 0,45–0,56, suivi du temps ≤ 0,37). À confirmer en 2.4. → ADR-005
+- **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
+- **Régénérer les retours** : le cache `.cache/feedback-texts/` évite de repayer, mais modifier un angle de `scenario.yaml` invalide tout le jeu réservé (~0,7 €). Le test des fichiers versionnés échoue tant qu'ils ne suivent plus le plan. → ADR-007
+- **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [1.4] Scénario maître, cas limites, jeu réservé — 2026-10-03
+
+`714381d` · ADR-006, ADR-007
+
+- `data/scenario.yaml` : SPEC §5 en configuration (patterns S1 à S7, bruit en petits sujets sous le seuil de classement, cas limites E1 à E8, volumes du jeu réservé).
+- `scripts/lib/feedback-plan.ts` planifie chaque retour à seed fixe ; **le plan est la vérité terrain**. Le modèle n'écrit que l'objet et le texte (`scripts/generate-feedbacks.ts`, lots de 10, contrôles et nouvelles tentatives, cache, mode `--preview`).
+- Sorties : `data/feedbacks.json` (214 retours, sans étiquette), `evals/ground-truth/feedbacks.gt.json`, `evals/holdout/` (77 retours et leur vérité).
+- Relecture humaine : exemples S1, S3, E1 validés avant la génération ; corrections après relecture (angles recopiés mot pour mot, risque de départ inventé par le modèle, tons incohérents, sentiment des multi-sujets).
+- `pnpm db:seed` insère les retours (`received_at` relatif à `DEMO_NOW`, heures de bureau à Paris). `scripts/review-sample.ts` sort l'échantillon de relecture.
+- Règle 4 outillée : règle ESLint et test qui interdisent à `src/` de lire `evals/ground-truth` ou `evals/holdout`.
+
+## [1.3] Clients, prospects, tickets de référence — 2026-10-02
+
+`022d20a` · ADR-005
+
+- `data/customers.csv` : 90 clients + 5 prospects générés sans LLM (seed fixe), comptes sensibles de SPEC §4.5 exacts, aucun domaine e-mail grand public.
+- `data/reference_tickets.json` : 40 tickets T-101 à T-140. Chiffres planifiés en code (biais réel ÷ estimé : permissions 1,65, export 1,69, notifications 1,03, autres 1,10 à 1,28) ; textes écrits par le modèle ; tickets cités par SPEC et les skills (T-108, T-112, T-117, T-121, T-124) écrits à la main.
+- Relecture : chronologie corrigée (assignation multiple avant T-108, rôle admin à partir de T-117) ; `product.md` complété des fonctionnalités livrées par les tickets.
+- Migration `0002` : `sync_id_sequence` recale les séquences après un seed à ID explicites (règle la dette de 0.2). `pnpm db:seed` idempotent.
+- `src/lib/demo-now.ts` : toutes les dates relatives à `DEMO_NOW`.
+
+## [1.2] Skills — 2026-10-02
+
+`d9d2807`
+
+- 9 skills dans `context/jalon/skills/` (triage-taxonomy, rice-scoring, moscow, backlog-format, user-story, estimation, challenge, digest, prototype) : règles, gabarit, bon et mauvais exemple, erreurs fréquentes.
+- `src/lib/skills.ts` : `listSkills()` et `loadSkill(name)` ; un nom hors de l'index est refusé (l'agent ne peut pas lire un autre fichier).
+
+## [1.1] Pack de contexte — 2026-10-02
+
+`69ef142` · ADR-004
+
+- `context/jalon/` : produit (avec la liste des fonctionnalités existantes, pour CL-05), stratégie et OKRs, personas, équipe et capacité, carte d'architecture (8 modules à identifiants stables, couplage, dette), engagements, glossaire.
+- `weighting.yaml` : tous les paramètres et seuils de §8 et §10.10, validés par un schéma zod strict ; `src/lib/context.ts` : `loadContextPack()`.
 
 ## [0.3] Couche LLM, embeddings, observabilité — 2026-10-02
 
