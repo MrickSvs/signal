@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème), 2.4 (estimation par analogie) et 2.5 (scoring RICE hybride) faites, checklists validées par le PO. Prochaine étape : 2.6 (pipeline en graphe LangGraph), qui enchaîne tous ces nœuds.
-- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension ; les 11 classés ont un score courant (mode MRR, dernier run) et une estimation en cache. Le jeu réservé (77 retours) reste hors base.
-- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 310 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
-- Coût LLM cumulé : ~3,9 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €).
+- **Phase 2 (pipeline) en cours** : 2.1 à 2.6 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`), avec un verrou contre les runs simultanés, un mode incrémental (`POST /api/pipeline/incremental`) et des alertes. Checklist 2.6 validée sauf la latence de l'incrémental (voir ci-dessous). Prochaine étape : 2.7 (digest et cron).
+- Base Supabase remise à zéro puis reconstruite par un run complet : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 9 retours d'essai ajoutés en incrémental (R-215 à R-223). 25 insights au statut « propose » (I-26 à I-50 : les séquences ne réutilisent pas les ID), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible, voir ci-dessous). 3 alertes d'essai ouvertes (2 `churn`, 1 `nouveau_sujet`). Le jeu réservé (77 retours) reste hors base.
+- App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction » ; les routes `/api/pipeline/*` partent au prochain déploiement.
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 346 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Coût LLM cumulé : ~5,4 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,17 €).
 
 ## Points d'attention
 
@@ -17,7 +17,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Sorties structurées** : natives (`output_config.format`), pas d'appel d'outil forcé (refusé par Sonnet/Opus 5.5). Tout passe par `invokeStructured()`. → ADR-003
 - **Cache de prompt sur Haiku** : vérifié en 2.1, le préfixe du triage (~5 900 tokens) dépasse le minimum de 4 096 ; le run complet lit le cache à chaque appel. → ADR-008
 - **Enums des sorties structurées** : jusqu'à 2.1, `transformJSONSchema` du SDK les retirait du schéma (ils n'étaient pas imposés). Corrigé dans `invokeStructured()` ; la nouvelle tentative après une sortie invalide reçoit maintenant les erreurs. → ADR-008
-- **Seed et rattachement** : le seed ne charge le compte que pour les commentaires in-app et les NPS ; après tout `db:seed`, relancer `pnpm pipeline:enrich` (le graphe de 2.6 le fera). Les signaux business ne sont pas stockés, ils sont recalculés à la demande. → ADR-009
+- **Seed et rattachement** : le seed ne charge le compte que pour les commentaires in-app et les NPS ; `pnpm pipeline:run` refait le rattachement (nœud `enrich`) après tout `db:seed`. Les signaux business ne sont pas stockés, ils sont recalculés à la demande. → ADR-009
 - **Seuil de regroupement** : 0,28 et non 0,35 (valeur initiale), mesuré sur voyage-4 : tout fusionne dès 0,35. Seuil d'appariement par centroïdes : 0,9. → ADR-010
 - **Insights fusionnés** : ils gardent leurs `insight_items`, figés, comme mémoire pour rejouer la fusion au run suivant. Toute lecture des items d'un insight filtre sur son statut. → ADR-010
 - **Bruit classé** : trois petits sujets du bruit se regroupent légitimement au-delà de 5 retours (« recréer les mêmes tâches » 7, filtre par assigné E5 + S6 5, usage mobile 5) et sont classés. **Décision du PO : accepté**, ce sont de vrais problèmes récurrents ; la règle des 5 retours reste inchangée. S3 sort aussi émergent (×2,25) à côté de S7 (×14). → ADR-010
@@ -32,8 +32,25 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
 - **Régénérer les retours** : le cache `.cache/feedback-texts/` évite de repayer, mais modifier un angle de `scenario.yaml` invalide tout le jeu réservé (~0,7 €). Le test des fichiers versionnés échoue tant qu'ils ne suivent plus le plan. → ADR-007
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
-- **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
+- **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` ajoutée en 2.6, prise en compte au prochain déploiement.
+- **`DATABASE_URL` = pooler Supabase en mode session** (port 5432) : la connexion directe n'existe qu'en IPv6 (injoignable en local comme depuis Vercel) et le mode transaction (6543) ne garde pas le verrou de session du pipeline. Les migrations, elles, passent par la CLI Supabase, pas par cette variable. → ADR-013
+- **Latence de l'incrémental** : 15 à 25 s par retour en local (triage Haiku 5–7 s, Voyage ~2 s, ~0,2 s par requête Supabase depuis le poste), au-dessus du budget de 15 s (SPEC §15). **Région Vercel à rapprocher de Supabase (eu-west-1) : `regions: ["dub1"]` dans `vercel.json`, à faire en 2.7 quand le fichier sera créé pour le cron** (décision du PO), puis remesurer en ligne. Un insight qui devient classé déclenche sa première estimation et son premier jugement (~48 s). → ADR-013
+- **Incrémental sans rejugement** : un retour ajouté reprend le jugement stocké du modèle (`scores.judgment`, migration 0004) et recalcule les faits en code (Reach, Confidence, règles MoSCoW, rang). Le run de nuit rejuge tout, ~0,8 € même sans changement (dette : étendre la réutilisation au run complet). → ADR-013
+- **Pas d'alerte au premier run** sur une base sans insight : tout y est nouveau, le digest en rend compte. L'alerte `churn` porte sur le compte, pas sur l'insight. → ADR-013
+- **S4 en signal faible** après le run sur base vide : le triage Haiku a classé deux retours de Forgeval (R-122, R-213) en « autre » ; I-39 n'a plus que 4 retours, il n'est donc ni scoré ni Won't. Variance du triage, à mesurer avec `eval:triage` (6.2), pas corrigée à la main.
+- **Test instable** : `src/lib/context.test.ts` « names the missing file » échoue parfois (lecture parallèle des fichiers du pack). Proposé en tâche séparée.
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.6] Le pipeline en graphe LangGraph — 2026-10-03
+
+`7e462c1` · ADR-013
+
+- `src/pipeline/graph.ts` : StateGraph ingest → triage (fan-out par lots via `Send`) → enrich → embed → cluster → estimate → score → alert. État minimal (ID, stats, coûts), nœuds idempotents, une nouvelle tentative par nœud, un span Langfuse par nœud sous la trace du run. Checkpointer Postgres (schéma `langgraph`) pour `--resume`.
+- `src/pipeline/lock.ts` : verrou `pg_try_advisory_lock` pour toute la durée d'un run ; un second run attend 30 s puis abandonne (« Run en cours, réessaie dans un instant. »).
+- `src/pipeline/incremental.ts` : 1 à 10 retours → triage, rattachement à l'insight le plus proche ou file « à surveiller », nouvel insight « propose » à 3 items proches, re-score des insights touchés (jugement stocké, calculs en code), alertes ; la réponse dit, par retour, ce qu'il est devenu.
+- `src/pipeline/nodes/alert.ts` (code pur) : seuils de SPEC §10.10, une alerte par sujet et par type sur 24 h, les suivantes l'enrichissent.
+- Migration `0004` : `scores.judgment`. `pnpm pipeline:run [--resume <run_id>]`, `pnpm pipeline:reset --yes`, `POST /api/pipeline/incremental`, `GET /api/pipeline/runs`. Graphe Mermaid dans `docs/ARCHITECTURE.md` (testé).
+- Vérifié en réel : base remise à zéro, run tué à 68/214 retours triés puis repris sans retrier (301 s, 1,22 €), run concurrent refusé ; S1 → I-27 ; trois retours « interface en espagnol » → I-50 + alerte `nouveau_sujet` ; Groupe Hélix : alerte `churn` créée puis enrichie. Latence de l'incrémental au-dessus du budget (voir Points d'attention).
 
 ## [2.5] Scoring RICE hybride, robustesse, alignement, MoSCoW — 2026-10-03
 
