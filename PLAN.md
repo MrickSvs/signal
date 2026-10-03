@@ -213,8 +213,8 @@ Ajoute src/lib/context.ts : loadContextPack() (lecture des fichiers dont archite
 
 **Test** :
 
-- [ ] 👤 Relecture : cohérence avec le scénario (§5), `architecture.md` cohérente avec les limites de SPEC §4.3, crédibilité de la stratégie, chiffres de MRR cohérents avec SPEC §4.2.
-- [ ] `loadContextPack()` testé, `weighting.yaml` validé par zod.
+- [x] 👤 Relecture : cohérence avec le scénario (§5), `architecture.md` cohérente avec les limites de SPEC §4.3, crédibilité de la stratégie, chiffres de MRR cohérents avec SPEC §4.2.
+- [x] `loadContextPack()` testé, `weighting.yaml` validé par zod.
 
 **Commit** : `feat(context): jalon context pack`
 
@@ -250,9 +250,9 @@ Crée src/lib/skills.ts : listSkills() (index nom + description) et loadSkill(na
 
 **Test** :
 
-- [ ] 9 skills présentes, frontmatter valide (test).
-- [ ] La skill `backlog-format` contient la règle de choix et un exemple de chaque type conforme à SPEC §9 ; la skill `user-story` contient le gabarit complet de SPEC §9.1.
-- [ ] La skill `triage-taxonomy` contient un exemple de retour multi-sujets scindé en deux items.
+- [x] 9 skills présentes, frontmatter valide (test).
+- [x] La skill `backlog-format` contient la règle de choix et un exemple de chaque type conforme à SPEC §9 ; la skill `user-story` contient le gabarit complet de SPEC §9.1.
+- [x] La skill `triage-taxonomy` contient un exemple de retour multi-sujets scindé en deux items.
 
 **Commit** : `feat(context): product skills`
 
