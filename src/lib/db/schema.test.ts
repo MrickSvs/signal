@@ -198,3 +198,76 @@ describe("sync_id_sequence", () => {
     await expect(sync("insights")).rejects.toThrow(/unknown entity/);
   });
 });
+
+describe("feedback_inbox", () => {
+  beforeAll(async () => {
+    await db.exec(`
+      insert into customers (id, name, segment, plan) values ('C-900', 'Inbox', 'agence_com', 'business');
+      insert into pipeline_runs (id, kind, status, started_at) values
+        ('00000000-0000-0000-0000-000000000901', 'full', 'termine', now() - interval '2 days'),
+        ('00000000-0000-0000-0000-000000000902', 'incremental', 'termine', now());
+      insert into feedbacks (id, channel, source_type, received_at, raw_text, subject, customer_id) values
+        ('R-900', 'email_client', 'client_direct', now(), 'Notifs perdues et un Gantt svp', 'Deux sujets', 'C-900'),
+        ('R-901', 'ticket_support', 'support', now(), 'Sans analyse', null, null);
+      insert into feedback_analyses (feedback_id, run_id, model, status, injection_suspected, created_at) values
+        ('R-900', '00000000-0000-0000-0000-000000000901', 'haiku', 'failed', null, now() - interval '2 days'),
+        ('R-900', '00000000-0000-0000-0000-000000000902', 'haiku', 'ok', true, now());
+      insert into feedback_items (feedback_id, item_index, type, product_area, underlying_problem, summary, existing_feature) values
+        ('R-900', 1, 'bug', 'notifications', 'p1', 'Notifications perdues', false),
+        ('R-900', 2, 'demande_fonctionnelle', 'planification', 'p2', 'Vue Gantt', true);
+      insert into insights (id, title, problem_statement, status) values
+        ('I-90', 'Notifs', 'p', 'actif'), ('I-91', 'Gantt', 'p', 'propose'), ('I-92', 'Ancien', 'p', 'fusionne');
+      insert into insight_items (insight_id, item_id, feedback_id) values
+        ('I-90', 'R-900.1', 'R-900'), ('I-91', 'R-900.2', 'R-900'), ('I-92', 'R-900.1', 'R-900');
+    `);
+  });
+
+  type InboxRow = {
+    analysis_status: string | null;
+    injection_suspected: boolean | null;
+    item_types: string;
+    product_areas: string;
+    existing_feature: boolean;
+    summary: string | null;
+    insight_ids: string;
+    customer_plan: string | null;
+    search_text: string;
+  };
+  const row = (id: string) =>
+    one<InboxRow>(
+      `select analysis_status, injection_suspected, item_types::text, product_areas::text,
+              existing_feature, summary, insight_ids::text, customer_plan, search_text
+       from feedback_inbox where id = $1`,
+      [id],
+    );
+
+  it("summarizes a multi-topic feedback with its latest analysis and open insights (CL-01)", async () => {
+    const r = await row("R-900");
+    expect(r.analysis_status).toBe("ok");
+    expect(r.injection_suspected).toBe(true);
+    expect(r.item_types).toBe("{bug,demande_fonctionnelle}");
+    expect(r.product_areas).toBe("{notifications,planification}");
+    expect(r.existing_feature).toBe(true);
+    expect(r.summary).toBe("Notifications perdues");
+    // I-92 is merged: its frozen items are matching memory, not where the feedback lives.
+    expect(r.insight_ids).toBe("{I-90,I-91}");
+    expect(r.customer_plan).toBe("business");
+    expect(r.search_text).toContain("R-900");
+    expect(r.search_text).toContain("Vue Gantt");
+  });
+
+  it("keeps feedbacks without analysis, items or account", async () => {
+    const r = await row("R-901");
+    expect(r.analysis_status).toBeNull();
+    expect(r.item_types).toBe("{}");
+    expect(r.insight_ids).toBe("{}");
+    expect(r.existing_feature).toBe(false);
+  });
+
+  it("filters on array columns the way PostgREST does (cs)", async () => {
+    const ids = await db.query<{ id: string }>(
+      `select id from feedback_inbox where insight_ids @> '{I-91}' and item_types @> '{bug}'`,
+    );
+    expect(ids.rows.map((r) => r.id)).toEqual(["R-900"]);
+  });
+});

@@ -659,9 +659,9 @@ Page d'accueil : le dernier digest, sections dans l'ordre de SPEC §12.2 (alerte
 
 **Test** :
 
-- [ ] Filtrer sur « injection suspectée » renvoie le ticket S6.
-- [ ] Un retour E1 affiche ses deux items et ses deux insights.
-- [ ] Coller un texte proche de S1 → rattaché à l'insight S1.
+- [x] Filtrer sur « injection suspectée » renvoie le ticket S6.
+- [x] Un retour E1 affiche ses deux items et ses deux insights.
+- [x] Coller un texte proche de S1 → rattaché à l'insight S1.
 
 **Commit** : `feat(ui): feedback inbox and live ingestion`
 

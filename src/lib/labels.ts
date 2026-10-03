@@ -14,6 +14,55 @@ export const CHANNEL_LABELS: Record<Enums["feedback_channel"], string> = {
   slack_interne: "Slack interne",
 };
 
+/** Who wrote a feedback, from its channel (same mapping as data/scenario.yaml). */
+export const CHANNEL_SOURCE_TYPES: Record<
+  Enums["feedback_channel"],
+  Enums["feedback_source_type"]
+> = {
+  email_client: "client_direct",
+  ticket_support: "support",
+  commentaire_in_app: "client_direct",
+  nps: "client_direct",
+  note_csm: "interne",
+  note_sales: "interne",
+  slack_interne: "interne",
+};
+
+export const ITEM_TYPE_LABELS: Record<Enums["item_type"], string> = {
+  bug: "Bug",
+  demande_fonctionnelle: "Demande fonctionnelle",
+  irritant_ux: "Irritant UX",
+  question: "Question",
+  eloge: "Éloge",
+  signal_churn: "Signal de churn",
+  autre: "Autre",
+};
+
+export const URGENCY_LABELS: Record<Enums["urgency"], string> = {
+  basse: "Basse",
+  moyenne: "Moyenne",
+  haute: "Haute",
+  critique: "Critique",
+};
+
+/** Sentiment from −2 to 2. */
+export function sentimentLabel(sentiment: number): string {
+  if (sentiment <= -2) return "Très négatif";
+  if (sentiment < 0) return "Négatif";
+  if (sentiment === 0) return "Neutre";
+  if (sentiment < 2) return "Positif";
+  return "Très positif";
+}
+
+/** Display name of an ISO 639-1 language code (« en » → « anglais »). */
+export function languageLabel(code: string): string {
+  try {
+    return new Intl.DisplayNames(["fr"], { type: "language" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
 export const PLAN_LABELS: Record<Enums["customer_plan"], string> = {
   free: "Free",
   pro: "Pro",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { modelFamily, notionPageUrl } from "./labels";
+import { languageLabel, modelFamily, notionPageUrl, sentimentLabel } from "./labels";
 
 describe("modelFamily", () => {
   it("maps model ids to their family", () => {
@@ -15,5 +15,15 @@ describe("notionPageUrl", () => {
     expect(notionPageUrl("1a2b3c4d-0000-1111-2222-333344445555")).toBe(
       "https://www.notion.so/1a2b3c4d000011112222333344445555",
     );
+  });
+});
+
+describe("sentimentLabel and languageLabel", () => {
+  it("names the sentiment scale and languages in French", () => {
+    expect(sentimentLabel(-2)).toBe("Très négatif");
+    expect(sentimentLabel(0)).toBe("Neutre");
+    expect(sentimentLabel(1)).toBe("Positif");
+    expect(languageLabel("en")).toBe("anglais");
+    expect(languageLabel("not a code")).toBe("not a code");
   });
 });

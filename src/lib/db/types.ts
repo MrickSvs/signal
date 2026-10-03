@@ -546,6 +546,13 @@ export type Database = {
             foreignKeyName: "feedback_analyses_feedback_id_fkey";
             columns: ["feedback_id"];
             isOneToOne: false;
+            referencedRelation: "feedback_inbox";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_analyses_feedback_id_fkey";
+            columns: ["feedback_id"];
+            isOneToOne: false;
             referencedRelation: "feedbacks";
             referencedColumns: ["id"];
           },
@@ -605,6 +612,13 @@ export type Database = {
           watch?: boolean;
         };
         Relationships: [
+          {
+            foreignKeyName: "feedback_items_feedback_id_fkey";
+            columns: ["feedback_id"];
+            isOneToOne: false;
+            referencedRelation: "feedback_inbox";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "feedback_items_feedback_id_fkey";
             columns: ["feedback_id"];
@@ -703,6 +717,13 @@ export type Database = {
           similarity?: number | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "insight_items_feedback_id_fkey";
+            columns: ["feedback_id"];
+            isOneToOne: false;
+            referencedRelation: "feedback_inbox";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "insight_items_feedback_id_fkey";
             columns: ["feedback_id"];
@@ -1227,7 +1248,39 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      feedback_inbox: {
+        Row: {
+          analysis_status: Database["public"]["Enums"]["analysis_status"] | null;
+          channel: Database["public"]["Enums"]["feedback_channel"] | null;
+          churn_signal: boolean | null;
+          customer_id: string | null;
+          customer_name: string | null;
+          customer_plan: Database["public"]["Enums"]["customer_plan"] | null;
+          customer_segment: Database["public"]["Enums"]["customer_segment"] | null;
+          customer_status: Database["public"]["Enums"]["customer_status"] | null;
+          existing_feature: boolean | null;
+          id: string | null;
+          injection_suspected: boolean | null;
+          insight_ids: string[] | null;
+          item_types: Database["public"]["Enums"]["item_type"][] | null;
+          language: string | null;
+          product_areas: Database["public"]["Enums"]["product_area"][] | null;
+          received_at: string | null;
+          search_text: string | null;
+          subject: string | null;
+          summary: string | null;
+          truncated: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       format_readable_id: {

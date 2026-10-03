@@ -240,3 +240,18 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Conséquences** :
   - Un digest régénéré couvre la période depuis le digest précédent : sans nouveau retour, ses sections « nouveaux retours » et « mouvements » sont vides, les sections d'état (alertes, tendances, comptes) restent pleines.
   - Les liens vers Insights, Backlog et Priorisation sont à honorer en 3.4, 3.5 et 4.3.
+
+## ADR-017 — Écran Retours : vue `feedback_inbox`, « pourquoi ce classement » composé en code
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 3.3. Le tableau des retours doit être paginé côté serveur et filtrable par canal, plan, segment, type, domaine, insight, période, injection, fonctionnalité existante et échec d'analyse (SPEC §12.3). Ces critères vivent dans cinq tables (`feedbacks`, `customers`, `feedback_analyses`, `feedback_items`, `insight_items`) ; PostgREST ne sait pas filtrer une table sur un agrégat d'une autre. Le panneau de détail doit dire « pourquoi ce classement », alors que le triage ne stocke aucune justification libre.
+- **Décision** :
+  - **Migration 0005 : vue `feedback_inbox`** (une ligne par retour, `security_invoker`, révoquée pour anon et authenticated) : dernière analyse, tableaux `item_types`, `product_areas`, `insight_ids` (insights `propose` ou `actif` seulement : un insight fusionné garde des items figés, ADR-010), `existing_feature`, résumé du premier item et `search_text` (ID, objet, verbatim, résumés). Filtres PostgREST (`eq`, `cs`, `gte`, `ilike` échappé), `range` et `count: exact`. Testée sur PGlite.
+  - **Filtres dans l'URL** (`canal`, `plan` dont `sans_compte`, `segment`, `type`, `domaine`, `insight`, `periode` 7 ou 30 jours relatifs à `DEMO_NOW`, `injection`, `existante`, `echec`, `q`, `page`) ; analyse pure et tolérante (`lib/feedbacks/filters.ts`) : une valeur inconnue est ignorée. 25 retours par page ; une page au-delà de la fin renvoie à la première.
+  - **Panneau de détail** piloté par `?retour=R-042` (le lien des EvidenceChip de 3.1) : verbatim en texte, compte ou « compte non identifié », analyse (modèle, sentiment, urgence, langue, confiance, signaux, erreur en cas d'échec), puis chaque item avec ses insights (y compris un insight rejeté, signalé comme tel) et « pourquoi ce classement ».
+  - **« Pourquoi ce classement »** composé en code (`lib/feedbacks/why.ts`) à partir des champs stockés : type et domaine, demande exprimée face au problème sous-jacent (P3), fonctionnalité existante (CL-05), type jamais regroupé, similarité au rattachement face au seuil de `weighting.yaml`, file « à surveiller » ou item isolé. Pas d'appel de modèle : une justification demandée après coup serait inventée.
+  - **« Ajouter un retour »** : modale client → `POST /api/pipeline/incremental` (route de 2.6, inchangée) ; `source_type` déduit du canal (`CHANNEL_SOURCE_TYPES`, même table que `data/scenario.yaml`). 409 → « run en cours, réessaie » (rien n'est enregistré) ; échec du triage affiché sur le retour (CL-11).
+- **Conséquences** :
+  - Toute nouvelle colonne utile au tableau passe par une nouvelle vue ou une migration qui la recrée (`create or replace view` dans une nouvelle migration).
+  - Le tableau compte les insights ouverts ; le détail montre aussi les insights rejetés qui ont absorbé l'item.
