@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage) et 2.2 (rattachement aux comptes) faites. Prochaine étape : 2.3 (regroupement par problème, stabilité et tensions).
-- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items) et rattachés (203 à un compte, 11 sans compte identifiable). Le jeu réservé (77 retours) reste hors base.
+- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes) et 2.3 (regroupement par problème) faites. Prochaine étape : 2.4 (estimation par analogie).
+- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension. Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 169 tests.
-- Coût LLM cumulé : ~2,7 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 234 tests.
+- Coût LLM cumulé : ~3,0 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €).
 
 ## Points d'attention
 
@@ -18,6 +18,10 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Cache de prompt sur Haiku** : vérifié en 2.1, le préfixe du triage (~5 900 tokens) dépasse le minimum de 4 096 ; le run complet lit le cache à chaque appel. → ADR-008
 - **Enums des sorties structurées** : jusqu'à 2.1, `transformJSONSchema` du SDK les retirait du schéma (ils n'étaient pas imposés). Corrigé dans `invokeStructured()` ; la nouvelle tentative après une sortie invalide reçoit maintenant les erreurs. → ADR-008
 - **Seed et rattachement** : le seed ne charge le compte que pour les commentaires in-app et les NPS ; après tout `db:seed`, relancer `pnpm pipeline:enrich` (le graphe de 2.6 le fera). Les signaux business ne sont pas stockés, ils sont recalculés à la demande. → ADR-009
+- **Seuil de regroupement** : 0,28 et non 0,35 (valeur initiale), mesuré sur voyage-4 : tout fusionne dès 0,35. Seuil d'appariement par centroïdes : 0,9. → ADR-010
+- **Insights fusionnés** : ils gardent leurs `insight_items`, figés, comme mémoire pour rejouer la fusion au run suivant. Toute lecture des items d'un insight filtre sur son statut. → ADR-010
+- **Bruit classé** : trois petits sujets du bruit se regroupent légitimement au-delà de 5 retours (« recréer les mêmes tâches » 7, filtre par assigné E5 + S6 5, usage mobile 5) et sont classés. S3 sort aussi émergent (×2,25) à côté de S7 (×14). À arbitrer par le PO (voir BUILD_LOG 2.3).
+- **Voyage sans moyen de paiement** : 3 requêtes/min et 10 000 tokens/min ; le premier embedding des 234 items a dû passer par petits lots espacés. Ajouter un moyen de paiement avant 2.6 (run complet sur base vide).
 - **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
 - **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 (permissions 0,49–0,52, notifications 0,45–0,56, suivi du temps ≤ 0,37). À confirmer en 2.4. → ADR-005
@@ -26,6 +30,16 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.3] Regroupement par problème, stabilité et tensions — 2026-10-03
+
+ADR-010
+
+- `src/pipeline/nodes/embed.ts` : un vecteur par item, « problème sous-jacent — résumé » (jamais le texte brut) ; éloges, questions et `autre` jamais regroupés.
+- `src/lib/clustering/agglomerative.ts` : clustering agglomératif average linkage, cosinus, déterministe. Seuil 0,28 réglé sur les données (partition identique de 0,27 à 0,29).
+- `src/pipeline/nodes/match.ts` : appariement entre runs (Jaccard ≥ 0,5, puis centroïdes ≥ 0,9), fusion (`merged_into`), scission (l'ID reste à la plus grosse part), dissolution ; statut, titre verrouillé, overrides et backlog conservés ; un rejeté reste rejeté ; une fusion est rejouée en code au run suivant.
+- `src/pipeline/nodes/label-insights.ts` (Sonnet) : titre formulé comme un problème, énoncé, demandes exprimées (fréquences comptées en code, ID vérifiés), passe de consolidation, passe de tensions. `src/lib/insights/aggregates.ts` : comptes distincts, MRR, renouvellements, segments, canaux, tendance, classement. `commitments.md` dit quel domaine couvre chaque engagement.
+- `pnpm pipeline:cluster [--threshold X]` : 25 insights, 0,23 €. S1 en un insight sur 4 canaux ; S3 titré « Rendre compte de l'avancement au client » ; S5a/S5b reliés par une tension ; S7 émergent. Second run : mêmes ID, aucun appel au modèle.
 
 ## [2.2] Rattachement client et signaux business — 2026-10-03
 

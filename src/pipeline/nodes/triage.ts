@@ -272,7 +272,8 @@ function check(error: { message: string } | null, what: string): void {
 
 /**
  * Idempotent write: analysis upserted by (feedback_id, run_id); on success, the items of the
- * feedback are replaced (R-042.1, R-042.2…). A failed analysis leaves previous items untouched.
+ * feedback are replaced (R-042.1, R-042.2…) and their embedding reset. A failed analysis leaves
+ * previous items untouched.
  */
 export async function writeTriageResult(db: Db, result: TriageResult): Promise<void> {
   const feedbackUpdate: { truncated: boolean; language?: string } = {
@@ -293,9 +294,10 @@ export async function writeTriageResult(db: Db, result: TriageResult): Promise<v
   );
   if (result.analysis.status !== "ok") return;
 
+  // A rewritten item loses its embedding: the embed node recomputes it from the new text.
+  const rows = result.items.map((item) => ({ ...item, embedding: null }));
   check(
-    (await db.from("feedback_items").upsert(result.items, { onConflict: "feedback_id,item_index" }))
-      .error,
+    (await db.from("feedback_items").upsert(rows, { onConflict: "feedback_id,item_index" })).error,
     `écriture des items de ${result.feedbackId}`,
   );
   check(

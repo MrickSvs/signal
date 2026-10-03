@@ -11,7 +11,7 @@ Tout ce que Signal sait du produit, hors du code. Le pipeline et l'agent lisent 
 | `personas.md`     | Les 4 personas                                                                          | rédaction du backlog                     |
 | `team.md`         | Équipe, vélocité, échelle de points, capacité                                           | estimation, MoSCoW (capacité)            |
 | `architecture.md` | Modules, couplage, dépendances, dette et zones à risque                                 | estimation par analogie, backlog         |
-| `commitments.md`  | Engagements contractuels et comptes sensibles (échéances en J+)                         | MoSCoW, alertes, agent                   |
+| `commitments.md`  | Engagements contractuels (domaine couvert, échéance en J+) et comptes sensibles         | classement, MoSCoW, alertes, agent       |
 | `glossary.md`     | Les termes métier                                                                       | tous les prompts qui en ont besoin       |
 | `weighting.yaml`  | Tous les paramètres et seuils (Reach, Confidence, effort, MoSCoW, clustering, alertes…) | code uniquement (`src/lib/context.ts`)   |
 | `skills/`         | Les savoir-faire métier, un `SKILL.md` par skill                                        | pipeline et agent                        |

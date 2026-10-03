@@ -109,9 +109,10 @@ triage:
   max_items_per_feedback: 3 # CL-01
 
 clustering:
-  distance_threshold: 0.35 # distance cosinus, average linkage ; valeur initiale, à régler en 2.3
+  distance_threshold: 0.28 # distance cosinus, average linkage ; réglé en 2.3 : même partition de 0,27 à 0,29, tout fusionne dès 0,35
   min_cluster_size: 2 # en dessous : item isolé, pas d'insight
   run_matching_jaccard: 0.5 # appariement des insights entre deux runs (CL-14)
+  run_matching_centroid_similarity: 0.9 # à défaut de Jaccard : centroïdes très proches (mesuré en 2.3 : groupes distincts ≤ 0,83, même groupe ≥ 0,94)
   watch_queue_min_items: 3 # file « à surveiller » → insight proposé (CL-16)
 
 # §10.10 Alertes et enquêtes.

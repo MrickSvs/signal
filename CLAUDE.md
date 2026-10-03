@@ -103,4 +103,6 @@ Les commandes sont ajoutées au fil des étapes ; garde ce tableau à jour.
 - **Supabase gratuit :** un projet est mis en pause après 7 jours d'inactivité. Le cron quotidien le garde actif ; `/status` le vérifie.
 - **Langfuse Hobby :** plafond mensuel strict, sans dépassement, et 30 jours de rétention. Evals en échantillon par défaut.
 - **Embeddings :** la dimension est figée dans la migration ; changer de modèle impose une nouvelle migration.
+- **Voyage sans moyen de paiement :** 3 requêtes/min et 10 000 tokens/min ; un lot de 128 items échoue en 429. Ajouter un moyen de paiement (les 200 M tokens gratuits restent gratuits) ou vectoriser par petits lots espacés.
+- **Items d'un insight :** un insight `fusionne` (et un `rejete` dissous) garde ses `insight_items` figés, comme mémoire pour l'appariement (ADR-010). Toute lecture des items d'un insight filtre sur son statut.
 - **Dates du scénario :** toujours relatives à `DEMO_NOW` ; ne jamais coder une date en dur, ni laisser un jour de la semaine dans un texte généré.

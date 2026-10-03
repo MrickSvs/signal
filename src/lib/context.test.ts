@@ -9,6 +9,7 @@ import {
   DEFAULT_CONTEXT_DIR,
   loadContextPack,
   parseArchitectureModules,
+  parseCommitments,
   parseWeighting,
 } from "./context";
 
@@ -60,8 +61,9 @@ describe("loadContextPack (real pack)", () => {
     expect(w.effort.tshirt_upper_bounds).toEqual({ S: 3, M: 8, L: 20 });
     expect(w.moscow.rule_order[0]).toBe("engagement_contractuel");
     expect(w.moscow.must_capacity_share).toBe(0.6);
-    expect(w.clustering.distance_threshold).toBe(0.35);
+    expect(w.clustering.distance_threshold).toBe(0.28);
     expect(w.clustering.run_matching_jaccard).toBe(0.5);
+    expect(w.clustering.run_matching_centroid_similarity).toBe(0.9);
     expect(w.clustering.watch_queue_min_items).toBe(3);
     expect(w.triage.truncation_chars).toBe(6000);
     expect(w.overrides.context_changed_share).toBe(0.3);
@@ -144,6 +146,47 @@ describe("parseWeighting", () => {
       (raw.reach.extrapolation_factors as Record<string, number>).free = 0;
     });
     expect(() => parseWeighting(source)).toThrow(ContextPackError);
+  });
+});
+
+describe("parseCommitments", () => {
+  const doc = (rows: string) =>
+    `# Engagements\n\n## Engagements contractuels\n\n| Compte | Engagement | Domaine | Échéance | Statut |\n| --- | --- | --- | --- | --- |\n${rows}\n\n## Comptes sensibles\n\n| Atelier Mercure | Enterprise | 140 | 4 200 € | J+45 | orange | x |\n`;
+
+  it("reads the real commitment of Atelier Mercure", async () => {
+    const { commitments } = await loadContextPack();
+    expect(commitments).toEqual([
+      {
+        account: "Atelier Mercure",
+        engagement: "Permissions par projet et accès invités restreint livrés",
+        product_areas: ["permissions_partage"],
+        due_in_days: 75,
+        status: "Non commencé",
+      },
+    ]);
+  });
+
+  it("reads several areas and ignores the other tables", () => {
+    expect(
+      parseCommitments(
+        doc("| Studio X | **Export** | `reporting_export`, `taches` | J+10 | En cours |"),
+      ),
+    ).toEqual([
+      {
+        account: "Studio X",
+        engagement: "Export",
+        product_areas: ["reporting_export", "taches"],
+        due_in_days: 10,
+        status: "En cours",
+      },
+    ]);
+  });
+
+  it("rejects an unknown area or a missing section", () => {
+    expect(() =>
+      parseCommitments(doc("| Studio X | Export | `export` | J+10 | En cours |")),
+    ).toThrow(ContextPackError);
+    expect(() => parseCommitments("# Rien")).toThrow(/Engagements contractuels/);
   });
 });
 

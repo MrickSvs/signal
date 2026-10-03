@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
+import { Constants } from "@/lib/db/types";
 
 export const DEFAULT_CONTEXT_DIR = path.join(process.cwd(), "context", "jalon");
 
@@ -156,6 +157,7 @@ export const weightingSchema = z.strictObject({
     distance_threshold: z.number().gt(0).lt(2),
     min_cluster_size: positiveInt,
     run_matching_jaccard: share,
+    run_matching_centroid_similarity: share,
     watch_queue_min_items: positiveInt,
   }),
   alerts: z.strictObject({
@@ -181,12 +183,25 @@ const architectureModuleSchema = z.object({
 
 export type ArchitectureModule = z.infer<typeof architectureModuleSchema>;
 
+const commitmentSchema = z.object({
+  account: z.string().min(1),
+  engagement: z.string().min(1),
+  product_areas: z.array(z.enum(Constants.public.Enums.product_area)).min(1),
+  /** Days from DEMO_NOW (J+75 → 75). */
+  due_in_days: z.number().int(),
+  status: z.string().min(1),
+});
+
+export type Commitment = z.infer<typeof commitmentSchema>;
+
 export type ContextPack = {
   dir: string;
   documents: Record<ContextDocument, string>;
   weighting: Weighting;
   /** Module ids are the component names used by reference_tickets.components. */
   modules: ArchitectureModule[];
+  /** Contractual commitments of commitments.md: which product areas they cover, and when. */
+  commitments: Commitment[];
 };
 
 export class ContextPackError extends Error {
@@ -223,6 +238,36 @@ export function parseArchitectureModules(markdown: string): ArchitectureModule[]
   const duplicate = ids.find((id, i) => ids.indexOf(id) !== i);
   if (duplicate) throw new ContextPackError(`architecture.md: duplicate module « ${duplicate} »`);
   return modules;
+}
+
+// Rows of the "Engagements contractuels" table: | Compte | Engagement | `area`, `area` | J+75 | Statut |
+const COMMITMENT_ROW = /^\|([^|]+)\|([^|]+)\|([^|]+)\|\s*J([+-]\d+)\s*\|([^|]+)\|$/;
+
+/** Extracts the contractual commitments of commitments.md (account, areas, due date in J+). */
+export function parseCommitments(markdown: string): Commitment[] {
+  const section = markdown.split(/^## /m).find((s) => s.startsWith("Engagements contractuels"));
+  if (!section) {
+    throw new ContextPackError("commitments.md: missing « ## Engagements contractuels » section");
+  }
+  return section
+    .split("\n")
+    .map((line) => COMMITMENT_ROW.exec(line.trim()))
+    .filter((match): match is RegExpExecArray => match !== null)
+    .map(([, account, engagement, areas, due, status]) => {
+      const parsed = commitmentSchema.safeParse({
+        account: account.trim(),
+        engagement: engagement.replaceAll("**", "").trim(),
+        product_areas: [...areas.matchAll(/`([^`]+)`/g)].map((m) => m[1]),
+        due_in_days: Number(due),
+        status: status.trim(),
+      });
+      if (!parsed.success) {
+        throw new ContextPackError(`commitments.md: invalid commitment row « ${account.trim()} »`, {
+          cause: parsed.error,
+        });
+      }
+      return parsed.data;
+    });
 }
 
 export function parseWeighting(source: string): Weighting {
@@ -263,5 +308,6 @@ export async function loadContextPack(dir: string = DEFAULT_CONTEXT_DIR): Promis
     documents,
     weighting: parseWeighting(weightingSource),
     modules: parseArchitectureModules(documents.architecture),
+    commitments: parseCommitments(documents.commitments),
   };
 }

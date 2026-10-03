@@ -4,11 +4,12 @@
 
 ## Engagements contractuels
 
-| Compte          | Engagement                                                       | Échéance | Statut       |
-| --------------- | ---------------------------------------------------------------- | -------- | ------------ |
-| Atelier Mercure | **Permissions par projet** et **accès invités restreint** livrés | J+75     | Non commencé |
+| Compte          | Engagement                                                       | Domaine               | Échéance | Statut       |
+| --------------- | ---------------------------------------------------------------- | --------------------- | -------- | ------------ |
+| Atelier Mercure | **Permissions par projet** et **accès invités restreint** livrés | `permissions_partage` | J+75     | Non commencé |
 
 - Signé au dernier renouvellement d'Atelier Mercure, en contrepartie d'un engagement d'un an.
+- Le **domaine** (valeurs de `product_area`) dit quels insights l'engagement couvre : un insight de ce domaine qui contient un retour du compte est couvert, donc classé (SPEC §8).
 - Échéance dans les 90 jours du trimestre en cours : tout insight couvert par cet engagement est **Must** (règle MoSCoW, `weighting.yaml`).
 - Le renouvellement suivant (J+45) arrive **avant** l'échéance : le client attend de voir l'avancement d'ici là.
 
