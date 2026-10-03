@@ -46,13 +46,14 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [3.3] Écran Retours — 2026-10-03
 
-ADR-017
+`7a92881` · ADR-017
 
 - `/retours` : tableau paginé côté serveur (25 par page) sur la vue `feedback_inbox` (migration 0005) : ID, date relative, canal, compte et plan, résumé, types et domaines, insights, signaux (échec d'analyse, injection, churn, fonctionnalité existante, langue, tronqué ; 3 au plus par ligne).
 - Filtres dans l'URL (canal, plan ou « compte non identifié », segment, type, domaine, insight, période, injection, fonctionnalité existante, échec d'analyse) et recherche plein texte simple (ID, objet, verbatim, résumés).
 - Panneau de détail (`?retour=R-042`) : verbatim en texte, compte, analyse, chaque item avec ses insights et « pourquoi ce classement » (composé en code depuis les champs stockés), lien Notion s'il existe.
 - « Ajouter un retour » : modale → pipeline incrémental → rattachement, nouveau sujet à valider ou sujet à surveiller, durée et coût ; message clair si un run est en cours.
-- Vérifié sur la base réelle (requêtes et pipeline) : filtre injection → R-144 (S6) ; R-011 (E1) → 2 items, I-27 et I-26 ; un texte proche de S1 → R-224 rattaché à I-27 (similarité 0,86, 18 s, 0,007 €). Rendu dans le navigateur à vérifier par le PO.
+- Vérifié sur la base réelle (requêtes et pipeline) : filtre injection → R-144 (S6) ; R-011 (E1) → 2 items, I-27 et I-26 ; un texte proche de S1 → R-224 rattaché à I-27 (similarité 0,86, 18 s, 0,007 €).
+- Checklist 3.3 validée (rendu, panneau, filtres et modale vérifiés dans le navigateur par le PO). Poussée sur `main`.
 
 ## [3.2] Écran Digest — 2026-10-03
 
