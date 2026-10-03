@@ -37,7 +37,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [2.5] Scoring RICE hybride, robustesse, alignement, MoSCoW — 2026-10-03
 
-ADR-012
+`89e8fa8` · ADR-012
 
 - `src/lib/scoring/` (sans LLM, couvert à 100 %) : Reach en comptes distincts (modes comptes et MRR, retour sans compte, prospects, insight manuel), Confidence, Effort, RICE avec overrides et départage des égalités, robustesse du top 5, règles MoSCoW dans l'ordre avec tensions, capacité, validation des overrides et « contexte modifié ».
 - `src/pipeline/nodes/score.ts` (Sonnet) : un jugement par insight classé — Impact, justification, 2 à 5 preuves limitées aux retours de l'insight, contradictions, alignement et OKRs, recommandation MoSCoW. Le modèle ne produit aucun score. Effort par l'estimation en cache, calculs, rang et nouvelle version dans `scores`.
