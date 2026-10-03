@@ -27,7 +27,7 @@ Seuls les développeurs comptent dans la capacité en semaines-personne : le des
 
 ## Échelle de points
 
-Suite de Fibonacci : **1, 2, 3, 5, 8, 13, 21**. Au-delà de 13, l'élément doit être découpé ; 21 est réservé aux estimations d'insight, jamais à une story.
+Suite de Fibonacci : **1, 2, 3, 5, 8, 13, 21**. Un élément du backlog vaut au plus 13 points ; au-delà de 8, on propose un découpage. 21 est réservé aux fourchettes d'insight, jamais à un élément du backlog.
 
 | Points | Repère                                                                    |
 | ------ | ------------------------------------------------------------------------- |
