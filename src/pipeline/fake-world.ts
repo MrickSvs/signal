@@ -54,6 +54,7 @@ export function feedbackRow(text: string, extra: Record<string, unknown> = {}) {
     language: null,
     ingested_run_id: null,
     received_at: daysAgo(3),
+    created_at: daysAgo(1),
     ...extra,
   };
 }
@@ -108,6 +109,9 @@ export function world(): MemoryTables {
     alerts: [],
     pipeline_runs: [],
     complexity_estimates: [],
+    digests: [],
+    po_state: [{ id: true, last_seen_at: null, last_digest_id: null }],
+    decisions: [],
   };
 }
 
@@ -121,6 +125,7 @@ export function memoryDb(tables: MemoryTables) {
         language: null,
         ingested_run_id: null,
         received_at: NOW.toISOString(),
+        created_at: new Date().toISOString(),
       }),
       feedback_items: (row) => ({
         id: `${row.feedback_id}.${row.item_index}`,
@@ -140,13 +145,15 @@ export function memoryDb(tables: MemoryTables) {
         mrr_exposed: 0,
         accounts_count: 0,
         renewals_90d: 0,
+        created_at: new Date().toISOString(),
       }),
       insight_relations: () => ({ id: `rel-${++n}` }),
       scores: () => ({
         id: `score-${++n}`,
         created_at: new Date(NOW.getTime() + ++n).toISOString(),
       }),
-      alerts: () => ({ id: `alert-${++n}` }),
+      alerts: () => ({ id: `alert-${++n}`, created_at: new Date().toISOString() }),
+      digests: () => ({ id: `digest-${++n}`, created_at: new Date().toISOString() }),
       pipeline_runs: () => ({ id: `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}` }),
     },
   });
@@ -222,6 +229,27 @@ export function fakeInvoke() {
           usage: EMPTY_USAGE,
         };
       }
+      case "write-digest": {
+        if (body.includes("[digest-fail]")) throw new Error("API indisponible");
+        const facts = JSON.parse(body.slice(body.indexOf("{"), body.lastIndexOf("}") + 1));
+        const first = facts.feedbacks.ids[0];
+        return {
+          data: {
+            alertes: facts.alerts.length
+              ? `- Alerte ${facts.alerts[0].kind}.`
+              : "Aucune alerte ouverte.",
+            nouveaux_retours: first ? `Des retours, dont ${first}.` : "Aucun nouveau retour.",
+            tendances: "Aucune tendance émergente.",
+            comptes_a_risque: "Aucun compte à risque.",
+            classement: "",
+            a_trancher: "Revue en lot des sujets proposés.",
+            recommandations: first
+              ? [{ action: "Valider les sujets proposés", preuves: [first], confiance: "moyenne" }]
+              : [],
+          },
+          usage: EMPTY_USAGE,
+        };
+      }
       default:
         throw new Error(`Appel de modèle inattendu : ${options.name}`);
     }
@@ -247,4 +275,9 @@ export const fakeEstimateFn = vi.fn(
   }),
 );
 
-export const SKILLS = { triage: "skill triage", riceScoring: "skill rice", moscow: "skill moscow" };
+export const SKILLS = {
+  triage: "skill triage",
+  riceScoring: "skill rice",
+  moscow: "skill moscow",
+  digest: "skill digest",
+};

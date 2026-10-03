@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);
   return bufA.length === bufB.length && timingSafeEqual(bufA, bufB);
@@ -18,4 +18,10 @@ export function isAuthorized(header: string | null, password: string): boolean {
   const sep = decoded.indexOf(":");
   if (sep === -1) return false;
   return safeEqual(decoded.slice(sep + 1), password);
+}
+
+/** True when the Authorization header is « Bearer <secret> » (Vercel cron, CRON_SECRET). False without secret. */
+export function isBearerAuthorized(header: string | null, secret: string | undefined): boolean {
+  if (!secret || !header?.startsWith("Bearer ")) return false;
+  return safeEqual(header.slice(7), secret);
 }

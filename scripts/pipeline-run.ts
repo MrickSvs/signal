@@ -1,5 +1,5 @@
 // Full pipeline CLI (PLAN 2.6): ingest → triage → enrich → embed → cluster → estimate → score →
-// alert, as a LangGraph graph checkpointed in Postgres (schema « langgraph », out of PostgREST).
+// alert → digest, as a LangGraph graph checkpointed in Postgres (schema « langgraph », out of PostgREST).
 // Usage: pnpm pipeline:run [--resume <run_id>] [--reach-mode comptes|mrr] [--batch-size N]
 // Cost: a run on a reset base (~215 feedbacks) is ~1.5 € (triage ~0.3, labels ~0.25, estimates
 // ~0.15, judgments ~0.8); a run without new feedback relabels nothing but re-judges the ranked
@@ -79,11 +79,12 @@ async function main() {
   const args = parseRunArgs(process.argv.slice(2));
   const db = getScriptDb(); // loads .env
   initTracing();
-  const [pack, triage, riceScoring, moscow] = await Promise.all([
+  const [pack, triage, riceScoring, moscow, digest] = await Promise.all([
     loadContextPack(),
     loadSkill("triage-taxonomy"),
     loadSkill("rice-scoring"),
     loadSkill("moscow"),
+    loadSkill("digest"),
   ]);
   const runId = args.resume ?? randomUUID();
   const reachMode = args.reachMode ?? pack.weighting.reach.default_mode;
@@ -124,6 +125,7 @@ async function main() {
             triage: triage.content,
             riceScoring: riceScoring.content,
             moscow: moscow.content,
+            digest: digest.content,
           },
           now: getDemoNow(),
           triageBatchSize: args.batchSize,

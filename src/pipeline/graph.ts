@@ -1,10 +1,11 @@
 // Full pipeline as a LangGraph StateGraph (SPEC §6.1, ADR 003 of SPEC §6.5):
-// ingest → triage (fan-out by batches via Send) → enrich → embed → cluster → estimate → score → alert.
+// ingest → triage (fan-out by batches via Send) → enrich → embed → cluster → estimate → score →
+// alert → digest.
 // The state only carries ids, counters and costs: the data lives in Supabase. Every node is
 // idempotent (it reads what is left to do from the base), so a run interrupted anywhere can be
 // resumed from its checkpoint (`--resume <run_id>`, CL-13), and a failed element is recorded
 // without stopping the run (CL-11). `cluster` covers the match and label steps of SPEC §6.1:
-// they share one plan written after every model call (2.3). The digest node comes in 2.7.
+// they share one plan written after every model call (2.3).
 import { Annotation, END, Send, START, StateGraph } from "@langchain/langgraph";
 import type { BaseCheckpointSaver } from "@langchain/langgraph";
 import type { ContextPack } from "@/lib/context";
@@ -15,6 +16,7 @@ import type { invokeStructured } from "@/lib/llm/structured";
 import type { ReachMode } from "@/lib/scoring/reach";
 import { fetchAll, runClustering } from "@/pipeline/insights";
 import { emergingInsights, loadAlertInput, runAlerts } from "@/pipeline/nodes/alert";
+import { runDigest } from "@/pipeline/nodes/digest";
 import { runEmbed } from "@/pipeline/nodes/embed";
 import { runEnrich } from "@/pipeline/nodes/enrich";
 import {
@@ -68,7 +70,7 @@ export type PipelineUpdate = typeof PipelineState.Update;
 export type PipelineContext = {
   db: Db;
   pack: Pick<ContextPack, "weighting" | "documents" | "commitments">;
-  skills: { triage: string; riceScoring: string; moscow: string };
+  skills: { triage: string; riceScoring: string; moscow: string; digest: string };
   now: Date;
   triageBatchSize?: number;
   /** Injected in tests: no model, Voyage or Langfuse call there (CLAUDE.md rule 11). */
@@ -311,6 +313,24 @@ export function buildPipelineGraph(ctx: PipelineContext) {
       return { stats: { alert: summary } };
     });
 
+  const digest = async (state: PipelineStateType): Promise<PipelineUpdate> =>
+    withSpan("pipeline-digest", { runId: state.runId }, async () => {
+      const runCost = new RunCost();
+      const result = await runDigest(db, {
+        runId: state.runId,
+        weighting,
+        skill: ctx.skills.digest,
+        now,
+        runCost,
+        invoke: ctx.invoke,
+      });
+      return {
+        failures: result.error ? [{ step: "digest", id: result.id, error: result.error }] : [],
+        stats: { digest: { id: result.id, writer: result.writer } },
+        cost: totals(runCost),
+      };
+    });
+
   const batchSize = ctx.triageBatchSize ?? DEFAULT_TRIAGE_BATCH_SIZE;
   const fanOut = (state: PipelineStateType) =>
     state.pending.length === 0
@@ -328,6 +348,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
     .addNode("estimate", estimate, { retryPolicy })
     .addNode("score", score, { retryPolicy })
     .addNode("alert", alert, { retryPolicy })
+    .addNode("digest", digest, { retryPolicy })
     .addEdge(START, "ingest")
     .addConditionalEdges("ingest", fanOut, ["triage", "enrich"])
     .addEdge("triage", "enrich")
@@ -336,7 +357,8 @@ export function buildPipelineGraph(ctx: PipelineContext) {
     .addEdge("cluster", "estimate")
     .addEdge("estimate", "score")
     .addEdge("score", "alert")
-    .addEdge("alert", END);
+    .addEdge("alert", "digest")
+    .addEdge("digest", END);
 }
 
 export function compilePipeline(ctx: PipelineContext, checkpointer?: BaseCheckpointSaver) {

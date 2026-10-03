@@ -18,10 +18,12 @@ graph TD;
 	estimate(estimate)
 	score(score)
 	alert(alert)
+	digest(digest)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> ingest;
-	alert --> __end__;
+	alert --> digest;
 	cluster --> estimate;
+	digest --> __end__;
 	embed --> cluster;
 	enrich --> embed;
 	estimate --> score;
@@ -44,8 +46,7 @@ graph TD;
 | `estimate` | Sonnet, en cache | Fourchette de points des insights classés                                                                                                                                       |
 | `score`    | Sonnet + code    | Jugement par le modèle, calculs en code, nouvelle version dans `scores`                                                                                                         |
 | `alert`    | code             | Seuils de SPEC §10.10 sur les retours du run ; rien au premier run (tout va au digest)                                                                                          |
-
-Le nœud `digest` arrive à l'étape 2.7.
+| `digest`   | code + Sonnet    | Faits de la période calculés en code, rédaction par Signal (skill `digest`), ID vérifiés en code ; repli sur un rendu brut des faits si la rédaction échoue                     |
 
 **État.** Le graphe ne transporte que des ID, des compteurs et des coûts (`run_id`, retours à trier, retours triés, insights créés, échecs, stats, coût) ; les données vivent dans Supabase.
 
@@ -56,5 +57,7 @@ Le nœud `digest` arrive à l'étape 2.7.
 **Mode incrémental** (`src/pipeline/incremental.ts`, `POST /api/pipeline/incremental`). 1 à 10 retours : triage → enrich → embed → rattachement à l'insight le plus proche (similarité moyenne aux items de l'insight, comme le regroupement complet en _average linkage_, au même seuil) ou file « à surveiller » ; dès que 3 items de la file sont proches, nouvel insight `propose` → agrégats des insights touchés → re-score en code (le jugement du modèle stocké dans `scores.judgment` est réutilisé ; Reach, Confidence, règles MoSCoW, RICE et rangs sont recalculés pour tous ; seul un insight sans jugement valide, par exemple devenu classé, est jugé et estimé) → alertes. Le run complet de nuit rejuge tout. La réponse décrit, par retour, ce qu'il est devenu ; `pipeline_runs.stats.timings_ms` donne la durée de chaque étape.
 
 **Alertes** (`src/pipeline/nodes/alert.ts`). Une alerte par sujet et par type sur 24 h (`dedup_key` = type | sujet | date) ; les suivantes enrichissent l'alerte ouverte (CL-55). Le sujet est l'insight, sauf pour `churn`, qui porte sur le compte.
+
+**Digest** (`src/pipeline/nodes/digest.ts`, `pnpm digest`, `GET /api/cron/digest`). Période : depuis le digest précédent, ou depuis la dernière visite de Léa si elle est plus ancienne. Le code calcule les faits ; le modèle rédige chaque section ; un schéma zod refuse un ID absent des faits, une ligne chiffrée sans ID, un jour de la semaine ou une date absolue (une nouvelle tentative, puis repli). Le code assemble les sections dans l'ordre fixe de SPEC §12.2 et impose « Pas encore d'historique » quand aucun score n'existe avant la période (CL-18).
 
 **Traces.** Un run = une trace Langfuse (`run-pipeline` ou `run-incremental`, session = `run_id`), un span par nœud ; coût, tokens, durée et lien de la trace dans `pipeline_runs` (`GET /api/pipeline/runs`).

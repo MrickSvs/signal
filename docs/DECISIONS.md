@@ -189,3 +189,20 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Run complet sur base remise à zéro : interrompu à 68/214 retours triés, repris avec `--resume` sans retrier, terminé en 301 s pour 1,22 € (plus ~40 s et ~0,1 € pour la tentative tuée, non comptés : un `SIGTERM` ne passe pas par la clôture du run). 24 insights, 10 classés. Un run concurrent est refusé après 30 s (code 2).
   - Incrémental, mesuré en local : 15 à 25 s par retour (triage Haiku 5 à 7 s, Voyage 1,5 à 2 s, chaque requête Supabase ~0,2 s depuis ici), 0,001 à 0,015 €. Un insight qui devient classé déclenche sa première estimation et son premier jugement : 48 s, 0,07 €. Le budget de 15 s de SPEC §15 n'est pas tenu ; à remesurer depuis Vercel en répétition (8.3).
   - Entre deux runs de nuit, l'Impact et l'alignement d'un insight ne bougent pas : un retour de plus change les faits (Reach, Confidence, MoSCoW par les règles dures, rang), pas le jugement.
+
+## ADR-014 — Digest : faits en code, rédaction vérifiée, repli garanti
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 2.7. Le digest est la scène d'ouverture de la démo (SPEC §12.2). Chaque chiffre doit porter un ID (P2, règle 9) et le digest ne doit jamais manquer, même si la rédaction échoue.
+- **Décision** :
+  - **Période** : depuis le digest précédent, ou depuis `po_state.last_seen_at` s'il est plus ancien ; aucun des deux → premier digest, tout est nouveau. Un retour est « nouveau » selon sa date d'entrée en base (`created_at`), pas sa date de réception du scénario ; les tendances restent sur 7 jours glissants relatifs à `DEMO_NOW` (§8.8).
+  - **Faits** (`src/pipeline/nodes/digest.ts`, code pur) : alertes ouvertes ; retours de la période par canal, dont ceux rattachés à un insight qui existait avant la période (« confirment un sujet connu ») ; insights émergents avec leurs retours des 7 derniers jours ; nouveaux insights ; rang au début de la période (dernière version de score antérieure) contre rang courant ; comptes à risque ; décisions en attente (insights proposés, backlog en brouillon, conflits Notion, fusions et scissions des runs complets de la période, overrides au contexte modifié).
+  - **Compte à risque** : client qui renouvelle dans moins de 90 jours (`moscow.horizon_days`) avec un signal de churn sur l'un de ses retours ou une santé rouge. Le sentiment négatif seul ne suffit pas : presque tous les comptes en ont.
+  - **Rédaction** (rôle reasoning, skill `digest`) : le modèle écrit chaque section sans titre, plus trois recommandations au plus avec preuves et confiance. Le schéma zod refuse un ID absent des faits, une ligne chiffrée sans ID (hors J+n, OKR et numéros de liste), un jour de la semaine ou une date absolue, plus de 25 lignes ; une nouvelle tentative avec les erreurs, puis **repli** sur un rendu brut des faits (`writer = repli`, erreur stockée).
+  - **Rendu** : le code assemble les sections dans l'ordre fixe et impose « Pas encore d'historique : c'est le premier classement. » quand aucun score n'existe avant la période (CL-18).
+  - **Cron** : `GET /api/cron/digest` (`Authorization: Bearer $CRON_SECRET`, comparé à temps constant ; refusé sans secret configuré) prend le verrou du pipeline, absorbe les retours non traités par lots de 10 (mode incrémental) dans un budget de 200 s, puis rédige le digest (run `digest` dans `pipeline_runs`). `vercel.json` : `0 4 * * *` (6 h à Paris en heure d'été, 5 h en hiver ; un cron Hobby se déclenche dans l'heure) et `regions: ["dub1"]` (près de Supabase eu-west-1). Le graphe du run complet se termine aussi par le nœud `digest`.
+- **Conséquences** :
+  - Premier digest réel : S7 (I-29) émergent, les 3 comptes Enterprise à risque + Clim'Ouest (Business, santé rouge), « pas encore d'historique », 27 s, 0,04 €. Second digest (cron local) : période depuis le premier, aucun mouvement, 24 s, 0,02 €.
+  - Les retours en échec de triage ne sont pas retentés par le cron ; le run complet (`pnpm pipeline:run`) le fait.
+  - Les dossiers d'alerte sont vides jusqu'à 4.5 : le digest les annonce « en cours ».
