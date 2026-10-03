@@ -5,10 +5,10 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage) et 2.2 (rattachement aux comptes) faites. Prochaine étape : 2.3 (regroupement par problème).
+- **Phase 2 (pipeline) en cours** : 2.1 (triage) et 2.2 (rattachement aux comptes) faites. Prochaine étape : 2.3 (regroupement par problème, stabilité et tensions).
 - Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items) et rattachés (203 à un compte, 11 sans compte identifiable). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 154 tests.
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 169 tests.
 - Coût LLM cumulé : ~2,7 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €).
 
 ## Points d'attention
@@ -29,7 +29,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [2.2] Rattachement client et signaux business — 2026-10-03
 
-ADR-009
+`67ac23d` · ADR-009
 
 - `src/pipeline/nodes/enrich.ts` (sans LLM) : compte connu, sinon domaine de l'e-mail (jamais une messagerie grand public ni `jalon.fr`), sinon nom de compte cité dans une note interne (exact, cœur du nom, puis approché), sinon aucun. Signaux par retour : plan, segment, MRR, jours avant renouvellement, prospect, poids de la source, `account_key` pour compter les comptes distincts.
 - Seed rendu réaliste (décision du PO) : seuls les commentaires in-app et les NPS arrivent avec leur compte.
@@ -37,7 +37,7 @@ ADR-009
 
 ## [2.1] Triage des retours — 2026-10-03
 
-ADR-008
+`75b596c` · ADR-008
 
 - `src/pipeline/nodes/triage.ts` : un appel Haiku structuré par retour (langue, sentiment, urgence, churn, injection, confiance, puis 1 à 3 items avec type, domaine, tags, demande exprimée, problème sous-jacent, résumé, fonctionnalité existante). Skill `triage-taxonomy` et `product.md` en préfixe mis en cache ; retour encapsulé par `wrapAsData()` ; texte tronqué à 6 000 caractères (début et fin) pour le modèle, `raw_text` intact.
 - `pnpm pipeline:triage [--model haiku|sonnet] [--sample N] [--run-id X] [--retry-failed] [--concurrency N]` : 8 appels en parallèle, échecs marqués `failed` sans arrêter le run, run suivi dans `pipeline_runs` (durée, tokens, coût, trace Langfuse).
