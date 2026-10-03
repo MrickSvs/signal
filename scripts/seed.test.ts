@@ -119,6 +119,30 @@ describe("feedback reception times", () => {
       now,
     );
     expect(row).not.toHaveProperty("days_ago");
-    expect(row).toMatchObject({ id: "R-001", channel: "nps", nps_score: 9 });
+    expect(row).not.toHaveProperty("language");
+    expect(row).toMatchObject({ id: "R-001", channel: "nps", nps_score: 9, customer_id: "C-001" });
+  });
+
+  it("keeps the account only for connected channels (in-app, NPS)", () => {
+    const base = {
+      source_type: "client_direct" as const,
+      author_name: "A",
+      author_email: "a@b.fr",
+      customer_id: "C-001",
+      days_ago: 3,
+      subject: null,
+      raw_text: "x",
+      nps_score: null,
+      language: "fr" as const,
+    };
+    const rows = feedbackRows(
+      [
+        { ...base, id: "R-001", channel: "commentaire_in_app" },
+        { ...base, id: "R-002", channel: "email_client" },
+        { ...base, id: "R-003", channel: "note_csm", source_type: "interne" },
+      ],
+      now,
+    );
+    expect(rows.map((r) => r.customer_id)).toEqual(["C-001", null, null]);
   });
 });

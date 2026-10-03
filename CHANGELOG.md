@@ -5,8 +5,8 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 faite (triage). Prochaine étape : 2.2 (rattachement client et signaux business).
-- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items). Le jeu réservé (77 retours) reste hors base.
+- **Phase 2 (pipeline) en cours** : 2.1 (triage) et 2.2 (rattachement aux comptes) faites. Prochaine étape : 2.3 (regroupement par problème).
+- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items) et rattachés (203 à un compte, 11 sans compte identifiable). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
 - CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 154 tests.
 - Coût LLM cumulé : ~2,7 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €).
@@ -17,6 +17,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Sorties structurées** : natives (`output_config.format`), pas d'appel d'outil forcé (refusé par Sonnet/Opus 5.5). Tout passe par `invokeStructured()`. → ADR-003
 - **Cache de prompt sur Haiku** : vérifié en 2.1, le préfixe du triage (~5 900 tokens) dépasse le minimum de 4 096 ; le run complet lit le cache à chaque appel. → ADR-008
 - **Enums des sorties structurées** : jusqu'à 2.1, `transformJSONSchema` du SDK les retirait du schéma (ils n'étaient pas imposés). Corrigé dans `invokeStructured()` ; la nouvelle tentative après une sortie invalide reçoit maintenant les erreurs. → ADR-008
+- **Seed et rattachement** : le seed ne charge le compte que pour les commentaires in-app et les NPS ; après tout `db:seed`, relancer `pnpm pipeline:enrich` (le graphe de 2.6 le fera). Les signaux business ne sont pas stockés, ils sont recalculés à la demande. → ADR-009
 - **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
 - **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 (permissions 0,49–0,52, notifications 0,45–0,56, suivi du temps ≤ 0,37). À confirmer en 2.4. → ADR-005
@@ -25,6 +26,14 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.2] Rattachement client et signaux business — 2026-10-03
+
+ADR-009
+
+- `src/pipeline/nodes/enrich.ts` (sans LLM) : compte connu, sinon domaine de l'e-mail (jamais une messagerie grand public ni `jalon.fr`), sinon nom de compte cité dans une note interne (exact, cœur du nom, puis approché), sinon aucun. Signaux par retour : plan, segment, MRR, jours avant renouvellement, prospect, poids de la source, `account_key` pour compter les comptes distincts.
+- Seed rendu réaliste (décision du PO) : seuls les commentaires in-app et les NPS arrivent avec leur compte.
+- `pnpm pipeline:enrich` : 214/214 retours rattachés comme prévu par le plan ; S2b sur les bons comptes, S4 sur le prospect Forgeval, E7 sans compte, relances E2 sous une seule clé.
 
 ## [2.1] Triage des retours — 2026-10-03
 

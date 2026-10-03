@@ -110,10 +110,23 @@ export function receivedAt(id: string, daysAgo: number, now: Date): Date {
   return at > now ? new Date(now.getTime() - random.int(5, 240) * 60000) : at;
 }
 
+// Only connected users (in-app comments, NPS answers) come with a known account (SPEC §4.2).
+// E-mails, tickets and internal notes arrive without one: the enrich node links them. The planned
+// account stays in data/feedbacks.json to measure the linking. The language is set by the triage.
+const CONNECTED_CHANNELS = new Set<Feedback["channel"]>(["commentaire_in_app", "nps"]);
+
 export function feedbackRows(feedbacks: Feedback[], now: Date): FeedbackInsert[] {
-  return feedbacks.map(({ days_ago, ...f }) => ({
-    ...f,
-    received_at: receivedAt(f.id, days_ago, now).toISOString(),
+  return feedbacks.map((f) => ({
+    id: f.id,
+    channel: f.channel,
+    source_type: f.source_type,
+    author_name: f.author_name,
+    author_email: f.author_email,
+    customer_id: CONNECTED_CHANNELS.has(f.channel) ? f.customer_id : null,
+    received_at: receivedAt(f.id, f.days_ago, now).toISOString(),
+    subject: f.subject,
+    raw_text: f.raw_text,
+    nps_score: f.nps_score,
   }));
 }
 
