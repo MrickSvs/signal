@@ -34,7 +34,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [2.4] Estimation par analogie — 2026-10-03
 
-ADR-011
+`922b33a` · ADR-011
 
 - `src/lib/estimation/reference.ts` (sans LLM) : les 3 tickets livrés les plus proches (cosinus, sur un jeu de tickets passé en paramètre pour le leave-one-out), analogue proche à partir de 0,45, biais de l'équipe (points réels ÷ estimés, au moins 3 tickets), correction et élargissement sur l'échelle de Fibonacci, T-shirt.
 - `src/services/estimate.ts` : un seul appel Sonnet structuré (skill `estimation` + `architecture.md` en préfixe mis en cache, besoin dans `wrapExternal()`). Composants limités aux modules de la carte, analogies limitées aux tickets fournis, revalidées en code. Correction de biais et élargissement sans analogue proche (confiance forcée à basse, signalée) faits par le code. Cache par `problem_hash`. `estimateBacklogItems` : une passe pour tous les éléments d'un insight.
