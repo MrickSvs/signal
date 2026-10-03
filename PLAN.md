@@ -277,8 +277,8 @@ Crée src/lib/skills.ts : listSkills() (index nom + description) et loadSkill(na
 
 **Test** :
 
-- [ ] `data/customers.csv` : 90 clients + 5 prospects, Atelier Mercure / Studio Bastide / Groupe Hélix conformes à SPEC §4.5.
-- [ ] 40 tickets en base avec embeddings, components, estimated_points, actual_points et surprises ; au moins 3 tickets par composant principal ; l'écart moyen réel ÷ estimé est visible sur permissions et export ; relancer `pnpm db:seed` ne crée pas de doublon.
+- [x] `data/customers.csv` : 90 clients + 5 prospects, Atelier Mercure / Studio Bastide / Groupe Hélix conformes à SPEC §4.5.
+- [x] 40 tickets en base avec embeddings, components, estimated_points, actual_points et surprises ; au moins 3 tickets par composant principal ; l'écart moyen réel ÷ estimé est visible sur permissions et export ; relancer `pnpm db:seed` ne crée pas de doublon.
 
 **Commit** : `feat(data): customers, prospects and reference tickets`
 
