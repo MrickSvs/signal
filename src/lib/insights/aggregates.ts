@@ -16,7 +16,13 @@ export type InsightFeedback = {
 };
 
 /** A commitment resolved to its customer: it covers insights of these areas citing this account. */
-export type CommitmentCoverage = { customerId: string; productAreas: readonly string[] };
+export type CommitmentCoverage = {
+  customerId: string;
+  productAreas: readonly string[];
+  /** Account name and due date in J+ days, for the MoSCoW rule and its rationale. */
+  account?: string;
+  dueInDays?: number;
+};
 
 export type Trend = {
   /** Feedbacks per week, oldest first; the last entry is the last 7 days. */

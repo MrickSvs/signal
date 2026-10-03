@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème) et 2.4 (estimation par analogie) faites. Prochaine étape : 2.5 (scoring RICE hybride).
-- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension. Le jeu réservé (77 retours) reste hors base.
+- **Phase 2 (pipeline) en cours** : 2.1 (triage), 2.2 (rattachement aux comptes), 2.3 (regroupement par problème), 2.4 (estimation par analogie) et 2.5 (scoring RICE hybride) faites. Prochaine étape : 2.6 (pipeline en graphe LangGraph).
+- Base Supabase seedée : 90 clients + 5 prospects, 40 tickets de référence avec embeddings, 214 retours de développement, tous triés (222 items, vectorisés) et rattachés (203 à un compte, 11 sans compte identifiable). 25 insights au statut « propose » (11 classés, 14 signaux faibles), une tension ; les 11 classés ont un score courant (mode MRR, dernier run) et une estimation en cache. Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — encore une page « en construction ».
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 260 tests.
-- Coût LLM cumulé : ~3,1 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 310 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Coût LLM cumulé : ~3,9 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €).
 
 ## Points d'attention
 
@@ -25,12 +25,24 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Sentiment du triage** : le signe ne correspond à la vérité terrain que pour 162 retours sur 214 ; les retours neutres sortent souvent à −1 ou +1. À mesurer et corriger avec `eval:triage` (6.2), pas avant.
 - **Volumes du jeu de données revus** (décision du PO) : bruit ~100 au lieu de ~140, soit 214 retours au lieu de ~265 ; SPEC §1 dit « plus de 150 retours par mois ». Volumes des patterns inchangés. → ADR-006
 - **Seuil d'analogue proche** : 0,45 et non 0,6, d'après les similarités mesurées sur voyage-4 ; confirmé en 2.4 (permissions 0,49–0,59, notifications 0,50–0,56, suivi du temps ≤ 0,37). → ADR-005, ADR-011
+- **Migration 0003** : `overrides.feedback_ids` (retours au moment de l'override, pour le « contexte modifié ») et `scores.overridden` (valeur d'origine d'un paramètre écrasé). L'écran Priorisation (3.5) et l'agent doivent renseigner `feedback_ids` à la création d'un override. → ADR-012
+- **MoSCoW** : les cinq règles de la skill (quartiles compris) sont dures ; le code corrige toute recommandation du modèle qui en diffère et le signale dans `rule_flags`. → ADR-012
+- **Jugements non déterministes** : d'un run à l'autre, le modèle peut changer un Impact (I-01 : 1 puis 2) ou signaler une contradiction. Changer de mode Reach par la CLI rejuge tout ; l'écran Priorisation devra recalculer en code. À mesurer avec `eval:stability` (6.2). → ADR-012
 - **Biais de l'équipe dilué** : le facteur est la moyenne sur tous les tickets qui touchent les composants retenus ; quand le modèle liste beaucoup de modules par ricochet, celui des permissions (× 1,65) tombe à × 1,31. À mesurer avec `eval:estimation` (6.2). → ADR-011
 - **Vérité terrain enrichie** par rapport à PLAN 1.4 : `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu) et `churn_signal`. Le runner `eval:triage` (6.2) doit en tenir compte. Les retours réservés ont des ID `H-001`…, pas `R-`. → ADR-007
 - **Régénérer les retours** : le cache `.cache/feedback-texts/` évite de repayer, mais modifier un angle de `scenario.yaml` invalide tout le jeu réservé (~0,7 €). Le test des fichiers versionnés échoue tant qu'ils ne suivent plus le plan. → ADR-007
 - **Heure du seed** : un retour « du jour » est placé avant l'instant du seed ; seedé la nuit, il tombe hors des heures de bureau. Seeder en journée avant une démo.
 - **Variables Vercel** : définies en **Production** seulement (pas Preview/Development). `DATABASE_URL` n'y est pas encore (utile en phase 4, checkpointer).
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [2.5] Scoring RICE hybride, robustesse, alignement, MoSCoW — 2026-10-03
+
+ADR-012
+
+- `src/lib/scoring/` (sans LLM, couvert à 100 %) : Reach en comptes distincts (modes comptes et MRR, retour sans compte, prospects, insight manuel), Confidence, Effort, RICE avec overrides et départage des égalités, robustesse du top 5, règles MoSCoW dans l'ordre avec tensions, capacité, validation des overrides et « contexte modifié ».
+- `src/pipeline/nodes/score.ts` (Sonnet) : un jugement par insight classé — Impact, justification, 2 à 5 preuves limitées aux retours de l'insight, contradictions, alignement et OKRs, recommandation MoSCoW. Le modèle ne produit aucun score. Effort par l'estimation en cache, calculs, rang et nouvelle version dans `scores`.
+- Migration `0003` : `overrides.feedback_ids`, `scores.overridden`.
+- `pnpm pipeline:score [--reach-mode comptes|mrr]` : en mode comptes, le Gantt (I-01) passe devant les permissions (I-07) ; en MRR, l'inverse. I-07 Must (engagement Atelier Mercure, J+75) ; I-11 (S4) hors stratégie, Won't. Must à 27 % de la capacité. 0,66 € le premier run, 0,15 € ensuite.
 
 ## [2.4] Estimation par analogie — 2026-10-03
 

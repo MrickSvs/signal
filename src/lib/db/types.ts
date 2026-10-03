@@ -919,6 +919,7 @@ export type Database = {
           active: boolean;
           context_changed: boolean;
           created_at: string;
+          feedback_ids: string[] | null;
           id: string;
           insight_id: string;
           param: Database["public"]["Enums"]["override_param"];
@@ -929,6 +930,7 @@ export type Database = {
           active?: boolean;
           context_changed?: boolean;
           created_at?: string;
+          feedback_ids?: string[] | null;
           id?: string;
           insight_id: string;
           param: Database["public"]["Enums"]["override_param"];
@@ -939,6 +941,7 @@ export type Database = {
           active?: boolean;
           context_changed?: boolean;
           created_at?: string;
+          feedback_ids?: string[] | null;
           id?: string;
           insight_id?: string;
           param?: Database["public"]["Enums"]["override_param"];
@@ -1118,6 +1121,7 @@ export type Database = {
           moscow_rationale: string | null;
           moscow_reco: Database["public"]["Enums"]["moscow"] | null;
           okr_refs: string[];
+          overridden: Json;
           rank: number | null;
           reach: number;
           reach_detail: Json;
@@ -1145,6 +1149,7 @@ export type Database = {
           moscow_rationale?: string | null;
           moscow_reco?: Database["public"]["Enums"]["moscow"] | null;
           okr_refs?: string[];
+          overridden?: Json;
           rank?: number | null;
           reach: number;
           reach_detail?: Json;
@@ -1172,6 +1177,7 @@ export type Database = {
           moscow_rationale?: string | null;
           moscow_reco?: Database["public"]["Enums"]["moscow"] | null;
           okr_refs?: string[];
+          overridden?: Json;
           rank?: number | null;
           reach?: number;
           reach_detail?: Json;

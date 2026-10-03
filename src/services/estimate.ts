@@ -450,13 +450,16 @@ export async function estimateInsight(
     .eq("id", insightId)
     .single();
   if (error || !insight) throw new EstimationError(`Insight ${insightId} introuvable`);
+  return estimateCached(db, { insightId, ...insightNeed(insight) }, options, deps);
+}
+
+/** What is estimated for an insight: its title and problem statement; the cache keys on the latter. */
+export function insightNeed(insight: { title: string; problem_statement: string | null }): {
+  statement: string;
+  need: string;
+} {
   const statement = insight.problem_statement?.trim() || insight.title;
-  return estimateCached(
-    db,
-    { insightId, statement, need: `${insight.title}\n\n${statement}` },
-    options,
-    deps,
-  );
+  return { statement, need: `${insight.title}\n\n${statement}` };
 }
 
 /** Estimate of a free-text need (CLI, agent), cached the same way. */

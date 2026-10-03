@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "db:push": "supabase db push",
     "db:types": "supabase gen types typescript --linked --schema public > src/lib/db/types.ts && prettier --write src/lib/db/types.ts",
@@ -16,6 +17,7 @@
     "pipeline:triage": "tsx scripts/pipeline-triage.ts",
     "pipeline:enrich": "tsx scripts/pipeline-enrich.ts",
     "pipeline:cluster": "tsx scripts/pipeline-cluster.ts",
+    "pipeline:score": "tsx scripts/pipeline-score.ts",
     "estimate": "tsx scripts/estimate.ts"
   },
   "dependencies": {
@@ -50,6 +52,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^5.0.3",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",

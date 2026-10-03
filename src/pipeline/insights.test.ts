@@ -197,7 +197,14 @@ describe("resolveCommitments", () => {
         { id: "C-001", name: "Autre" },
       ]),
     ).toEqual({
-      coverage: [{ customerId: "C-077", productAreas: ["permissions_partage"] }],
+      coverage: [
+        {
+          customerId: "C-077",
+          productAreas: ["permissions_partage"],
+          account: "Atelier Mercure",
+          dueInDays: 75,
+        },
+      ],
       unknown: [],
     });
     expect(resolveCommitments(commitments, []).unknown).toEqual(["Atelier Mercure"]);

@@ -68,7 +68,7 @@ function check(error: { message: string } | null, what: string): void {
   if (error) throw new Error(`Regroupement : ${what} en échec (${error.message})`);
 }
 
-async function fetchAll<T>(
+export async function fetchAll<T>(
   query: (
     from: number,
     to: number,
@@ -94,8 +94,14 @@ export function resolveCommitments(
   const unknown: string[] = [];
   for (const c of commitments) {
     const id = byName.get(normalizeName(c.account));
-    if (id) coverage.push({ customerId: id, productAreas: c.product_areas });
-    else unknown.push(c.account);
+    if (id) {
+      coverage.push({
+        customerId: id,
+        productAreas: c.product_areas,
+        account: c.account,
+        dueInDays: c.due_in_days,
+      });
+    } else unknown.push(c.account);
   }
   return { coverage, unknown };
 }

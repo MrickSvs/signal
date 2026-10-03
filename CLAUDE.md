@@ -80,11 +80,11 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `pnpm dev`                                                                                                                                 | Lancer l'app                |
 | `pnpm tsx scripts/smoke-llm.ts` | Vérifier la couche LLM (Haiku structuré + embedding + trace Langfuse) |
-| `pnpm lint` · `pnpm typecheck` · `pnpm test`                                                                                                                         | Qualité                        |
+| `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm test:coverage` (100 % sur `lib/scoring`)                                                                        | Qualité                        |
 | `pnpm db:push` · `pnpm db:types` · `pnpm db:seed`                                                                                                                    | Base                           |
 | `pnpm tsx scripts/generate-customers.ts` · `pnpm tsx scripts/generate-reference-tickets.ts` | Régénérer `data/customers.csv` et `data/reference_tickets.json` |
 | `pnpm tsx scripts/generate-feedbacks.ts` (`--preview`, `--dataset development\|holdout\|all`) · `pnpm tsx scripts/review-sample.ts` | Générer les retours et leur vérité terrain (cache dans `.cache/`) ; échantillon de relecture humaine |
-| `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:enrich` · `pipeline:cluster` · `pipeline:score` · `digest`                                  | Pipeline                       |
+| `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:enrich` · `pipeline:cluster` · `pipeline:score` (`--reach-mode comptes\|mrr`) · `digest`                                  | Pipeline                       |
 | `pnpm estimate "<besoin>"` ou `pnpm estimate I-07` (`--force`)                                                                                                       | Tester l'estimation (cache par énoncé) |
 | `pnpm notion:setup` · `pnpm notion:push`                                                                                                                             | Notion                         |
 | `pnpm eval:triage` (`--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` · `eval:guardrails` (`--tools`) · `eval:backlog` · `eval:judge-calibration` | Evals (`--sample N`, `--full`) |
