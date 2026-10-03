@@ -82,6 +82,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm tsx scripts/smoke-llm.ts` | Vérifier la couche LLM (Haiku structuré + embedding + trace Langfuse) |
 | `pnpm lint` · `pnpm typecheck` · `pnpm test`                                                                                                                         | Qualité                        |
 | `pnpm db:push` · `pnpm db:types` · `pnpm db:seed`                                                                                                                    | Base                           |
+| `pnpm tsx scripts/generate-customers.ts` · `pnpm tsx scripts/generate-reference-tickets.ts` | Régénérer `data/customers.csv` et `data/reference_tickets.json` |
 | `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:cluster` · `pipeline:score` · `digest`                                  | Pipeline                       |
 | `pnpm estimate "<besoin>"` (`--force`)                                                                                                                               | Tester l'estimation   |
 | `pnpm notion:setup` · `pnpm notion:push`                                                                                                                             | Notion                         |

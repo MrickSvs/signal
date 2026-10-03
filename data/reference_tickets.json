@@ -1,0 +1,573 @@
+[
+  {
+    "id": "T-101",
+    "title": "Assigner une tâche à plusieurs membres avec migration du champ assigné",
+    "description": "Le champ assigné d'une tâche devient une liste de membres, avec reprise des données existantes. Plusieurs personnes peuvent ainsi porter la même tâche.",
+    "module": "taches",
+    "components": [
+      "taches"
+    ],
+    "estimated_points": 8,
+    "actual_points": 8,
+    "actual_days": 15,
+    "surprises": "Estimation tenue. Le module tâches est lu par tout le reste, mais la liste des écrans à adapter avait été bien recensée au départ. La migration des données a été répétée sur une copie avant la mise en production.",
+    "shipped_days_ago": 607
+  },
+  {
+    "id": "T-102",
+    "title": "Ajouter le filtre par assigné dans la vue liste",
+    "description": "La vue liste peut être filtrée sur un ou plusieurs membres assignés, en plus du statut et de l'échéance. Cela permet à chacun de retrouver ses tâches sans parcourir tout le projet.",
+    "module": "liste",
+    "components": [
+      "liste"
+    ],
+    "estimated_points": 3,
+    "actual_points": 3,
+    "actual_days": 5.5,
+    "surprises": "Estimation tenue. Le filtre s'ajoute à la requête existante de la liste, avec un point de vigilance : l'export reprend cette requête, et il fallait vérifier que le nouveau filtre y était bien pris en compte.",
+    "shipped_days_ago": 592
+  },
+  {
+    "id": "T-103",
+    "title": "Réserver la suppression d'un projet au propriétaire de l'espace",
+    "description": "Seul le propriétaire de l'espace peut désormais supprimer un projet. Le bouton est masqué pour les autres membres et l'API refuse la requête côté serveur.",
+    "module": "permissions",
+    "components": [
+      "permissions"
+    ],
+    "estimated_points": 2,
+    "actual_points": 3,
+    "actual_days": 5.5,
+    "surprises": "Sous-estimé : il n'y a pas de couche d'autorisation centrale, et la suppression était déclenchable depuis la page projet et depuis les paramètres, chacune avec sa propre condition. Le second point d'entrée n'a été trouvé qu'en recette.",
+    "shipped_days_ago": 573
+  },
+  {
+    "id": "T-104",
+    "title": "Ajouter la préférence « digest quotidien » aux notifications",
+    "description": "Permettre à chaque membre de choisir entre un e-mail par événement et un récapitulatif quotidien. Nouvelle préférence dans les paramètres du compte, envoi groupé chaque matin par la file de tâches.",
+    "module": "notifications",
+    "components": [
+      "notifications",
+      "parametres"
+    ],
+    "estimated_points": 5,
+    "actual_points": 5,
+    "actual_days": 9,
+    "surprises": "Estimation tenue. Pour ne pas migrer tous les comptes d'un coup, la nouvelle préférence a été ajoutée à côté de l'ancienne, avec une reprise prévue plus tard : les deux champs coexistent depuis.",
+    "shipped_days_ago": 563
+  },
+  {
+    "id": "T-105",
+    "title": "Ajouter le type date aux champs personnalisés",
+    "description": "Un champ personnalisé peut maintenant être de type date, en plus du texte et du nombre. Il se saisit avec un sélecteur dans le détail de la tâche et s'affiche au bon format.",
+    "module": "champs_personnalises",
+    "components": [
+      "champs_personnalises"
+    ],
+    "estimated_points": 5,
+    "actual_points": 5,
+    "actual_days": 7.5,
+    "surprises": "Estimation tenue. Le stockage générique clé-valeur typé a absorbé le nouveau type sans migration, le travail s'est concentré sur le formulaire de tâche et l'affichage. Point de vigilance : chaque type supplémentaire devra aussi être géré par la liste et l'export.",
+    "shipped_days_ago": 545
+  },
+  {
+    "id": "T-106",
+    "title": "Réordonner les cartes à l'intérieur d'une colonne du kanban",
+    "description": "Une carte peut être déplacée vers le haut ou le bas de sa colonne, et son rang est conservé au rechargement. Les équipes y placent leurs tâches prioritaires en tête.",
+    "module": "tableau",
+    "components": [
+      "tableau"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 4,
+    "surprises": "Estimation tenue. Le tableau ne fait que lire les tâches et appeler l'API, le changement est resté dans le module. Le glisser-déposer recalcule tout le tableau, ce qui reste à surveiller sur les gros projets.",
+    "shipped_days_ago": 535
+  },
+  {
+    "id": "T-107",
+    "title": "Renommer un projet et modifier sa description depuis ses paramètres",
+    "description": "Les paramètres du projet permettent maintenant de changer son nom et sa description sans passer par le propriétaire de l'espace. Les modifications sont enregistrées immédiatement et visibles dans les écrans du projet.",
+    "module": "parametres",
+    "components": [
+      "parametres"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3.5,
+    "surprises": "Estimation tenue. Écran de configuration simple, peu de logique, aucun autre module touché.",
+    "shipped_days_ago": 516
+  },
+  {
+    "id": "T-108",
+    "title": "Corriger le double envoi des rappels d'échéance sur les tâches à plusieurs assignés",
+    "description": "Quand une tâche avait plusieurs assignés, chacun recevait le rappel d'échéance une fois par assigné. Dédoublonnage des destinataires avant l'envoi du rappel.",
+    "module": "notifications",
+    "components": [
+      "notifications"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3,
+    "surprises": "Aucune : cause trouvée dès le premier jour, correctif localisé dans le module de notifications, tests d'envoi ajoutés.",
+    "shipped_days_ago": 497
+  },
+  {
+    "id": "T-109",
+    "title": "Ajouter des sous-tâches en checklist dans le détail d'une tâche",
+    "description": "Une tâche peut maintenant contenir une liste de sous-tâches à cocher, ajoutées, renommées et supprimées depuis son détail. Les équipes découpaient jusque-là leurs tâches en plusieurs tâches séparées pour suivre l'avancement.",
+    "module": "taches",
+    "components": [
+      "taches"
+    ],
+    "estimated_points": 5,
+    "actual_points": 5,
+    "actual_days": 8.5,
+    "surprises": "Estimation tenue. Le modèle de tâche est lu par tous les autres modules, donc la checklist a été gardée volontairement simple et rattachée à la tâche seule.",
+    "shipped_days_ago": 486
+  },
+  {
+    "id": "T-110",
+    "title": "L'export CSV ignorait les filtres actifs de la vue liste",
+    "description": "Le fichier exporté contenait toutes les tâches du projet au lieu de celles affichées dans la liste. Les filtres actifs sont désormais transmis à la génération du fichier.",
+    "module": "export",
+    "components": [
+      "export",
+      "liste"
+    ],
+    "estimated_points": 1,
+    "actual_points": 2,
+    "actual_days": 3.5,
+    "surprises": "Sous-estimé : l'export reprend la requête de la liste mais construisait sa propre copie des paramètres de filtre, qui avait divergé. Il a fallu les réaligner et ajouter des tests pour chaque filtre.",
+    "shipped_days_ago": 468
+  },
+  {
+    "id": "T-111",
+    "title": "Trier la vue liste par échéance ou par date de création",
+    "description": "La vue liste propose un tri croissant ou décroissant sur l'échéance ou sur la date de création. Le tri est conservé quand les filtres changent.",
+    "module": "liste",
+    "components": [
+      "liste"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3,
+    "surprises": "Estimation tenue. Le tri s'ajoute à la requête de la liste existante. Les tâches sans échéance sont placées en fin de liste, ce qui a été précisé en recette.",
+    "shipped_days_ago": 453
+  },
+  {
+    "id": "T-112",
+    "title": "Bloquer l'export CSV pour les membres désactivés",
+    "description": "Un membre désactivé pouvait encore télécharger l'export d'un projet depuis une session restée ouverte. Vérification du statut du membre avant la génération du fichier.",
+    "module": "export",
+    "components": [
+      "export",
+      "permissions"
+    ],
+    "estimated_points": 2,
+    "actual_points": 3,
+    "actual_days": 4,
+    "surprises": "Sous-estimé : l'export avait son propre contrôle d'accès, distinct de celui des écrans. Il a fallu le reprendre à part, et la recette a révélé un second chemin d'export oublié.",
+    "shipped_days_ago": 440
+  },
+  {
+    "id": "T-113",
+    "title": "Corriger le lien vers la tâche dans l'e-mail de nouveau commentaire",
+    "description": "Le lien de l'e-mail de commentaire ouvrait la page du projet au lieu de la tâche commentée. Il pointe maintenant directement vers le détail de la tâche.",
+    "module": "notifications",
+    "components": [
+      "notifications"
+    ],
+    "estimated_points": 1,
+    "actual_points": 1,
+    "actual_days": 1.5,
+    "surprises": "Aucune : le gabarit de l'e-mail utilisait le mauvais identifiant, correctif d'une ligne et test d'envoi ajouté.",
+    "shipped_days_ago": 430
+  },
+  {
+    "id": "T-114",
+    "title": "Changer le statut d'une tâche en glissant sa carte d'une colonne à l'autre",
+    "description": "Déposer une carte dans une autre colonne du kanban change le statut de la tâche. L'écran se met à jour tout de suite et revient en arrière si l'enregistrement échoue.",
+    "module": "tableau",
+    "components": [
+      "tableau",
+      "taches"
+    ],
+    "estimated_points": 3,
+    "actual_points": 3,
+    "actual_days": 5.5,
+    "surprises": "Estimation tenue. L'API de changement de statut existait déjà, le travail était surtout côté front. Point de vigilance : le glisser-déposer recalcule tout le tableau.",
+    "shipped_days_ago": 414
+  },
+  {
+    "id": "T-115",
+    "title": "Afficher les champs personnalisés en colonnes dans la vue liste",
+    "description": "Les champs personnalisés d'un projet apparaissent comme colonnes de la vue liste, avec un affichage adapté à chaque type. Les valeurs étaient jusque-là visibles uniquement dans le détail de la tâche.",
+    "module": "champs_personnalises",
+    "components": [
+      "champs_personnalises",
+      "liste"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 8,
+    "surprises": "Plus long que prévu : les valeurs sont dans une table clé-valeur générique, et la requête de la liste, construite à la main, a dû être reprise pour les joindre sans ralentir le chargement.",
+    "shipped_days_ago": 392
+  },
+  {
+    "id": "T-116",
+    "title": "Limiter la taille des pièces jointes et afficher un message d'erreur clair",
+    "description": "Un fichier trop lourd est refusé avec un message qui indique la taille maximale autorisée. Auparavant, l'envoi échouait sans explication.",
+    "module": "taches",
+    "components": [
+      "taches"
+    ],
+    "estimated_points": 2,
+    "actual_points": 3,
+    "actual_days": 5.5,
+    "surprises": "Sous-estimé : la limite devait être vérifiée dans le formulaire et aussi côté serveur, et le module tâches, très couplé, remontait l'erreur de façon différente selon l'écran. Il a fallu harmoniser la gestion de l'erreur.",
+    "shipped_days_ago": 378
+  },
+  {
+    "id": "T-117",
+    "title": "Distinguer le rôle admin du propriétaire de l'espace",
+    "description": "Jusqu'ici, seul le créateur de l'espace pouvait gérer les membres. Création du rôle admin, attribuable à plusieurs membres depuis les paramètres, avec les droits de gestion de l'espace.",
+    "module": "permissions",
+    "components": [
+      "permissions",
+      "parametres"
+    ],
+    "estimated_points": 5,
+    "actual_points": 8,
+    "actual_days": 14,
+    "surprises": "Sous-estimé : les contrôles d'accès étaient répartis dans cinq écrans et dans l'export, chacun avec sa propre condition. Deux écrans oubliés ont été rattrapés en recette, puis il a fallu migrer les espaces existants.",
+    "shipped_days_ago": 364
+  },
+  {
+    "id": "T-118",
+    "title": "Créer la page de gestion des membres : liste, recherche et désactivation",
+    "description": "Les paramètres de l'espace affichent la liste des membres, avec une recherche par nom ou e-mail et un bouton de désactivation. Les admins n'ont plus besoin de passer par le support pour retirer un accès.",
+    "module": "parametres",
+    "components": [
+      "parametres"
+    ],
+    "estimated_points": 3,
+    "actual_points": 3,
+    "actual_days": 4,
+    "surprises": "Estimation tenue. Écran de configuration avec peu de logique. Point de vigilance : un membre désactivé garde ses tâches assignées, ce qui a été vérifié avec l'équipe produit.",
+    "shipped_days_ago": 352
+  },
+  {
+    "id": "T-119",
+    "title": "Envoyer un e-mail de rappel la veille de l'échéance d'une tâche",
+    "description": "Les assignés reçoivent un e-mail la veille de l'échéance d'une tâche non terminée. Le rappel respecte leurs préférences de notification.",
+    "module": "notifications",
+    "components": [
+      "notifications"
+    ],
+    "estimated_points": 3,
+    "actual_points": 2,
+    "actual_days": 3.5,
+    "surprises": "Surestimé : l'événement d'échéance proche et le gabarit d'e-mail existaient déjà, il a suffi de planifier l'envoi dans la file de tâches.",
+    "shipped_days_ago": 340
+  },
+  {
+    "id": "T-120",
+    "title": "Inclure les champs personnalisés dans l'export CSV",
+    "description": "Chaque champ personnalisé du projet devient une colonne du fichier exporté, avec les valeurs de la liste filtrée. Les équipes n'ont plus à les recopier à la main.",
+    "module": "export",
+    "components": [
+      "export",
+      "champs_personnalises"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 9,
+    "surprises": "Sous-estimé : l'export reprend la requête de la liste et les valeurs sont dans un stockage générique clé-valeur, il a fallu les pivoter en colonnes. La génération étant synchrone, les gros projets ont demandé des vérifications de durée.",
+    "shipped_days_ago": 322
+  },
+  {
+    "id": "T-121",
+    "title": "Afficher les compteurs de commentaires et de pièces jointes sur les cartes du kanban",
+    "description": "Chaque carte du tableau montre le nombre de commentaires et de pièces jointes de sa tâche, pour repérer d'un coup d'œil les tâches actives.",
+    "module": "tableau",
+    "components": [
+      "tableau"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 7.5,
+    "surprises": "Plus long que prévu : une requête par carte faisait ramer les gros tableaux, dont le rendu n'est pas virtualisé. Il a fallu regrouper les compteurs en une seule requête par tableau.",
+    "shipped_days_ago": 306
+  },
+  {
+    "id": "T-122",
+    "title": "Dupliquer une tâche",
+    "description": "Une action du menu de la tâche en crée une copie, avec son titre, sa description et ses sous-tâches, au statut à faire. Cela évite de ressaisir les tâches récurrentes.",
+    "module": "taches",
+    "components": [
+      "taches"
+    ],
+    "estimated_points": 2,
+    "actual_points": 1,
+    "actual_days": 2,
+    "surprises": "Surestimé : la duplication a réutilisé le chemin de création existant, sans nouveau modèle ni migration. Les commentaires et pièces jointes ne sont volontairement pas copiés.",
+    "shipped_days_ago": 290
+  },
+  {
+    "id": "T-123",
+    "title": "Masquer aux simples membres les actions réservées aux admins dans le détail de tâche et le tableau",
+    "description": "Les membres voyaient des boutons d'administration qui renvoyaient une erreur au clic. Ces actions sont maintenant cachées pour le rôle member dans le détail de tâche et dans le tableau.",
+    "module": "permissions",
+    "components": [
+      "permissions"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 7,
+    "surprises": "Sous-estimé : chaque écran avait sa propre condition d'affichage, sans contrôle central. Il a fallu relire les deux écrans un par un, et la recette a montré une action encore visible depuis la liste.",
+    "shipped_days_ago": 275
+  },
+  {
+    "id": "T-124",
+    "title": "Lien de téléchargement de l'export CSV réservé aux membres",
+    "description": "Après un export, le membre peut copier un lien vers le fichier pour un collègue. Le lien est valable 7 jours et ne s'ouvre que pour un membre connecté de l'espace.",
+    "module": "export",
+    "components": [
+      "export",
+      "permissions"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 9.5,
+    "surprises": "Sous-estimé : le lien a demandé son propre contrôle d'accès (membre connecté, bon espace, expiration), en plus de celui de l'export, et il n'existait aucun stockage pour les fichiers générés.",
+    "shipped_days_ago": 260
+  },
+  {
+    "id": "T-125",
+    "title": "Valider le format du champ nombre (décimales, séparateur, valeurs négatives)",
+    "description": "Le champ nombre acceptait des saisies ambiguës, comme une virgule ou un point, et stockait parfois du texte mal converti. Validation à la saisie : séparateur décimal, valeurs négatives et message d'erreur clair.",
+    "module": "champs_personnalises",
+    "components": [
+      "champs_personnalises"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 4,
+    "surprises": "Estimation tenue. Point de vigilance : le stockage générique des champs personnalisés conserve l'ancienne valeur telle quelle, les valeurs déjà saisies ne sont donc pas revalidées.",
+    "shipped_days_ago": 244
+  },
+  {
+    "id": "T-126",
+    "title": "Ajouter la pagination et le chargement progressif de la vue liste",
+    "description": "Les projets volumineux chargeaient toutes leurs tâches d'un coup dans la liste. La liste charge maintenant les tâches par pages, en gardant filtres et tri.",
+    "module": "liste",
+    "components": [
+      "liste"
+    ],
+    "estimated_points": 5,
+    "actual_points": 5,
+    "actual_days": 8.5,
+    "surprises": "Estimation tenue. La requête filtrée de la liste étant reprise par l'export, un test a confirmé que l'export CSV continue de sortir toutes les tâches, pas seulement la première page.",
+    "shipped_days_ago": 231
+  },
+  {
+    "id": "T-127",
+    "title": "Rendre les colonnes du kanban repliables, avec le nombre de cartes de chaque colonne",
+    "description": "Chaque colonne du tableau peut être repliée et affiche son nombre de cartes. Utile pour se concentrer sur les statuts en cours sur les projets chargés.",
+    "module": "tableau",
+    "components": [
+      "tableau"
+    ],
+    "estimated_points": 5,
+    "actual_points": 8,
+    "actual_days": 15,
+    "surprises": "Sous-estimé : le glisser-déposer recalcule tout le tableau et ne gérait pas une colonne repliée comme cible de dépôt. Il a fallu reprendre ce recalcul et ajouter des cas de test.",
+    "shipped_days_ago": 213
+  },
+  {
+    "id": "T-128",
+    "title": "Ne plus notifier un membre de ses propres actions",
+    "description": "Un membre qui s'assignait une tâche ou commentait la sienne recevait un e-mail pour sa propre action. On écarte désormais l'auteur de l'événement des destinataires avant l'envoi.",
+    "module": "notifications",
+    "components": [
+      "notifications"
+    ],
+    "estimated_points": 2,
+    "actual_points": 3,
+    "actual_days": 5,
+    "surprises": "Sous-estimé : le filtrage s'est fait en plusieurs endroits, un par type d'événement émis par les tâches. Le rappel d'échéance, qui n'a pas d'auteur, a demandé un cas à part.",
+    "shipped_days_ago": 198
+  },
+  {
+    "id": "T-129",
+    "title": "Archiver et désarchiver un projet depuis ses paramètres",
+    "description": "Les paramètres du projet proposent un bouton pour archiver le projet et un pour le désarchiver. Un projet archivé sort de la liste des projets actifs.",
+    "module": "parametres",
+    "components": [
+      "parametres"
+    ],
+    "estimated_points": 1,
+    "actual_points": 1,
+    "actual_days": 1.5,
+    "surprises": "Estimation tenue. Écran de configuration simple, sans impact sur les autres modules.",
+    "shipped_days_ago": 184
+  },
+  {
+    "id": "T-130",
+    "title": "Journaliser les changements de rôle des membres",
+    "description": "Chaque passage d'un membre à admin, ou l'inverse, est enregistré avec son auteur, la personne concernée et le rôle avant et après, pour que le support puisse répondre aux questions d'accès.",
+    "module": "permissions",
+    "components": [
+      "permissions"
+    ],
+    "estimated_points": 3,
+    "actual_points": 8,
+    "actual_days": 12,
+    "surprises": "Sous-estimé : aucun journal n'existait et les changements de rôle passaient par plusieurs chemins, chacun avec son propre contrôle. Chacun a dû être retrouvé et branché sur le journal, dont deux découverts en recette.",
+    "shipped_days_ago": 171
+  },
+  {
+    "id": "T-131",
+    "title": "Conserver le brouillon d'un commentaire en passant d'une tâche à l'autre",
+    "description": "Un commentaire commencé était perdu dès qu'on ouvrait une autre tâche. Le brouillon est désormais gardé par tâche et restauré à la réouverture, puis vidé à l'envoi.",
+    "module": "taches",
+    "components": [
+      "taches"
+    ],
+    "estimated_points": 3,
+    "actual_points": 5,
+    "actual_days": 8,
+    "surprises": "Sous-estimé : le détail de tâche s'ouvre depuis la page projet, la liste et le tableau, et chaque point d'entrée réinitialisait l'état à sa manière. Il a fallu unifier cette réinitialisation avant de brancher le brouillon.",
+    "shipped_days_ago": 159
+  },
+  {
+    "id": "T-132",
+    "title": "Accélérer l'export CSV des projets de plus de 2 000 tâches, qui expirait",
+    "description": "L'export CSV des gros projets dépassait le délai et ne renvoyait aucun fichier. La génération lit maintenant les tâches par lots et écrit le fichier au fil de l'eau.",
+    "module": "export",
+    "components": [
+      "export"
+    ],
+    "estimated_points": 5,
+    "actual_points": 8,
+    "actual_days": 15,
+    "surprises": "Sous-estimé : la génération est synchrone et reprend la requête de la liste, dont les champs personnalisés étaient chargés tâche par tâche. Il a fallu aussi regrouper cette lecture pour tenir le délai.",
+    "shipped_days_ago": 139
+  },
+  {
+    "id": "T-133",
+    "title": "Réordonner les champs personnalisés d'un projet dans le formulaire de tâche",
+    "description": "Les champs personnalisés s'affichaient dans l'ordre de création. Les admins peuvent maintenant les réordonner dans les paramètres du projet, et le formulaire de tâche suit cet ordre.",
+    "module": "champs_personnalises",
+    "components": [
+      "champs_personnalises",
+      "taches"
+    ],
+    "estimated_points": 3,
+    "actual_points": 3,
+    "actual_days": 4.5,
+    "surprises": "Estimation tenue. Point de vigilance : l'ordre est stocké avec la définition du champ, et la liste et l'export suivent aussi cet ordre, sans changement de leur côté.",
+    "shipped_days_ago": 127
+  },
+  {
+    "id": "T-134",
+    "title": "Corriger le défilement horizontal du kanban sur les petits écrans",
+    "description": "Sur petit écran, la dernière colonne du tableau restait hors d'atteinte. Le conteneur des colonnes défile maintenant correctement à l'horizontale.",
+    "module": "tableau",
+    "components": [
+      "tableau"
+    ],
+    "estimated_points": 1,
+    "actual_points": 1,
+    "actual_days": 1.5,
+    "surprises": "Aucune : correctif de style localisé dans le tableau, vérifié sur les largeurs d'écran courantes.",
+    "shipped_days_ago": 107
+  },
+  {
+    "id": "T-135",
+    "title": "Corriger le filtre par échéance qui ignorait le fuseau horaire du membre",
+    "description": "Une tâche due en fin de journée apparaissait dans le mauvais jour selon le fuseau du membre. Le filtre de la liste compare désormais les échéances dans le fuseau du membre.",
+    "module": "liste",
+    "components": [
+      "liste"
+    ],
+    "estimated_points": 1,
+    "actual_points": 1,
+    "actual_days": 1.5,
+    "surprises": "Aucune : cause trouvée rapidement dans la construction de la requête du filtre, correctif limité à la liste avec tests ajoutés.",
+    "shipped_days_ago": 96
+  },
+  {
+    "id": "T-136",
+    "title": "Empêcher de retirer le dernier admin d'un espace",
+    "description": "Un admin pouvait se rétrograder ou être retiré alors qu'il était le seul, laissant l'espace sans personne pour gérer les membres. L'action est maintenant refusée avec un message explicatif.",
+    "module": "permissions",
+    "components": [
+      "permissions"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 4,
+    "surprises": "Estimation tenue. La règle a été posée côté serveur, puis reprise dans l'écran des membres pour éviter un bouton qui échoue.",
+    "shipped_days_ago": 82
+  },
+  {
+    "id": "T-137",
+    "title": "Vérifier les droits de l'espace avant le téléchargement d'une pièce jointe",
+    "description": "Une pièce jointe pouvait être téléchargée par quiconque connaissait son adresse, même hors de l'espace. L'accès vérifie maintenant que la personne est connectée et membre du bon espace.",
+    "module": "permissions",
+    "components": [
+      "permissions",
+      "taches"
+    ],
+    "estimated_points": 5,
+    "actual_points": 8,
+    "actual_days": 15.5,
+    "surprises": "Sous-estimé : le téléchargement n'avait aucun contrôle propre, distinct de celui des écrans, et il a fallu ajouter ce point de contrôle au modèle des tâches. La recette a révélé un second chemin de téléchargement, depuis les commentaires.",
+    "shipped_days_ago": 62
+  },
+  {
+    "id": "T-138",
+    "title": "Ajouter un lien de désinscription en un clic dans le pied des e-mails de notification",
+    "description": "Chaque e-mail de notification contient un lien pour couper ce type de message sans se connecter aux paramètres. Le lien met à jour la préférence du membre.",
+    "module": "notifications",
+    "components": [
+      "notifications"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3,
+    "surprises": "Estimation tenue. Point de vigilance : le lien doit écrire dans les préférences stockées dans les paramètres, qui contiennent deux champs de notification, et seul le champ à jour est modifié.",
+    "shipped_days_ago": 48
+  },
+  {
+    "id": "T-139",
+    "title": "Ajouter le statut « en revue » aux tâches, avec sa colonne dans le kanban",
+    "description": "Les tâches peuvent passer par un statut « en revue » entre « en cours » et « terminé ». Le tableau affiche une colonne dédiée pour ce statut.",
+    "module": "taches",
+    "components": [
+      "taches",
+      "tableau"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3.5,
+    "surprises": "Estimation tenue. Le tableau génère une colonne par statut, ce qui a limité le changement à la liste des statuts et au filtre de la liste.",
+    "shipped_days_ago": 39
+  },
+  {
+    "id": "T-140",
+    "title": "Changer l'adresse e-mail de son compte, avec confirmation",
+    "description": "Un membre peut modifier l'adresse e-mail de son compte depuis les paramètres. Le changement ne prend effet qu'après un clic sur le lien envoyé à la nouvelle adresse.",
+    "module": "parametres",
+    "components": [
+      "parametres"
+    ],
+    "estimated_points": 2,
+    "actual_points": 2,
+    "actual_days": 3,
+    "surprises": "Estimation tenue. L'envoi de confirmation passe par la file de tâches existante, sans développement supplémentaire.",
+    "shipped_days_ago": 17
+  }
+]

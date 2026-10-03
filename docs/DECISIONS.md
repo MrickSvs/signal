@@ -56,3 +56,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **`weighting.yaml`** parsé par `yaml` 2.9.1 et validé par un schéma zod strict (clé inconnue refusée, poids de Confidence de somme 1, niveaux et échelles ordonnés, ordre MoSCoW complet). Il contient aussi les seuils d'alerte de §10.10 et la capacité (développeurs, semaines, part roadmap) : les 42 semaines-personne sont calculées en code.
   - Lecture disque à l'exécution depuis `process.cwd()/context/jalon` ; `outputFileTracingIncludes` embarque le pack dans les fonctions Vercel.
 - **Conséquences** : renommer un module impose de régénérer les tickets de référence. Changer de plans tarifaires demande d'adapter le schéma zod.
+
+## ADR-005 — Données de référence : chiffres planifiés en code, dates relatives
+
+- **Date** : 2026-10-02
+- **Statut** : acceptée
+- **Contexte** : étape 1.3. Les tickets de référence doivent porter des biais d'équipe mesurables (permissions et export sous-estimés, notifications bien estimées) et rester cohérents avec les tickets déjà cités dans SPEC §9 et les skills.
+- **Décision** :
+  - **Clients** générés sans LLM, à seed fixe (`scripts/lib/random.ts`, mulberry32), ID attribués après mélange. Les comptes de SPEC §4.5 et les 2 comptes Business du sujet permissions sont fixés dans le script (`SCENARIO_ACCOUNTS`). Les prospects n'ont ni plan, ni MRR, ni santé ; leurs sièges sont des sièges potentiels. Les autres comptes Enterprise renouvellent au-delà de 90 jours.
+  - **Tickets** : module, composants, points estimés et réels, durée (≈ 5/3 jour par point, ± 20 %) et date de livraison sont planifiés en code ; le rôle `generation` n'écrit que titre, description et surprises, à partir d'un thème par ticket, avec contrôles (sujets du scénario interdits, dates absolues, longueurs) et nouvelle tentative. Les tickets cités dans le contexte sont écrits à la main. Relecture humaine ensuite : chronologie corrigée (assignation multiple avant T-108, rôle admin seulement à partir de T-117).
+  - **Dates** : les fichiers stockent des décalages (`renewal_in_days`, `shipped_days_ago`) ; le seed les convertit à partir de `DEMO_NOW` (`src/lib/demo-now.ts`).
+  - **Séquences** : migration 0002, `sync_id_sequence(entity)` recale la séquence d'une entité sur le plus grand ID présent, sans jamais reculer. Exécutable par `service_role` seulement.
+  - **Seuil d'analogue proche** : 0,45 (et non 0,6) d'après les similarités mesurées sur voyage-4.
+- **Conséquences** : régénérer les tickets écrase les corrections de relecture faites dans le JSON (sauf celles reportées dans le plan) ; le test du fichier versionné vérifie qu'il suit toujours le plan.

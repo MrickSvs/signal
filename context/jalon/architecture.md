@@ -55,9 +55,9 @@ Les identifiants ci-dessous sont les noms de composants utilisés dans les ticke
 
 ### `export` — Export (couplage moyen)
 
-- **Responsabilités** : export CSV de la vue liste, filtres appliqués, génération synchrone.
+- **Responsabilités** : export CSV de la vue liste, filtres appliqués, génération synchrone ; lien de téléchargement du fichier réservé aux membres connectés (7 jours).
 - **Pourquoi moyen** : dépend de la requête de `liste`, des champs personnalisés et de son propre contrôle de permissions.
-- **Zones à risque** : pas de moteur de mise en forme (ni Excel formaté, ni PDF) ; pas de lien de partage ni d'accès sans compte ; génération synchrone qui expire sur les gros projets. Historiquement sous-estimé.
+- **Zones à risque** : pas de moteur de mise en forme (ni Excel formaté, ni PDF) ; pas de lien de partage hors de l'espace ni d'accès sans compte ; génération synchrone, lue par lots, qui peut encore expirer sur les très gros projets. Historiquement sous-estimé.
 
 ### `champs_personnalises` — Champs personnalisés (couplage moyen)
 

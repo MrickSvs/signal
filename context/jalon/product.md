@@ -54,36 +54,42 @@ Liste de référence pour repérer une demande qui porte sur quelque chose que J
 **Tableau (kanban)**
 
 - Vue kanban par projet, une colonne par statut.
-- Glisser-déposer une carte d'une colonne à l'autre.
+- Glisser-déposer une carte d'une colonne à l'autre, ou la réordonner dans sa colonne.
+- Compteurs de commentaires et de pièces jointes sur chaque carte.
+- Replier une colonne ; chaque colonne affiche son nombre de cartes.
 
 **Liste**
 
 - Vue liste de toutes les tâches d'un projet.
 - Filtrer la liste par statut, par échéance et **par assigné**.
 - Trier la liste par échéance ou par date de création.
+- Afficher les champs personnalisés en colonnes.
 
 **Notifications**
 
 - Notifications par e-mail : assignation, commentaire, échéance proche.
 - Préférence « digest quotidien » : un seul e-mail récapitulatif par jour.
+- Lien de désinscription en un clic dans chaque e-mail ; aucune notification pour ses propres actions.
 
 **Export**
 
-- Export CSV de la vue liste, filtres appliqués.
+- Export CSV de la vue liste, filtres appliqués, champs personnalisés inclus.
+- Copier un lien vers le fichier exporté, valable 7 jours, qui ne s'ouvre que pour un membre connecté de l'espace.
 
 **Champs personnalisés**
 
-- Ajouter des champs de type texte, nombre ou date aux tâches d'un projet.
+- Ajouter des champs de type texte, nombre ou date aux tâches d'un projet, et les réordonner.
 
 **Paramètres et compte**
 
-- Gérer le compte, les membres de l'espace et leurs rôles (`admin` / `member`).
+- Gérer le compte, les membres de l'espace et leurs rôles (`admin` / `member`) : rechercher, désactiver un membre.
+- Changer l'adresse e-mail de son compte (avec confirmation).
 - Paramètres de projet (nom, description, membres).
 
 ## Ce que Jalon ne fait pas
 
 - **Aucune vue Gantt ni timeline**, aucune dépendance entre tâches, aucune date de début (seulement une échéance).
-- **Aucun accès pour le client final** : pas d'invité externe, pas de lien de partage, pas de rapport client.
+- **Aucun accès pour le client final** : pas d'invité externe, pas de lien de partage hors de l'espace, pas de rapport client.
 - Pas de facturation, pas de suivi de temps (non-cibles explicites, voir `strategy.md`).
 - Pas de notification in-app, pas d'application mobile.
 - Pas d'intégrations natives (Slack, Google Drive, etc.) ni d'API publique documentée.

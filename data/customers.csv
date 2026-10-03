@@ -1,0 +1,96 @@
+id,name,status,segment,plan,seats,mrr_eur,renewal_in_days,health,csm,email_domain
+C-001,Cap Horizon Conseil,client,conseil,business,10,240,134,vert,Inès Marchand,cap-horizon-conseil.fr
+C-002,Agence Tamaris,client,agence_com,free,2,0,,vert,,agence-tamaris.fr
+C-003,Logis Entretien,client,pme_services,free,2,0,,vert,,logis-entretien.fr
+C-004,Studio Marelle,client,agence_digitale,enterprise,131,3930,229,vert,Clara Benali,studio-marelle.com
+C-005,Agence Pixel Sauvage,client,agence_digitale,business,16,384,202,orange,Thomas Roussel,agence-pixel-sauvage.eu
+C-006,Cabinet Brévent,client,conseil,pro,2,24,,vert,,cabinet-brevent.fr
+C-007,Cabinet Ouessant,client,conseil,pro,4,48,,vert,,cabinet-ouessant.fr
+C-008,Atelier Vermillon,client,agence_com,business,16,384,148,vert,Hugo Lefèvre,atelier-vermillon.fr
+C-009,Agence Ponant,client,agence_com,business,16,384,55,orange,Hugo Lefèvre,agence-ponant.com
+C-010,Forgeval Industrie,prospect,hors_cible,,300,0,,,,forgeval-industrie.eu
+C-011,Agence Sillage,client,agence_digitale,pro,4,48,,orange,,agence-sillage.fr
+C-012,Netéa Services,client,pme_services,pro,5,60,,vert,,netea-services.fr
+C-013,Studio Bastide,client,agence_digitale,enterprise,90,2700,38,rouge,Thomas Roussel,studio-bastide.fr
+C-014,Événements Garance,client,pme_services,free,2,0,,vert,,evenements-garance.com
+C-015,Domicile Services Plus,client,pme_services,business,7,168,44,orange,Hugo Lefèvre,domicile-services-plus.eu
+C-016,Boussole Conseil,client,conseil,business,13,312,316,orange,Thomas Roussel,boussole-conseil.fr
+C-017,Les Artisans du Web,client,agence_digitale,free,1,0,,vert,,les-artisans-du-web.fr
+C-018,Agence Archipel,client,agence_com,free,3,0,,vert,,agence-archipel.fr
+C-019,Maison Lumen,prospect,agence_com,,45,0,,,,maison-lumen.com
+C-020,Studio Bifurque,client,agence_digitale,pro,8,96,,orange,,studio-bifurque.eu
+C-021,Plasturgie Vallière,client,hors_cible,business,14,336,235,orange,Thomas Roussel,plasturgie-valliere.fr
+C-022,Studio Capucine,client,agence_com,pro,8,96,,orange,,studio-capucine.fr
+C-023,Agence Fil Rouge,client,agence_com,pro,7,84,,vert,,agence-fil-rouge.fr
+C-024,Propreté Lumière,client,pme_services,pro,8,96,,vert,,proprete-lumiere.com
+C-025,Studio Lagune,client,agence_digitale,free,1,0,,vert,,studio-lagune.eu
+C-026,Métallerie Brunet,client,hors_cible,free,2,0,,vert,,metallerie-brunet.fr
+C-027,Thermique Rousseau,client,pme_services,business,7,168,180,vert,Clara Benali,thermique-rousseau.fr
+C-028,Agence Kiosque,client,agence_digitale,business,9,216,77,vert,Inès Marchand,agence-kiosque.fr
+C-029,Hygiène Pro Atlantique,client,pme_services,pro,4,48,,rouge,,hygiene-pro-atlantique.com
+C-030,Agence Grand Large,client,agence_com,free,3,0,,vert,,agence-grand-large.eu
+C-031,Code & Craie,client,agence_digitale,enterprise,97,2910,173,vert,Hugo Lefèvre,code-et-craie.fr
+C-032,Cabinet Arpège,client,conseil,free,1,0,,orange,,cabinet-arpege.fr
+C-033,Agence Boréale,client,agence_com,free,3,0,,vert,,agence-boreale.fr
+C-034,Studio Escale,client,agence_digitale,free,2,0,,vert,,studio-escale.com
+C-035,Agence Quai Ouest,client,agence_com,business,16,384,276,vert,Thomas Roussel,agence-quai-ouest.eu
+C-036,Maintenance Delorme,client,pme_services,pro,5,60,,vert,,maintenance-delorme.fr
+C-037,Agence Carambole,client,agence_digitale,business,14,336,124,vert,Thomas Roussel,agence-carambole.fr
+C-038,Agence Hublot,client,agence_digitale,business,6,144,267,vert,Inès Marchand,agence-hublot.fr
+C-039,Maison Cardinal,client,agence_com,pro,3,36,,vert,,maison-cardinal.com
+C-040,Atelier Pivoine,client,agence_com,pro,4,48,,vert,,atelier-pivoine.eu
+C-041,Menuiserie Arnoux,client,hors_cible,free,2,0,,vert,,menuiserie-arnoux.fr
+C-042,Studio Néon Bleu,client,agence_digitale,free,1,0,,orange,,studio-neon-bleu.fr
+C-043,Maison Orage,client,agence_com,pro,5,60,,vert,,maison-orage.fr
+C-044,Lumière Numérique,client,agence_digitale,pro,6,72,,vert,,lumiere-numerique.com
+C-045,Services Ondine,prospect,pme_services,,12,0,,,,services-ondine.eu
+C-046,Agence Saltimbanque,client,agence_com,business,17,408,153,vert,Inès Marchand,agence-saltimbanque.fr
+C-047,Le Bureau des Idées,client,agence_com,enterprise,152,4560,229,vert,Thomas Roussel,le-bureau-des-idees.fr
+C-048,Jardins de l'Estuaire,client,pme_services,business,16,384,70,orange,Hugo Lefèvre,jardins-de-l-estuaire.fr
+C-049,Bureau Vauban Ingénierie,client,pme_services,business,6,144,58,vert,Inès Marchand,bureau-vauban-ingenierie.com
+C-050,Agence Tangente,client,agence_digitale,business,9,216,148,vert,Clara Benali,agence-tangente.eu
+C-051,Agence Belvédère,client,agence_com,free,1,0,,orange,,agence-belvedere.fr
+C-052,Agence Sémaphore,client,agence_com,free,3,0,,vert,,agence-semaphore.fr
+C-053,BTP Ravel & Fils,client,hors_cible,free,2,0,,vert,,btp-ravel-et-fils.fr
+C-054,Fonderie du Lac,client,hors_cible,free,2,0,,vert,,fonderie-du-lac.com
+C-055,Altitude RH Conseil,client,conseil,enterprise,166,4980,230,vert,Thomas Roussel,altitude-rh-conseil.eu
+C-056,Valmont Conseil,client,conseil,enterprise,102,3060,314,vert,Clara Benali,valmont-conseil.fr
+C-057,Nuage Rose,client,agence_digitale,pro,5,60,,vert,,nuage-rose.fr
+C-058,Équinoxe Conseil,client,conseil,business,17,408,275,vert,Clara Benali,equinoxe-conseil.fr
+C-059,Carrelages Sudre,client,hors_cible,pro,3,36,,orange,,carrelages-sudre.com
+C-060,Boulangeries Fournil d'Or,client,hors_cible,pro,4,48,,orange,,boulangeries-fournil-d-or.eu
+C-061,Agence Vif-Argent,client,agence_digitale,pro,8,96,,vert,,agence-vif-argent.fr
+C-062,Archives & Co,client,pme_services,pro,3,36,,vert,,archives-et-co.fr
+C-063,Ascenseurs Guérin,client,pme_services,free,2,0,,vert,,ascenseurs-guerin.fr
+C-064,Studio Alizé,client,agence_com,enterprise,100,3000,313,vert,Inès Marchand,studio-alize.com
+C-065,Énergie Services Ouest,client,pme_services,pro,8,96,,orange,,energie-services-ouest.eu
+C-066,Agence Mistral,client,agence_com,pro,6,72,,orange,,agence-mistral.fr
+C-067,Traducteurs Associés Lyon,client,pme_services,free,1,0,,vert,,traducteurs-associes-lyon.fr
+C-068,Studio Origami,client,agence_digitale,pro,3,36,,orange,,studio-origami.fr
+C-069,Studio Coquelicot,client,agence_digitale,business,11,264,339,vert,Hugo Lefèvre,studio-coquelicot.com
+C-070,Trame Conseil,client,conseil,free,2,0,,vert,,trame-conseil.eu
+C-071,Plume & Cie,client,agence_com,business,14,336,299,orange,Clara Benali,plume-et-cie.fr
+C-072,Agence Polygone,client,agence_digitale,business,14,336,160,orange,Inès Marchand,agence-polygone.fr
+C-073,TechniPlus Maintenance,client,pme_services,free,1,0,,vert,,techniplus-maintenance.fr
+C-074,Ferrand Stratégie,client,conseil,pro,8,96,,vert,,ferrand-strategie.com
+C-075,Clim'Ouest Services,client,pme_services,business,11,264,72,rouge,Thomas Roussel,clim-ouest-services.eu
+C-076,Groupe Hélix,client,agence_com,enterprise,110,3300,70,orange,Clara Benali,groupe-helix.fr
+C-077,Atelier Mercure,client,agence_com,enterprise,140,4200,45,orange,Inès Marchand,atelier-mercure.fr
+C-078,Cabinet Lorient & Associés,client,conseil,business,15,360,270,vert,Hugo Lefèvre,cabinet-lorient-et-associes.fr
+C-079,Agence Octet,client,agence_digitale,pro,3,36,,vert,,agence-octet.com
+C-080,Charpentes Lemoine,client,hors_cible,business,8,192,61,vert,Inès Marchand,charpentes-lemoine.eu
+C-081,Oxalis Communication,client,agence_com,business,17,408,299,vert,Clara Benali,oxalis-communication.fr
+C-082,Cabinet Médiane,client,conseil,pro,3,36,,vert,,cabinet-mediane.fr
+C-083,Agence Galaxie,client,agence_digitale,free,1,0,,vert,,agence-galaxie.fr
+C-084,Agence Myrtille,prospect,agence_digitale,,18,0,,,,agence-myrtille.com
+C-085,Les Faiseurs,client,agence_com,pro,3,36,,vert,,les-faiseurs.eu
+C-086,Héliotrope Communication,client,agence_com,pro,3,36,,vert,,heliotrope-communication.fr
+C-087,Diagnostic Habitat Morel,client,pme_services,pro,7,84,,vert,,diagnostic-habitat-morel.fr
+C-088,Studio Lucarne,client,agence_digitale,free,1,0,,vert,,studio-lucarne.fr
+C-089,Agence Rivage,client,agence_digitale,free,1,0,,vert,,agence-rivage.com
+C-090,Boutique Les Galets,client,hors_cible,pro,8,96,,vert,,boutique-les-galets.eu
+C-091,Pixelune,client,agence_digitale,pro,8,96,,vert,,pixelune.fr
+C-092,Sextant Partenaires,client,conseil,free,2,0,,vert,,sextant-partenaires.fr
+C-093,Cabinet Ardent,prospect,conseil,,25,0,,,,cabinet-ardent.fr
+C-094,Agence Contrepoint,client,agence_com,business,11,264,292,vert,Hugo Lefèvre,agence-contrepoint.com
+C-095,Sécuria Services,client,pme_services,enterprise,105,3150,234,vert,Clara Benali,securia-services.eu

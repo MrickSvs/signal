@@ -1225,6 +1225,7 @@ export type Database = {
         Args: { n: number; prefix: string; width: number };
         Returns: string;
       };
+      sync_id_sequence: { Args: { entity: string }; Returns: number };
     };
     Enums: {
       alert_kind: "nouveau_sujet" | "emergent" | "churn" | "bug_critique" | "engagement";
