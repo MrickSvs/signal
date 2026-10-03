@@ -295,10 +295,16 @@ async function readPackFile(dir: string, name: string): Promise<string> {
 }
 
 export async function loadContextPack(dir: string = DEFAULT_CONTEXT_DIR): Promise<ContextPack> {
-  const [weightingSource, ...contents] = await Promise.all([
+  // Read in parallel, but report the first failure in file order: the error is deterministic.
+  const results = await Promise.allSettled([
     readPackFile(dir, "weighting.yaml"),
     ...CONTEXT_DOCUMENTS.map((doc) => readPackFile(dir, `${doc}.md`)),
   ]);
+  const failed = results.find((r) => r.status === "rejected");
+  if (failed) throw failed.reason;
+  const [weightingSource, ...contents] = results.map(
+    (r) => (r as PromiseFulfilledResult<string>).value,
+  );
   const documents = Object.fromEntries(
     CONTEXT_DOCUMENTS.map((doc, i) => [doc, contents[i]]),
   ) as Record<ContextDocument, string>;
