@@ -33,7 +33,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [2.3] Regroupement par problème, stabilité et tensions — 2026-10-03
 
-ADR-010
+`510de24` · ADR-010
 
 - `src/pipeline/nodes/embed.ts` : un vecteur par item, « problème sous-jacent — résumé » (jamais le texte brut) ; éloges, questions et `autre` jamais regroupés.
 - `src/lib/clustering/agglomerative.ts` : clustering agglomératif average linkage, cosinus, déterministe. Seuil 0,28 réglé sur les données (partition identique de 0,27 à 0,29).
