@@ -1,6 +1,7 @@
 // Seeds Supabase with the versioned data: customers and prospects, reference tickets (with the
-// embedding of « title — description »). Idempotent: upsert by id, embeddings recomputed only for
-// new or edited tickets. Dates are computed from DEMO_NOW (renewals, deliveries).
+// embedding of « title — description ») and the development feedbacks. Idempotent: upsert by id,
+// embeddings recomputed only for new or edited tickets. Dates are computed from DEMO_NOW
+// (renewals, deliveries, receptions). The holdout set is never inserted (SPEC §5.5).
 // Usage: pnpm db:seed
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -11,6 +12,8 @@ import { embed } from "@/lib/embeddings";
 import { RunCost } from "@/lib/llm/cost";
 import { initTracing, shutdownTracing } from "@/lib/llm/tracing";
 import { CUSTOMERS_FILE, type CustomerRow } from "./generate-customers";
+import { FEEDBACK_FILES, feedbackSchema, type Feedback } from "./lib/feedbacks";
+import { createRandom } from "./lib/random";
 import { parseCsv } from "./lib/csv";
 import {
   REFERENCE_TICKETS_FILE,
@@ -20,6 +23,7 @@ import {
 
 type CustomerInsert = Database["public"]["Tables"]["customers"]["Insert"];
 type TicketInsert = Database["public"]["Tables"]["reference_tickets"]["Insert"];
+type FeedbackInsert = Database["public"]["Tables"]["feedbacks"]["Insert"];
 
 const orNull = (value: string) => (value === "" ? null : value);
 const intOrNull = (value: string) => (value === "" ? null : Number.parseInt(value, 10));
@@ -67,6 +71,50 @@ export function ticketsToEmbed(
       return !e || !e.has_embedding || e.title !== t.title || e.description !== t.description;
     })
     .map((t) => t.id);
+}
+
+/** Offset of Europe/Paris from UTC, in minutes, at a given instant (CET +60, CEST +120). */
+export function parisOffsetMinutes(date: Date): number {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Paris",
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+      .formatToParts(date)
+      .map((p) => [p.type, Number(p.value)]),
+  );
+  const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute);
+  return Math.round((asUtc - Math.floor(date.getTime() / 60000) * 60000) / 60000);
+}
+
+/**
+ * received_at = DEMO_NOW − days_ago, at an office hour in Paris (8:30 to 18:30), stable for a given
+ * feedback. A feedback of the day never lands in the future: it falls a few minutes to hours ago.
+ */
+export function receivedAt(id: string, daysAgo: number, now: Date): Date {
+  const random = createRandom([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7));
+  const minutes = 8 * 60 + 30 + random.int(0, 600);
+  const day = addDays(now, -daysAgo);
+  const offset = parisOffsetMinutes(day);
+  // Paris wall-clock date of that instant, then its midnight expressed in UTC.
+  const parisDay = new Date(day.getTime() + offset * 60000);
+  const midnight =
+    Date.UTC(parisDay.getUTCFullYear(), parisDay.getUTCMonth(), parisDay.getUTCDate()) -
+    offset * 60000;
+  const at = new Date(midnight + minutes * 60000);
+  return at > now ? new Date(now.getTime() - random.int(5, 240) * 60000) : at;
+}
+
+export function feedbackRows(feedbacks: Feedback[], now: Date): FeedbackInsert[] {
+  return feedbacks.map(({ days_ago, ...f }) => ({
+    ...f,
+    received_at: receivedAt(f.id, days_ago, now).toISOString(),
+  }));
 }
 
 async function check<T>(
@@ -125,6 +173,21 @@ async function seedTickets(db: Db, now: Date, runCost: RunCost) {
   return { total: rows.length, embedded: fresh.length };
 }
 
+async function seedFeedbacks(db: Db, now: Date) {
+  const feedbacks = feedbackSchema
+    .array()
+    .parse(JSON.parse(readFileSync(FEEDBACK_FILES.development.data, "utf8")));
+  const rows = feedbackRows(feedbacks, now);
+  for (let i = 0; i < rows.length; i += 100) {
+    await check(
+      "feedbacks",
+      db.from("feedbacks").upsert(rows.slice(i, i + 100), { onConflict: "id" }),
+    );
+  }
+  await check("feedbacks sequence", db.rpc("sync_id_sequence", { entity: "feedbacks" }));
+  return rows.length;
+}
+
 async function main() {
   if (existsSync(".env")) process.loadEnvFile(".env");
   initTracing();
@@ -134,17 +197,25 @@ async function main() {
 
   const customers = await seedCustomers(db, now);
   const tickets = await seedTickets(db, now, runCost);
+  const feedbacks = existsSync(FEEDBACK_FILES.development.data) ? await seedFeedbacks(db, now) : 0;
 
-  const [{ count: customerCount }, { count: ticketCount }, { count: missing }] = await Promise.all([
+  const [
+    { count: customerCount },
+    { count: ticketCount },
+    { count: missing },
+    { count: feedbackCount },
+  ] = await Promise.all([
     db.from("customers").select("id", { count: "exact", head: true }),
     db.from("reference_tickets").select("id", { count: "exact", head: true }),
     db.from("reference_tickets").select("id", { count: "exact", head: true }).is("embedding", null),
+    db.from("feedbacks").select("id", { count: "exact", head: true }),
   ]);
   console.log(`DEMO_NOW : ${now.toISOString()}`);
   console.log(`Clients et prospects : ${customers} upserts, ${customerCount} en base.`);
   console.log(
     `Tickets de référence : ${tickets.total} upserts, ${tickets.embedded} embeddings calculés, ${ticketCount} en base, ${missing} sans embedding.`,
   );
+  console.log(`Retours : ${feedbacks} upserts, ${feedbackCount} en base.`);
   console.log(`Coût : ${runCost.eur.toFixed(5)} €`);
   await shutdownTracing();
 }

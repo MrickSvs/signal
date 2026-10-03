@@ -25,6 +25,24 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // CLAUDE.md rule 4: the application never reads the evaluation data (ground truth, holdout set).
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/evals-guard.test.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "Literal[value=/evals[\\\\/](ground-truth|holdout)/]",
+          message: "src/ ne lit jamais evals/ground-truth ni evals/holdout (CLAUDE.md, règle 4).",
+        },
+        {
+          selector: "TemplateElement[value.raw=/evals[\\\\/](ground-truth|holdout)/]",
+          message: "src/ ne lit jamais evals/ground-truth ni evals/holdout (CLAUDE.md, règle 4).",
+        },
+      ],
+    },
+  },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);
 

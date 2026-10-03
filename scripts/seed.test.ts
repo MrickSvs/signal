@@ -3,7 +3,15 @@ import { describe, expect, it } from "vitest";
 import { CUSTOMERS_FILE } from "./generate-customers";
 import { parseCsv } from "./lib/csv";
 import { REFERENCE_TICKETS_FILE, type ReferenceTicket } from "./lib/reference-tickets";
-import { customerRows, ticketEmbeddingText, ticketRows, ticketsToEmbed } from "./seed";
+import {
+  customerRows,
+  feedbackRows,
+  parisOffsetMinutes,
+  receivedAt,
+  ticketEmbeddingText,
+  ticketRows,
+  ticketsToEmbed,
+} from "./seed";
 
 const now = new Date("2026-03-10T09:00:00Z");
 
@@ -56,5 +64,61 @@ describe("ticketRows and embeddings", () => {
       { id: c.id, title: c.title, description: c.description, has_embedding: false },
     ];
     expect(ticketsToEmbed([a, b, c, d], existing)).toEqual([b.id, c.id, d.id]);
+  });
+});
+
+describe("feedback reception times", () => {
+  const parisHour = (d: Date) =>
+    Number(
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Paris",
+        hour: "2-digit",
+        hourCycle: "h23",
+      }).format(d),
+    );
+
+  it("knows the Paris offset in winter and in summer", () => {
+    expect(parisOffsetMinutes(new Date("2026-01-15T12:00:00Z"))).toBe(60);
+    expect(parisOffsetMinutes(new Date("2026-07-15T12:00:00Z"))).toBe(120);
+  });
+
+  it("places a feedback on its day, at an office hour in Paris, stable across seeds", () => {
+    const at = receivedAt("R-042", 10, now);
+    expect(at).toEqual(receivedAt("R-042", 10, now));
+    expect(parisHour(at)).toBeGreaterThanOrEqual(8);
+    expect(parisHour(at)).toBeLessThanOrEqual(18);
+    const days = (now.getTime() - at.getTime()) / 86_400_000;
+    expect(days).toBeGreaterThan(9);
+    expect(days).toBeLessThan(11);
+  });
+
+  it("never puts a feedback of the day in the future", () => {
+    const early = new Date("2026-03-10T06:00:00Z"); // 7:00 in Paris
+    for (const id of ["R-001", "R-002", "R-003", "R-004"]) {
+      expect(receivedAt(id, 0, early).getTime()).toBeLessThanOrEqual(early.getTime());
+    }
+  });
+
+  it("drops the offset and keeps the feedback fields", () => {
+    const [row] = feedbackRows(
+      [
+        {
+          id: "R-001",
+          channel: "nps",
+          source_type: "client_direct",
+          author_name: "A",
+          author_email: "a@b.fr",
+          customer_id: "C-001",
+          days_ago: 3,
+          subject: null,
+          raw_text: "Top",
+          nps_score: 9,
+          language: "fr",
+        },
+      ],
+      now,
+    );
+    expect(row).not.toHaveProperty("days_ago");
+    expect(row).toMatchObject({ id: "R-001", channel: "nps", nps_score: 9 });
   });
 });

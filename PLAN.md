@@ -38,7 +38,7 @@ Les durées sont des estimations prudentes de temps de session ; 👤 signale un
 
 | Après | Ce qui doit être vrai                                                                                                   |
 | ----- | ----------------------------------------------------------------------------------------------------------------------- |
-| 1.4   | Le monde de Jalon existe : pack de contexte (dont `architecture.md`), skills, 40 tickets de référence, ~265 retours + ~80 réservés. |
+| 1.4   | Le monde de Jalon existe : pack de contexte (dont `architecture.md`), skills, 40 tickets de référence, ~225 retours + ~80 réservés. |
 | 2.6   | `pnpm pipeline:run` tourne de bout en bout ; on retrouve S1 à S7 en base ; un second run garde les mêmes ID d'insights. |
 | 4.3   | Démo minimale possible : digest → insight → priorisation → backlog (epic, stories, bugs) dans le chat.                  |
 | 5.2   | Chaîne complète jusqu'au kanban Notion.                                                                                 |
@@ -288,7 +288,7 @@ Crée src/lib/skills.ts : listSkills() (index nom + description) et loadSkill(na
 
 `[Cœur]` · ~2 h 30 + 👤 45 min de relecture
 
-**Objectif** : ~265 retours réalistes où les patterns S1 à S7 et les cas limites E1 à E8 sont cachés, un jeu réservé pour les evals, et leur vérité terrain à part.
+**Objectif** : ~225 retours réalistes où les patterns S1 à S7 et les cas limites E1 à E8 sont cachés, un jeu réservé pour les evals, et leur vérité terrain à part.
 **Dépendances** : 1.1, 1.3.
 **Cas limites** : CL-01 à CL-09 (données plantées), CL-49, CL-50.
 
@@ -315,7 +315,7 @@ IMPORTANT : avant la génération complète, montre-moi 5 retours d'exemple pour
 **Test** :
 
 - [ ] 👤 Exemples S1, S3 et E1 validés avant la génération complète.
-- [ ] ~265 retours de développement en base et ~80 retours réservés hors base ; répartitions conformes à `scenario.yaml`.
+- [ ] ~225 retours de développement en base et ~80 retours réservés hors base ; répartitions conformes à `scenario.yaml`.
 - [ ] Aucun identifiant de pattern ou de cas limite (S1…S7, E1…E8), ni le mot « pattern », ni nom de jour ou de mois dans les textes (vérification par grep).
 - [ ] 👤 Relecture : 30 retours crédibles et variés, sans tics d'écriture d'IA ; 30 étiquettes de vérité terrain justes (sinon corriger ou élargir `acceptable_types`).
 - [ ] Aucun fichier de `src` ne référence `evals/ground-truth` ni `evals/holdout`.
@@ -951,7 +951,7 @@ Consulte la doc actuelle de l'API Notion (version 2025-09-03 : data sources) et 
 **Test** :
 
 - [ ] Les trois bases existent avec les bonnes propriétés.
-- [ ] ~265 retours et les insights sont dans Notion, reliés entre eux.
+- [ ] ~225 retours et les insights sont dans Notion, reliés entre eux.
 - [ ] Relancer le push ne crée aucun doublon ; un texte de plus de 2 000 caractères passe sans erreur.
 
 **Commit** : `feat(notion): workspace setup and bulk push`

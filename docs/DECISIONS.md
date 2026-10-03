@@ -69,3 +69,25 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Séquences** : migration 0002, `sync_id_sequence(entity)` recale la séquence d'une entité sur le plus grand ID présent, sans jamais reculer. Exécutable par `service_role` seulement.
   - **Seuil d'analogue proche** : 0,45 (et non 0,6) d'après les similarités mesurées sur voyage-4.
 - **Conséquences** : régénérer les tickets écrase les corrections de relecture faites dans le JSON (sauf celles reportées dans le plan) ; le test du fichier versionné vérifie qu'il suit toujours le plan.
+
+## ADR-006 — Volume du jeu de développement : bruit ramené à ~100
+
+- **Date** : 2026-10-02
+- **Statut** : acceptée (décision du PO avant l'étape 1.4)
+- **Contexte** : le jeu de développement prévoyait ~265 retours dont ~140 de bruit. Les volumes des patterns créent les contrastes visibles en démo (Gantt contre permissions, quatre canaux de S1, pic de S7) ; au-delà d'environ 100, le bruit n'ajoute rien de visible mais alourdit chaque run du pipeline.
+- **Décision** : volumes des patterns et des cas limites inchangés, bruit à ~100, total ~225 retours sur 6 semaines ; jeu réservé maintenu à ~80. SPEC §1 dit désormais « plus de 150 retours par mois » (225 sur 6 semaines).
+- **Conséquences** : ~15 % de coût et de durée en moins par run complet ; les signaux faibles restent nombreux (petits regroupements plantés dans le bruit).
+
+## ADR-007 — Jeu de retours : le plan est la vérité terrain
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 1.4. La vérité terrain des evals (§14.2) doit être exacte et ne jamais dépendre de ce que le modèle a « voulu » écrire.
+- **Décision** :
+  - `data/scenario.yaml` traduit SPEC §5 ; `scripts/lib/feedback-plan.ts` planifie chaque retour à seed fixe (pattern, canal, compte, auteur et e-mail, jours avant `DEMO_NOW`, langue, ton, fautes, note NPS, churn, injection, items attendus, cas limites). Le rôle `generation` n'écrit que l'objet et le texte, par lots de 10 (fils longs à part), 4 lots en parallèle. Les volumes comptent des items : un retour E1 porte deux items.
+  - Contrôles du texte en code, avec nouvelle tentative : identifiants de pattern, dates absolues, jours, mois, années, objet selon le canal, langue, longueur des fils E6, phrase d'injection, et **aucune reprise mot pour mot de l'angle de la fiche** (6 mots consécutifs), pour ne pas planter de mot-clé commun entre retours d'un pattern (§5.4).
+  - Cache des textes dans `.cache/feedback-texts/` (ignoré par git), indexé par le retour planifié et le prompt ; les textes en cache sont revalidés. Une régénération ne paie que ce qui a changé.
+  - Vérité terrain : schéma de PLAN 1.4 plus `topic` (sujet de bruit), `acceptable_areas` (domaine ambigu, sur le modèle de `acceptable_types`) et `churn_signal`. Sentiment d'un E1 : le sujet nettement négatif l'emporte, sinon somme des deux tons.
+  - Garde-fous de la règle 4 : `no-restricted-syntax` ESLint sur les chemins `evals/ground-truth` et `evals/holdout` dans `src/`, et un test qui parcourt `src/` (chemins découpés compris).
+  - `received_at` = `DEMO_NOW` − `days_ago`, à une heure de bureau à Paris stable par retour ; un retour du jour n'est jamais dans le futur.
+- **Conséquences** : modifier un angle du jeu de développement invalide tout le cache du jeu réservé (son prompt liste ces angles pour les éviter). Le test des fichiers versionnés échoue tant que les fichiers ne suivent plus le plan : il faut régénérer.

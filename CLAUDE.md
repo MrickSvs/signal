@@ -83,6 +83,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm lint` · `pnpm typecheck` · `pnpm test`                                                                                                                         | Qualité                        |
 | `pnpm db:push` · `pnpm db:types` · `pnpm db:seed`                                                                                                                    | Base                           |
 | `pnpm tsx scripts/generate-customers.ts` · `pnpm tsx scripts/generate-reference-tickets.ts` | Régénérer `data/customers.csv` et `data/reference_tickets.json` |
+| `pnpm tsx scripts/generate-feedbacks.ts` (`--preview`, `--dataset development\|holdout\|all`) · `pnpm tsx scripts/review-sample.ts` | Générer les retours et leur vérité terrain (cache dans `.cache/`) ; échantillon de relecture humaine |
 | `pnpm pipeline:run` (`--resume <run_id>`) · `pipeline:triage` (`--retry-failed`) · `pipeline:cluster` · `pipeline:score` · `digest`                                  | Pipeline                       |
 | `pnpm estimate "<besoin>"` (`--force`)                                                                                                                               | Tester l'estimation   |
 | `pnpm notion:setup` · `pnpm notion:push`                                                                                                                             | Notion                         |
