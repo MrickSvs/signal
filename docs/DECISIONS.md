@@ -172,3 +172,20 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Le modèle reste non déterministe (Sonnet 5.5 sans température, ADR-003) : entre deux runs, l'Impact de I-01 est passé de 1 à 2 et une contradiction est apparue sur I-02 (Confidence 1 → 0,8). C'est l'objet de l'éval `stability` (6.2) ; aucune mise en cache du jugement pour l'instant.
   - Changer de mode Reach par la CLI rejuge tous les insights. L'écran Priorisation (3.5) devra recalculer en code à partir des jugements stockés, sans appel au modèle.
   - Le score précédent d'un insight en échec garde son ancien rang, qui peut alors doubler un rang du nouveau classement.
+
+## ADR-013 — Pipeline en graphe : état minimal, verrou de session, incrémental sans rejugement
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 2.6. Rendre le pipeline rejouable de bout en bout, robuste aux pannes (CL-11, CL-13), exclusif (CL-12), et ajouter un mode incrémental rapide (SPEC §6.1, §10.10, §15).
+- **Décision** :
+  - **Versions** : `@langchain/langgraph` 1.4.18, `@langchain/langgraph-checkpoint-postgres` 1.0.5, `pg` 8.23.
+  - **Graphe** (`src/pipeline/graph.ts`, `Annotation.Root`) : ingest → triage (fan-out par lots de 10 via `Send`, `maxConcurrency` 2 × 4 appels) → enrich → embed → cluster → estimate → score → alert. L'état ne porte que des ID, des compteurs et des coûts ; chaque nœud relit en base ce qui reste à faire (idempotence). `cluster` réunit cluster, match et label : en 2.3, ils partagent un plan écrit après tous les appels de modèle. `retryPolicy` d'une nouvelle tentative par nœud. Le nœud `digest` arrive en 2.7.
+  - **Reprise** : `PostgresSaver` dans un schéma `langgraph`, hors de l'API PostgREST (ses tables n'ont pas de RLS). `--resume <run_id>` repart du dernier checkpoint ; sans checkpoint, le run repart du début.
+  - **Verrou** : `pg_try_advisory_lock` sur une connexion `pg` dédiée, interrogé chaque seconde pendant 30 s au plus. Une requête PostgREST ne peut pas tenir un verrou de session. `DATABASE_URL` doit être le **pooler en mode session** (port 5432, IPv4) : la connexion directe Supabase n'existe qu'en IPv6 (injoignable d'ici et depuis Vercel), et le mode transaction (6543) ne garde pas les verrous de session.
+  - **Incrémental** : rattachement par similarité moyenne aux items de l'insight (même mesure et même seuil que l'_average linkage_ du run complet) ; un insight rejeté absorbe ses items et reste rejeté, un insight fusionné n'attire rien. File « à surveiller » regroupée au même seuil, nouvel insight `propose` dès 3 items. **Re-score sans rejugement** : migration 0004 (`scores.judgment`) ; le jugement stocké est réutilisé tant qu'il valide encore le schéma, et seuls les faits sont recalculés en code ; seul un insight sans jugement valide est jugé. Le run de nuit rejuge tout. Une nouvelle version n'est écrite que pour les insights touchés ou dont le résultat change.
+  - **Alertes** : code pur. Sujet = l'insight, sauf `churn` = le compte (deux retours du même compte, sur deux sujets, enrichissent une seule alerte). `dedup_key` = `type|sujet|date de création`. Aucune alerte sur un premier run (base sans insight vivant) : tout y est nouveau, et c'est le digest qui en rend compte (CL-18, CL-52).
+- **Conséquences** :
+  - Run complet sur base remise à zéro : interrompu à 68/214 retours triés, repris avec `--resume` sans retrier, terminé en 301 s pour 1,22 € (plus ~40 s et ~0,1 € pour la tentative tuée, non comptés : un `SIGTERM` ne passe pas par la clôture du run). 24 insights, 10 classés. Un run concurrent est refusé après 30 s (code 2).
+  - Incrémental, mesuré en local : 15 à 25 s par retour (triage Haiku 5 à 7 s, Voyage 1,5 à 2 s, chaque requête Supabase ~0,2 s depuis ici), 0,001 à 0,015 €. Un insight qui devient classé déclenche sa première estimation et son premier jugement : 48 s, 0,07 €. Le budget de 15 s de SPEC §15 n'est pas tenu ; à remesurer depuis Vercel en répétition (8.3).
+  - Entre deux runs de nuit, l'Impact et l'alignement d'un insight ne bougent pas : un retour de plus change les faits (Reach, Confidence, MoSCoW par les règles dures, rang), pas le jugement.

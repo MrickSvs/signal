@@ -1118,6 +1118,7 @@ export type Database = {
           impact_rationale: string | null;
           insight_id: string;
           is_current: boolean;
+          judgment: Json | null;
           moscow_rationale: string | null;
           moscow_reco: Database["public"]["Enums"]["moscow"] | null;
           okr_refs: string[];
@@ -1146,6 +1147,7 @@ export type Database = {
           impact_rationale?: string | null;
           insight_id: string;
           is_current?: boolean;
+          judgment?: Json | null;
           moscow_rationale?: string | null;
           moscow_reco?: Database["public"]["Enums"]["moscow"] | null;
           okr_refs?: string[];
@@ -1174,6 +1176,7 @@ export type Database = {
           impact_rationale?: string | null;
           insight_id?: string;
           is_current?: boolean;
+          judgment?: Json | null;
           moscow_rationale?: string | null;
           moscow_reco?: Database["public"]["Enums"]["moscow"] | null;
           okr_refs?: string[];

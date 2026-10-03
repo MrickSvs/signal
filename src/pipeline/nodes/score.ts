@@ -421,6 +421,8 @@ export type ComputedScore = {
   moscow_final: MoscowCategory;
   mrr_exposed: number;
   accounts_count: number;
+  /** The model's judgment, stored so an incremental run can reuse it (migration 0004). */
+  judgment: Judgment;
 };
 
 export type ComputeResult = { scores: ComputedScore[]; capacity: CapacityReport };
@@ -552,6 +554,7 @@ export function computeScores(
       moscow_final: e.moscowOverride ?? moscow.reco,
       mrr_exposed: e.mrr_exposed,
       accounts_count: e.accounts_count,
+      judgment: e.judgment,
     };
   });
 
@@ -736,25 +739,95 @@ export type RunScoringOptions = {
   now: Date;
   commitments: readonly Commitment[];
   context: ScoreContext;
-  deps?: JudgeDeps & { estimate?: EstimateDeps; estimateFn?: typeof estimateInsight };
+  /**
+   * Incremental mode (PLAN 2.6): only these insights are judged again; the others reuse the
+   * judgment of their current score (judged anyway when it is missing or no longer valid).
+   * An empty set judges only the insights without a valid stored judgment.
+   * Every ranked insight is still computed, since a rank depends on all the others.
+   */
+  rejudge?: ReadonlySet<string>;
+  /** Writes a new version only for judged or `touched` insights and those whose result changed. */
+  writeOnlyChanged?: boolean;
+  /** Insights whose facts changed (new feedbacks): always get a new version. */
+  touched?: ReadonlySet<string>;
+  deps?: JudgeDeps & EstimateRunDeps;
 };
 
 export type ScoringSummary = ComputeResult & {
   failures: ScoringFailure[];
   estimatesCached: number;
   judged: number;
+  /** Insights whose judgment was reused from their current score. */
+  reused: string[];
+  /** Insights that got a new version in scores. */
+  written: string[];
   contextChanged: string[];
 };
 
+type CurrentScore = Pick<
+  Tables<"scores">,
+  "insight_id" | "judgment" | "rank" | "rice" | "moscow_reco" | "robustness" | "reach_mode"
+>;
+
+async function loadCurrentScores(db: Db): Promise<Map<string, CurrentScore>> {
+  const rows = await fetchAll(
+    (from, to) =>
+      db
+        .from("scores")
+        .select("insight_id, judgment, rank, rice, moscow_reco, robustness, reach_mode")
+        .eq("is_current", true)
+        .order("insight_id")
+        .range(from, to),
+    "lecture des scores courants",
+  );
+  return new Map(rows.map((r) => [r.insight_id, r]));
+}
+
+/** A stored judgment is reused only if it still validates against the insight's feedbacks. */
+export function reusableJudgment(
+  stored: Json | null | undefined,
+  insight: Pick<ScoringInsight, "feedbacks">,
+  ctx: ScoreContext,
+): Judgment | null {
+  if (!stored) return null;
+  const parsed = judgmentSchema(
+    insight.feedbacks.map((f) => f.id),
+    ctx.okrIds,
+    ctx.weighting.impact.scale,
+  ).safeParse(stored);
+  return parsed.success ? parsed.data : null;
+}
+
+/** Same rank, RICE, MoSCoW recommendation and robustness as the current version. */
+export function sameResult(score: ComputedScore, current: CurrentScore | undefined): boolean {
+  return (
+    current !== undefined &&
+    current.reach_mode === score.reach_mode &&
+    current.rank === score.rank &&
+    Math.abs(Number(current.rice) - score.rice) < 1e-6 &&
+    current.moscow_reco === score.moscow_reco &&
+    current.robustness === score.robustness
+  );
+}
+
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-export async function runScoring(db: Db, options: RunScoringOptions): Promise<ScoringSummary> {
-  const { weighting, mode } = options;
-  const deps = options.deps ?? {};
-  const { insights, commitments } = await loadScoringInsights(db, options);
-  const failures: ScoringFailure[] = [];
+export type EstimateRunDeps = {
+  runCost?: RunCost;
+  estimate?: EstimateDeps;
+  estimateFn?: typeof estimateInsight;
+};
 
-  // Effort: the cached estimate of each insight. Needs are embedded in one Voyage call (rate limit).
+/**
+ * Effort (pipeline node `estimate`): the cached estimate of each insight, computed when missing.
+ * Needs are embedded in one Voyage call (rate limit) and only if a model call is needed.
+ */
+export async function runEstimates(
+  db: Db,
+  insights: readonly Pick<ScoringInsight, "id" | "title" | "problem_statement">[],
+  deps: EstimateRunDeps = {},
+): Promise<{ estimates: Map<string, StoredEstimate>; failures: ScoringFailure[] }> {
+  const failures: ScoringFailure[] = [];
   const estimateDeps: EstimateDeps = { runCost: deps.runCost, ...deps.estimate };
   if (!estimateDeps.embedQuery) {
     const needs = insights.map((i) => insightNeed(i).need);
@@ -775,8 +848,20 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
       failures.push({ insight: insight.id, step: "estimation", error: message(error) });
     }
   });
+  return { estimates, failures };
+}
 
+export async function runScoring(db: Db, options: RunScoringOptions): Promise<ScoringSummary> {
+  const { weighting, mode } = options;
+  const deps = options.deps ?? {};
+  const { insights, commitments } = await loadScoringInsights(db, options);
+  const { estimates, failures } = await runEstimates(db, insights, deps);
+
+  const current =
+    options.rejudge || options.writeOnlyChanged ? await loadCurrentScores(db) : new Map();
   const inputs: ComputeInput[] = [];
+  const reused: string[] = [];
+  let judged = 0;
   await mapWithConcurrency(insights, JUDGE_CONCURRENCY, async (insight) => {
     const estimate = estimates.get(insight.id);
     if (!estimate) return;
@@ -786,8 +871,18 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
       weighting.effort.velocity_points_per_dev_week,
     )!;
     const facts = insightFacts(insight, commitments);
+    const stored =
+      options.rejudge && !options.rejudge.has(insight.id)
+        ? reusableJudgment(current.get(insight.id)?.judgment, insight, options.context)
+        : null;
+    if (stored) {
+      reused.push(insight.id);
+      inputs.push({ insight, facts, judgment: stored, effort });
+      return;
+    }
     try {
       const judgment = await judgeInsight(insight, facts, options.context, deps);
+      judged++;
       inputs.push({ insight, facts, judgment, effort });
     } catch (error) {
       failures.push({ insight: insight.id, step: "jugement", error: message(error) });
@@ -799,7 +894,16 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
     mode,
     weighting,
   );
-  await writeScores(db, computed.scores);
+  const reusedSet = new Set(reused);
+  const toWrite = options.writeOnlyChanged
+    ? computed.scores.filter(
+        (s) =>
+          !reusedSet.has(s.insight_id) ||
+          options.touched?.has(s.insight_id) ||
+          !sameResult(s, current.get(s.insight_id)),
+      )
+    : computed.scores;
+  await writeScores(db, toWrite);
 
   // CL-22: an override survives the run; flagged when the insight's feedbacks changed too much.
   const changed: string[] = [];
@@ -825,7 +929,9 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
     ...computed,
     failures,
     estimatesCached: [...estimates.values()].filter((e) => e.cached).length,
-    judged: inputs.length,
+    judged,
+    reused: reused.sort(),
+    written: toWrite.map((s) => s.insight_id),
     contextChanged: changed,
   };
 }
@@ -878,6 +984,7 @@ export async function writeScores(db: Db, scores: readonly ComputedScore[]): Pro
       moscow_rationale: s.moscow_rationale,
       rule_flags: s.rule_flags as unknown as Json,
       overridden: s.overridden as unknown as Json,
+      judgment: s.judgment as unknown as Json,
       is_current: true,
     };
     check((await db.from("scores").insert(row)).error, `écriture du score de ${s.insight_id}`);

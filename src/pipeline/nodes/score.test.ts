@@ -15,6 +15,7 @@ import {
   runScoring,
   type Judgment,
   type ScoreContext,
+  reusableJudgment,
 } from "./score";
 
 const pack = await loadContextPack();
@@ -259,6 +260,40 @@ describe("judgmentSchema", () => {
 });
 
 describe("runScoring", () => {
+  it("re-judges only the given insights in incremental mode and writes only what changed", async () => {
+    const t = tables();
+    await run(t).summary;
+    expect(t.scores.every((s) => s.judgment !== null)).toBe(true);
+    const before = t.scores.length;
+
+    let n = 100;
+    const db = createMemoryDb(t, { defaults: { scores: () => ({ id: `score-${++n}` }) } });
+    const invoke = mockInvoke();
+    const result = await runScoring(db, {
+      mode: "comptes",
+      weighting,
+      now,
+      commitments: pack.commitments,
+      context,
+      rejudge: new Set(["I-01"]),
+      writeOnlyChanged: true,
+      deps: {
+        invoke: invoke as unknown as typeof invokeStructured,
+        estimateFn: estimateFn as never,
+      },
+    });
+    expect(invoke.mock.calls.map((c) => c[3].metadata!.insight_id)).toEqual(["I-01"]);
+    expect(result).toMatchObject({ judged: 1, reused: ["I-02"], written: ["I-01"] });
+    expect(result.scores.map((s) => s.insight_id).sort()).toEqual(["I-01", "I-02"]);
+    expect(t.scores).toHaveLength(before + 1);
+    expect(
+      t.scores
+        .filter((s) => s.is_current)
+        .map((s) => s.insight_id)
+        .sort(),
+    ).toEqual(["I-01", "I-02"]);
+  });
+
   it("scores ranked insights only: a rejected insight is neither judged nor ranked", async () => {
     const t = tables();
     const { invoke, summary } = run(t);
@@ -449,5 +484,16 @@ describe("computeScores", () => {
       scores: [],
       capacity: { must_weeks: 0, alert: false },
     });
+  });
+});
+
+describe("reusableJudgment", () => {
+  it("reuses a stored judgment only while it validates against the insight's feedbacks", () => {
+    const insight = { feedbacks: [{ id: "R-001" }, { id: "R-002" }] } as never;
+    expect(reusableJudgment(judgment(), insight, context)).toEqual(judgment());
+    expect(reusableJudgment(null, insight, context)).toBeNull();
+    expect(
+      reusableJudgment(judgment({ impact_evidence: ["R-001", "R-404"] }), insight, context),
+    ).toBeNull();
   });
 });

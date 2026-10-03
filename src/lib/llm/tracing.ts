@@ -89,6 +89,29 @@ export async function withTrace<T>(
   });
 }
 
+/**
+ * A child observation inside the active trace (a pipeline node within its run): unlike withTrace,
+ * it does not rename the trace nor change its session.
+ */
+export async function withSpan<T>(
+  name: string,
+  input: unknown,
+  fn: () => Promise<T>,
+  toOutput: (result: T) => unknown = (result) => result,
+): Promise<T> {
+  return startActiveObservation(name, async (span) => {
+    span.update({ input });
+    try {
+      const result = await fn();
+      span.update({ output: toOutput(result) });
+      return result;
+    } catch (error) {
+      span.update({ level: "ERROR", statusMessage: errorMessage(error) });
+      throw error;
+    }
+  });
+}
+
 /** LangChain callbacks that record each model call as a generation (model, tokens, cost). */
 export function langfuseCallbacks(): CallbackHandler[] {
   return isTracingConfigured() ? [new CallbackHandler()] : [];

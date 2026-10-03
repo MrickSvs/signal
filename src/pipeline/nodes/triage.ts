@@ -336,32 +336,31 @@ export function pickSample<T>(items: readonly T[], n: number): T[] {
   return Array.from({ length: n }, (_, i) => items[Math.floor((i * items.length) / n)]);
 }
 
-/** Feedbacks without a successful analysis; previously failed ones only with retryFailed. */
+/**
+ * Feedbacks without a successful analysis; previously failed ones only with retryFailed.
+ * `ids` restricts the search (a fan-out batch, an incremental run): already triaged ones are skipped.
+ */
 export async function loadFeedbacksToTriage(
   db: Db,
-  options: { retryFailed: boolean; sample?: number },
+  options: { retryFailed: boolean; sample?: number; ids?: readonly string[] },
 ): Promise<FeedbackToTriage[]> {
+  const { ids } = options;
+  if (ids && ids.length === 0) return [];
   const [feedbacks, analyses] = await Promise.all([
-    fetchAll(
-      (from, to) =>
-        db
-          .from("feedbacks")
-          .select(
-            "id, channel, source_type, subject, raw_text, nps_score, customer:customers(name, status, plan, segment)",
-          )
-          .order("id")
-          .range(from, to),
-      "lecture des retours",
-    ),
-    fetchAll(
-      (from, to) =>
-        db
-          .from("feedback_analyses")
-          .select("feedback_id, status")
-          .order("feedback_id")
-          .range(from, to),
-      "lecture des analyses",
-    ),
+    fetchAll((from, to) => {
+      let query = db
+        .from("feedbacks")
+        .select(
+          "id, channel, source_type, subject, raw_text, nps_score, customer:customers(name, status, plan, segment)",
+        );
+      if (ids) query = query.in("id", ids);
+      return query.order("id").range(from, to);
+    }, "lecture des retours"),
+    fetchAll((from, to) => {
+      let query = db.from("feedback_analyses").select("feedback_id, status");
+      if (ids) query = query.in("feedback_id", ids);
+      return query.order("feedback_id").range(from, to);
+    }, "lecture des analyses"),
   ]);
   const ok = new Set(analyses.filter((a) => a.status === "ok").map((a) => a.feedback_id));
   const failed = new Set(analyses.filter((a) => a.status === "failed").map((a) => a.feedback_id));
