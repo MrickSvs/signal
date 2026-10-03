@@ -497,12 +497,12 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 
 **Test** :
 
-- [ ] Mode « comptes » : l'insight Gantt (S2a) est devant les permissions (S2b).
-- [ ] Mode « MRR » : les permissions passent devant.
-- [ ] Permissions : `moscow_reco = must`, justification citant l'engagement Atelier Mercure.
-- [ ] S4 : `hors_strategie`, `wont`.
-- [ ] Tests : égalités ; ordre des règles MoSCoW (compte Enterprise à risque qui demande une fonctionnalité hors stratégie → Won't + tension dans `rule_flags`) ; compte E2 compté une fois ; override conservé après un nouveau run.
-- [ ] Couverture de `lib/scoring` : 100 %.
+- [x] Mode « comptes » : l'insight Gantt (S2a) est devant les permissions (S2b).
+- [x] Mode « MRR » : les permissions passent devant.
+- [x] Permissions : `moscow_reco = must`, justification citant l'engagement Atelier Mercure.
+- [x] S4 : `hors_strategie`, `wont`.
+- [x] Tests : égalités ; ordre des règles MoSCoW (compte Enterprise à risque qui demande une fonctionnalité hors stratégie → Won't + tension dans `rule_flags`) ; compte E2 compté une fois ; override conservé après un nouveau run.
+- [x] Couverture de `lib/scoring` : 100 %.
 
 **Commit** : `feat(scoring): hybrid RICE, robustness, alignment and MoSCoW rules`
 
