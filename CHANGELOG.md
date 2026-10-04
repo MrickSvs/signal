@@ -5,12 +5,14 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 3 (cockpit) terminée** : 3.1 (shell, composants de preuve, formatage en heure de Paris), 3.2 (écran Digest), 3.3 (écran Retours), 3.4 (écran Insights), 3.5 (priorisation interactive) et 3.6 (écran Contexte) faites. Prochaine étape : 4.1 (cœur de l'agent Signal).
+- **Phase 4 (agent) commencée** : 4.1 (cœur de l'agent Signal) faite — agent unique, 10 outils, briefing, mémoire, garde-fous, route `POST /api/agent` en SSE et `pnpm chat`. Le chat n'est pas encore dans l'interface (4.2) : on parle à l'agent en terminal. Prochaine étape : 4.2 (chat et trace en direct, plus réduction du coût par tour).
+- **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 446 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
-- Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 484 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Base : migration 0006 (`match_feedback_items`, recherche par le sens). Retour d'essai R-226 (mail collé dans le chat, rattaché à C-013 / I-27) et ses 3 alertes ajoutés en 4.1.
+- Coût LLM cumulé : ~5,8 € (essais de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
 
 ## Points d'attention
 
@@ -42,7 +44,21 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **S4 en signal faible** après le run sur base vide : le triage Haiku a classé deux retours de Forgeval (R-122, R-213) en « autre » ; I-39 n'a plus que 4 retours, il n'est donc ni scoré ni Won't. Variance du triage, à mesurer avec `eval:triage` (6.2), pas corrigée à la main.
 - **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
 - **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
+- **Coût d'un tour d'agent** : ~0,01 à 0,05 € mesuré en 4.1, plus ~0,05 € d'écriture du cache du prompt système (~14 700 tokens, TTL 1 h) une fois par heure. Premier poste : la sortie (réponses de 1 800 à 2 400 tokens, réflexion comprise). **Décision du PO** : réponses courtes par défaut et cache de l'historique en 4.2 ; ni changement de modèle ni réduction de la réflexion avant les evals (6.2). Latence 30 à 60 s par tour. → ADR-021
+- **Budget de 15 appels d'outils** : middleware maison (celui de LangChain répond en anglais et termine sans réponse un tour entièrement bloqué) ; le compteur vit dans l'état de l'agent, car le middleware de résumé peut réécrire les messages au milieu d'un long tour. → ADR-021
+- **`server-only`** : `src/server/queries` l'importe ; `pnpm chat` tourne avec `tsx --conditions=react-server`, et Vitest le remplace par un module vide. → ADR-021
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [4.1] Cœur de l'agent — 2026-10-04
+
+`876232c` · ADR-021
+
+- Agent unique `createAgent` (LangChain 1.5.15, Sonnet) : prompt système en blocs mis en cache 1 h (persona et règles de SPEC §10.2, principes P1 à P7, index des skills, product / strategy / commitments / team) ; briefing calculé en code (top 10, alertes, décisions en attente, nouveautés depuis la dernière visite, page courante) ajouté après le cache à chaque tour, encapsulé comme donnée.
+- 10 outils (`src/agent/tools/`, un fichier chacun) : `get_briefing`, `search_feedbacks` (par le sens via pgvector, migration 0006, ou par filtres, texte complet avec `ids`), `list_insights`, `get_insight`, `query_customers` (totaux en code, « historique financier inexistant »), `get_priority` (« et si » simulé en mémoire, rien d'écrit), `estimate_complexity`, `load_skill`, `list_backlog`, `add_feedback` (pipeline incrémental sous verrou). Contrat commun : zod, « quand / pas quand », sortie JSON bornée à 10 éléments, `wrapExternal`, erreurs courtes.
+- Garde-fous : 15 appels d'outils par tour puis réponse partielle explicite ; résumé au-delà de 30 messages ; mémoire `PostgresSaver` (schéma `langgraph`) et table `threads` ; emplacement de la validation humaine posé pour 4.4.
+- `POST /api/agent` en SSE (`token`, `tool_start`, `tool_end`, `interrupt`, `done` avec coût et lien Langfuse, `error`), `maxDuration` 300 ; `pnpm chat` en terminal.
+- Vérifié en réel (7 tours, ~0,30 €) : Enterprise ce mois-ci (réponse structurée, réserve sur le périmètre des chiffres), churn du mois dernier (« cette donnée n'existe pas », 0,01 €), Impact du Gantt à 3 (I-26 3e → 2e en simulation, désaccord dit une fois), question citée non ajoutée, mail collé → R-226 rattaché à C-013 / I-27 avec 3 alertes, hors sujet recentré, trace Langfuse complète avec le run incrémental imbriqué.
+- Validé par le PO : alertes de R-226 conservées ; override d'Impact et MoSCoW Must de I-26 conservés.
 
 ## [3.6] Écran Contexte — 2026-10-03
 

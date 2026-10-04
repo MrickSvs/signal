@@ -812,6 +812,10 @@ Consulte la doc actuelle de LangChain v1 (createAgent, middleware, dont le middl
 - Onglet « Trace » : appels d'outils en temps réel (nom, arguments résumés, statut, durée, modèle), skills chargées, coût du tour, lien Langfuse. Pendant une opération longue, la trace montre la progression.
 - Liste des conversations (table threads), bouton « Nouvelle conversation ».
 - Active les boutons « En parler à Signal » du Digest (chat pré-rempli).
+- Coût d'un tour (mesuré en 4.1 : ~0,01 à 0,05 €, plus ~0,05 € d'écriture du cache du prompt une fois par heure ; la sortie, réflexion comprise, en est le premier poste) :
+  1. réponses courtes par défaut — la structure Faits → Lecture → Recommandation → À trancher est réservée aux vraies analyses (SPEC §10.2), plafond de sortie de l'agent (~1 200 tokens) côté code ;
+  2. cache de l'historique de la conversation (point de cache sur le dernier message) pour que les appels d'outils d'un tour et les tours suivants relisent l'historique au lieu de le repayer.
+  Mesurer avant / après sur les mêmes questions (coût et latence dans Langfuse) et noter l'écart dans BUILD_LOG. Ne pas réduire la réflexion ni changer de modèle avant les evals (6.2).
 Tests : rendu d'une réponse contenant du HTML et un ID inexistant.
 ```
 
@@ -819,6 +823,7 @@ Tests : rendu d'une réponse contenant du HTML et un ID inexistant.
 
 - [ ] Une question sur un insight affiche dans la trace les outils appelés, en direct.
 - [ ] Les ID de la réponse ouvrent les bons aperçus ; un ID inventé apparaît comme « ID inconnu ».
+- [ ] Sur les mêmes questions qu'en 4.1, le coût moyen d'un tour baisse (hors écriture horaire du cache), sans perte de qualité visible.
 
 **Commit** : `feat(ui): agent chat panel with live trace and ID checks`
 
