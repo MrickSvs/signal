@@ -5,11 +5,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 3 (cockpit) commencée** : 3.1 (shell, composants de preuve, formatage en heure de Paris), 3.2 (écran Digest), 3.3 (écran Retours) et 3.4 (écran Insights) faites.
+- **Phase 3 (cockpit) terminée** : 3.1 (shell, composants de preuve, formatage en heure de Paris), 3.2 (écran Digest), 3.3 (écran Retours), 3.4 (écran Insights), 3.5 (priorisation interactive) et 3.6 (écran Contexte) faites. Prochaine étape : 4.1 (cœur de l'agent Signal).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 401 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 446 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
 - Coût LLM cumulé : ~5,5 € (génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
 
 ## Points d'attention
@@ -43,6 +43,26 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
 - **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [3.6] Écran Contexte — 2026-10-03
+
+`2c262df` · ADR-020
+
+- `/contexte` en lecture seule, relu depuis le repo à chaque chargement : les 7 fichiers du pack rendus en markdown (repliables, avec leur chemin), `weighting.yaml` en tableau par section avec ses commentaires (`lib/context-view.ts`, testé), les 9 skills (nom, description, contenu dépliable).
+- Encadré « Adapter Signal à un autre produit » tiré de la section du même nom de `context/jalon/README.md` : une seule source pour les 3 étapes.
+- Rendu par `react-markdown` 10 + `remark-gfm` 4, HTML brut désactivé.
+- Vérifié dans le navigateur à 1 280 × 800, chat ouvert : tout est lisible, sans défilement horizontal ni erreur console.
+- `prototype-kit/` n'existe pas encore (étape du prototype) et n'est donc pas affiché.
+
+## [3.5] Priorisation interactive — 2026-10-03
+
+`8879cda` · ADR-019
+
+- Classement recalculé en code dans les deux modes de Reach à partir des jugements stockés et des estimations en cache (`computeStoredRanking`) : aucun appel de modèle, aucune formule côté client.
+- Écritures par un service partagé (`services/prioritization.ts`, réutilisé par l'agent en 4.4) : override et annulation, MoSCoW final, sujet manuel ; validées par `lib/scoring`, sous le verrou du pipeline, journalisées dans `decisions`. L'override de Reach est lié à son mode (`{ mode, value }`).
+- `/priorisation` : tableau re-classé avec animation (framer-motion), popovers R / I / C / E (source, justification, preuves, override), MoSCoW recommandé → final, jauge de capacité des Must, recommandations de Signal, journal des décisions filtrable, « Ajouter un sujet ».
+- Vérifié sur la base réelle : en mode MRR, les permissions (I-31) passent 3e devant le Gantt (I-26) 9e ; un override d'Impact re-classe et entre au journal ; Confidence 70 % refusée ; « Migrer l'authentification » entre 6e avec le badge manuel ; tension I-30 / I-32 affichée ; base remise en l'état.
+- Écart : S4 (I-39) est un signal faible depuis 2.6, il n'apparaît donc pas comme « hors stratégie » dans les recommandations (règle couverte par les tests unitaires).
 
 ## [3.4] Écran Insights — 2026-10-03
 
