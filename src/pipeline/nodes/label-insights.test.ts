@@ -139,15 +139,13 @@ describe("labelInsight", () => {
   });
 
   it("never throws: an invalid output becomes a failure (CL-11)", async () => {
-    const invoke = vi
-      .fn()
-      .mockRejectedValue(
-        new StructuredOutputError("Sortie invalide", {
-          kind: "validation",
-          attempts: 2,
-          usage: EMPTY_USAGE,
-        }),
-      );
+    const invoke = vi.fn().mockRejectedValue(
+      new StructuredOutputError("Sortie invalide", {
+        kind: "validation",
+        attempts: 2,
+        usage: EMPTY_USAGE,
+      }),
+    );
     const result = await labelInsight("N1", items, [], ctx, { ...deps, invoke });
     expect(result).toMatchObject({ ok: false, error: "Sortie invalide" });
     expect(invoke).toHaveBeenCalledTimes(1); // validation errors are not retried here

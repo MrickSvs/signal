@@ -19,7 +19,7 @@ import { wrapExternal } from "@/lib/llm/data";
 import { invokeStructured } from "@/lib/llm/structured";
 import { mustCapacity, type CapacityReport } from "@/lib/scoring/capacity";
 import { computeConfidence, confidenceLevels } from "@/lib/scoring/confidence";
-import { chooseEffort, type Effort } from "@/lib/scoring/effort";
+import { chooseEffort, effortFromManual, type Effort } from "@/lib/scoring/effort";
 import {
   applyMoscowRules,
   quartile,
@@ -53,6 +53,7 @@ import { computeRobustness, type RobustnessResult } from "@/lib/scoring/robustne
 import {
   estimateInsight,
   insightNeed,
+  loadCachedInsightEstimates,
   type EstimateDeps,
   type StoredEstimate,
 } from "@/services/estimate";
@@ -341,7 +342,9 @@ export function buildJudgeMessages(
       `## Retours de l'insight (${items.length} items représentatifs sur ${insight.items.length})`,
       wrapExternal("retours", items.map(itemLine).join("\n")),
       "",
-      `Preuves possibles (ID de retours) : ${insight.feedbacks.map((f) => f.id).join(", ")}`,
+      insight.feedbacks.length > 0
+        ? `Preuves possibles (ID de retours) : ${insight.feedbacks.map((f) => f.id).join(", ")}`
+        : "Preuves possibles (ID de retours) : aucune — sujet créé par le PO hors retours, impact_evidence vide.",
     ].join("\n"),
   );
   return [system, human];
@@ -434,7 +437,7 @@ export function computeScores(
 ): ComputeResult {
   const levels = confidenceLevels(weighting.confidence);
   const base = inputs.map(({ insight, facts, judgment, effort }) => {
-    const ov = overrideValues(insight.overrides);
+    const ov = overrideValues(insight.overrides, mode);
     const reach =
       insight.origin === "manuel" && ov.manualReach
         ? manualReach(ov.manualReach, mode)
@@ -764,12 +767,12 @@ export type ScoringSummary = ComputeResult & {
   contextChanged: string[];
 };
 
-type CurrentScore = Pick<
+export type CurrentScore = Pick<
   Tables<"scores">,
   "insight_id" | "judgment" | "rank" | "rice" | "moscow_reco" | "robustness" | "reach_mode"
 >;
 
-async function loadCurrentScores(db: Db): Promise<Map<string, CurrentScore>> {
+export async function loadCurrentScores(db: Db): Promise<Map<string, CurrentScore>> {
   const rows = await fetchAll(
     (from, to) =>
       db
@@ -808,6 +811,28 @@ export function sameResult(score: ComputedScore, current: CurrentScore | undefin
     current.moscow_reco === score.moscow_reco &&
     current.robustness === score.robustness
   );
+}
+
+/** Effort entered by the PO for a manual insight (SPEC §8.9): no estimate is needed then. */
+export function manualEffortWeeks(insight: Pick<ScoringInsight, "origin" | "overrides">) {
+  if (insight.origin !== "manuel") return null;
+  return overrideValues(insight.overrides).rice.effort ?? null;
+}
+
+/** Backlog points, else the estimate's range, else the effort entered for a manual insight. */
+export function effortOf(
+  insight: Pick<ScoringInsight, "origin" | "overrides" | "backlogPoints">,
+  estimate: Pick<StoredEstimate["estimate"], "points_min" | "points_max"> | null,
+  weighting: Weighting,
+): Effort | null {
+  const effort = chooseEffort(
+    estimate ? { min: estimate.points_min, max: estimate.points_max } : null,
+    insight.backlogPoints,
+    weighting.effort.velocity_points_per_dev_week,
+  );
+  if (effort) return effort;
+  const manual = manualEffortWeeks(insight);
+  return manual === null ? null : effortFromManual(manual);
 }
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -855,7 +880,11 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
   const { weighting, mode } = options;
   const deps = options.deps ?? {};
   const { insights, commitments } = await loadScoringInsights(db, options);
-  const { estimates, failures } = await runEstimates(db, insights, deps);
+  const { estimates, failures } = await runEstimates(
+    db,
+    insights.filter((i) => manualEffortWeeks(i) === null),
+    deps,
+  );
 
   const current =
     options.rejudge || options.writeOnlyChanged ? await loadCurrentScores(db) : new Map();
@@ -863,13 +892,8 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
   const reused: string[] = [];
   let judged = 0;
   await mapWithConcurrency(insights, JUDGE_CONCURRENCY, async (insight) => {
-    const estimate = estimates.get(insight.id);
-    if (!estimate) return;
-    const effort = chooseEffort(
-      { min: estimate.estimate.points_min, max: estimate.estimate.points_max },
-      insight.backlogPoints,
-      weighting.effort.velocity_points_per_dev_week,
-    )!;
+    const effort = effortOf(insight, estimates.get(insight.id)?.estimate ?? null, weighting);
+    if (!effort) return;
     const facts = insightFacts(insight, commitments);
     const stored =
       options.rejudge && !options.rejudge.has(insight.id)
@@ -933,6 +957,55 @@ export async function runScoring(db: Db, options: RunScoringOptions): Promise<Sc
     reused: reused.sort(),
     written: toWrite.map((s) => s.insight_id),
     contextChanged: changed,
+  };
+}
+
+export type StoredRanking = ComputeResult & {
+  insights: ScoringInsight[];
+  /** Ranked insights that cannot be computed without a model call (no judgment or estimate). */
+  pending: { insight: string; missing: "jugement" | "estimation" }[];
+  current: Map<string, CurrentScore>;
+  estimates: Map<string, StoredEstimate>;
+};
+
+/**
+ * The ranking recomputed in code from the stored judgments and the cached estimates, in any Reach
+ * mode (Priorisation screen, ADR-012): read only, never a model call.
+ */
+export async function computeStoredRanking(
+  db: Db,
+  options: Pick<RunScoringOptions, "mode" | "weighting" | "now" | "commitments" | "context">,
+): Promise<StoredRanking> {
+  const { insights, commitments } = await loadScoringInsights(db, options);
+  const [current, estimates] = await Promise.all([
+    loadCurrentScores(db),
+    loadCachedInsightEstimates(db, insights),
+  ]);
+  const inputs: ComputeInput[] = [];
+  const pending: StoredRanking["pending"] = [];
+  for (const insight of insights) {
+    const effort = effortOf(
+      insight,
+      estimates.get(insight.id)?.estimate ?? null,
+      options.weighting,
+    );
+    if (!effort) {
+      pending.push({ insight: insight.id, missing: "estimation" });
+      continue;
+    }
+    const judgment = reusableJudgment(current.get(insight.id)?.judgment, insight, options.context);
+    if (!judgment) {
+      pending.push({ insight: insight.id, missing: "jugement" });
+      continue;
+    }
+    inputs.push({ insight, facts: insightFacts(insight, commitments), judgment, effort });
+  }
+  return {
+    ...computeScores(inputs, options.mode, options.weighting),
+    insights,
+    pending,
+    current,
+    estimates,
   };
 }
 

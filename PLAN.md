@@ -724,10 +724,10 @@ Aucune formule dupliquée côté client : tout passe par lib/scoring.
 
 **Test** :
 
-- [ ] La bascule comptes → MRR fait passer les permissions devant le Gantt, avec animation.
-- [ ] Un override d'Impact avec raison re-classe et apparaît dans le journal ; une Confidence de 70 % est refusée.
-- [ ] Un sujet manuel (« Migrer l'authentification ») entre dans le classement avec le badge « manuel ».
-- [ ] S4 apparaît dans les recommandations comme hors stratégie ; S5a / S5b comme tension.
+- [x] La bascule comptes → MRR fait passer les permissions devant le Gantt, avec animation.
+- [x] Un override d'Impact avec raison re-classe et apparaît dans le journal ; une Confidence de 70 % est refusée.
+- [x] Un sujet manuel (« Migrer l'authentification ») entre dans le classement avec le badge « manuel ».
+- [ ] S4 apparaît dans les recommandations comme hors stratégie ; S5a / S5b comme tension. _(Tension I-30 / I-32 affichée ; S4 (I-39) est un signal faible depuis 2.6, donc hors classement et hors recommandations : règle testée en unitaire seulement.)_
 
 **Commit** : `feat(ui): interactive prioritization, overrides and manual topics`
 

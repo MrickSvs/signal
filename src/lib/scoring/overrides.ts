@@ -3,7 +3,7 @@
 import type { Weighting } from "@/lib/context";
 import { confidenceLevels } from "./confidence";
 import type { MoscowCategory } from "./moscow-rules";
-import type { ManualReach } from "./reach";
+import type { ManualReach, ReachMode } from "./reach";
 import type { RiceParams } from "./rice";
 
 export const OVERRIDE_PARAMS = ["reach", "impact", "confidence", "effort", "moscow"] as const;
@@ -25,6 +25,18 @@ export function isManualReach(value: unknown): value is ManualReach {
   return isPositive(comptes) && (mrr === null || isPositive(mrr));
 }
 
+/**
+ * Reach override of an insight from the feedbacks: the two Reach modes have different units
+ * (accounts, euros), so the override holds the mode it was entered in and applies only there.
+ */
+export type ModeReach = { mode: ReachMode; value: number };
+
+export function isModeReach(value: unknown): value is ModeReach {
+  if (typeof value !== "object" || value === null) return false;
+  const { mode, value: v } = value as Record<string, unknown>;
+  return (mode === "comptes" || mode === "mrr") && isPositive(v);
+}
+
 export function validateOverride(input: OverrideInput, weighting: Weighting): OverrideCheck {
   const { param, value } = input;
   if (param !== "moscow" && !input.reason?.trim()) {
@@ -40,10 +52,12 @@ export function validateOverride(input: OverrideInput, weighting: Weighting): Ov
         ? { ok: true }
         : {
             ok: false,
-            error: `Confidence attendue dans ${confidenceLevels(weighting.confidence).join(", ")}`,
+            error: `Confidence attendue dans ${confidenceLevels(weighting.confidence)
+              .map((v) => `${Math.round(v * 100)} %`)
+              .join(", ")}`,
           };
     case "reach":
-      return isPositive(value) || isManualReach(value)
+      return isPositive(value) || isManualReach(value) || isModeReach(value)
         ? { ok: true }
         : { ok: false, error: "Reach strictement positif attendu" };
     case "effort":
@@ -84,14 +98,19 @@ export type OverrideValues = {
   manualReach: ManualReach | null;
 };
 
-/** Values of the active overrides. */
-export function overrideValues(overrides: readonly ActiveOverride[]): OverrideValues {
+/** Values of the active overrides; a mode-bound Reach applies only in its mode. */
+export function overrideValues(
+  overrides: readonly ActiveOverride[],
+  mode?: ReachMode,
+): OverrideValues {
   const result: OverrideValues = { rice: {}, moscow: null, manualReach: null };
   for (const o of overrides) {
     if (o.param === "moscow") result.moscow = o.value as MoscowCategory;
     // A manual insight's Reach is its computed Reach (manualReach), not an override of it.
     else if (o.param === "reach" && isManualReach(o.value)) result.manualReach = o.value;
-    else result.rice[o.param] = o.value as number;
+    else if (o.param === "reach" && isModeReach(o.value)) {
+      if (o.value.mode === mode) result.rice.reach = o.value.value;
+    } else result.rice[o.param] = o.value as number;
   }
   return result;
 }

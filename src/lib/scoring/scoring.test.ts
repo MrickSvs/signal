@@ -2,9 +2,15 @@ import { describe, expect, it } from "vitest";
 import { loadContextPack } from "@/lib/context";
 import { mustCapacity, roadmapCapacityWeeks } from "./capacity";
 import { computeConfidence, confidenceLevels, downgradeConfidence } from "./confidence";
-import { chooseEffort, effortFromBacklog, effortFromRange } from "./effort";
+import { chooseEffort, effortFromBacklog, effortFromManual, effortFromRange } from "./effort";
 import { applyMoscowRules, quartile, type MoscowFacts } from "./moscow-rules";
-import { contextChanged, isManualReach, overrideValues, validateOverride } from "./overrides";
+import {
+  contextChanged,
+  isManualReach,
+  isModeReach,
+  overrideValues,
+  validateOverride,
+} from "./overrides";
 import { computeReach, distinctAccounts, manualReach, type ReachAccount } from "./reach";
 import { applyOverrides, compareEntries, rankEntries, rice } from "./rice";
 import {
@@ -154,6 +160,17 @@ describe("effort", () => {
     expect(() => effortFromRange({ min: 0, max: 3 }, 3)).toThrow(/invalide/);
     expect(() => effortFromRange({ min: 2, max: 3 }, 0)).toThrow(/vélocité/);
     expect(() => effortFromBacklog([], 3)).toThrow(/Aucun point/);
+    expect(() => effortFromManual(0)).toThrow(/positif/);
+  });
+
+  it("keeps an effort entered by the PO as is, without a range (SPEC §8.9)", () => {
+    expect(effortFromManual(4)).toEqual({
+      weeks: 4,
+      source: "manuel",
+      low_weeks: null,
+      high_weeks: null,
+      points: null,
+    });
   });
 });
 
@@ -490,6 +507,8 @@ describe("overrides", () => {
     expect(check("reach", 0)).toBe(false);
     expect(check("reach", { comptes: 40, mrr: null })).toBe(true);
     expect(check("reach", { comptes: 0, mrr: null })).toBe(false);
+    expect(check("reach", { mode: "mrr", value: 1200 })).toBe(true);
+    expect(check("reach", { mode: "mrr", value: 0 })).toBe(false);
     expect(check("effort", 3.5)).toBe(true);
     expect(check("effort", -1)).toBe(false);
     expect(check("effort", Number.POSITIVE_INFINITY)).toBe(false);
@@ -534,5 +553,13 @@ describe("overrides", () => {
       manualReach: { comptes: 20, mrr: null },
     });
     expect(overrideValues([{ param: "reach", value: 12 }]).rice).toEqual({ reach: 12 });
+  });
+
+  it("applies a mode-bound Reach only in its mode (units differ)", () => {
+    const reach = [{ param: "reach" as const, value: { mode: "comptes", value: 40 } }];
+    expect(overrideValues(reach, "comptes").rice).toEqual({ reach: 40 });
+    expect(overrideValues(reach, "mrr").rice).toEqual({});
+    expect(isModeReach({ mode: "autre", value: 3 })).toBe(false);
+    expect(isModeReach(null)).toBe(false);
   });
 });

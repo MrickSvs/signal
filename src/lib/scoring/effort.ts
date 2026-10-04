@@ -44,6 +44,12 @@ export function effortFromBacklog(points: readonly number[], velocity: number): 
   };
 }
 
+/** Effort entered by the PO for a manual insight (SPEC §8.9), in person-weeks: no range. */
+export function effortFromManual(weeks: number): Effort {
+  if (!(weeks > 0)) throw new Error("L'effort doit être strictement positif");
+  return { weeks, source: "manuel", low_weeks: null, high_weeks: null, points: null };
+}
+
 /** The backlog refines the initial estimate as soon as one of its items has points. */
 export function chooseEffort(
   range: PointsRange | null,

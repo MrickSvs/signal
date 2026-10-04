@@ -453,6 +453,35 @@ export async function estimateInsight(
   return estimateCached(db, { insightId, ...insightNeed(insight) }, options, deps);
 }
 
+/**
+ * Cached estimates of several insights, read only (Priorisation screen): an insight whose problem
+ * changed since its last estimate is absent, never estimated here.
+ */
+export async function loadCachedInsightEstimates(
+  db: Db,
+  insights: readonly { id: string; title: string; problem_statement: string | null }[],
+): Promise<Map<string, StoredEstimate>> {
+  if (insights.length === 0) return new Map();
+  const { data, error } = await db
+    .from("complexity_estimates")
+    .select(ESTIMATE_COLUMNS)
+    .in(
+      "insight_id",
+      insights.map((i) => i.id),
+    )
+    .is("item_id", null)
+    .order("created_at", { ascending: false });
+  if (error) throw new EstimationError(`Lecture du cache d'estimation (${error.message})`);
+  const hashOf = new Map(insights.map((i) => [i.id, problemHash(insightNeed(i).statement)]));
+  const result = new Map<string, StoredEstimate>();
+  for (const row of data) {
+    const id = row.insight_id!;
+    if (result.has(id) || row.problem_hash !== hashOf.get(id)) continue;
+    result.set(id, { id: row.id, cached: true, estimate: fromRow(row) });
+  }
+  return result;
+}
+
 /** What is estimated for an insight: its title and problem statement; the cache keys on the latter. */
 export function insightNeed(insight: { title: string; problem_statement: string | null }): {
   statement: string;

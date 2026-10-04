@@ -148,6 +148,12 @@ export function memoryDb(tables: MemoryTables) {
         created_at: new Date().toISOString(),
       }),
       insight_relations: () => ({ id: `rel-${++n}` }),
+      overrides: () => ({
+        id: `ovr-${++n}`,
+        active: true,
+        context_changed: false,
+        created_at: new Date().toISOString(),
+      }),
       scores: () => ({
         id: `score-${++n}`,
         created_at: new Date(NOW.getTime() + ++n).toISOString(),
@@ -217,6 +223,7 @@ export function fakeInvoke() {
         const evidence = /Preuves possibles \(ID de retours\) : (.*)$/m
           .exec(body)![1]
           .split(", ")
+          .filter((id) => /^R-\d+$/.test(id))
           .slice(0, 2);
         return {
           data: {
