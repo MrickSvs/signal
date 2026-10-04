@@ -439,3 +439,83 @@ export async function createManualTopic(
     };
   });
 }
+
+// ---------------------------------------------------------------------------
+// « What if » (agent's get_priority, SPEC §10.5): the same computation with hypothetical values,
+// in memory only. Nothing is written: no override, no decision, no score.
+// ---------------------------------------------------------------------------
+
+export const whatIfSchema = z
+  .array(
+    z.object({
+      insight_id: z.string().regex(/^I-\d+$/, "ID d'insight attendu (I-xx)"),
+      param: z.enum(["reach", "impact", "confidence", "effort", "moscow"]),
+      /** Same units as the Priorisation screen: Confidence in %, Reach in the mode's unit. */
+      value: z.union([z.number(), z.enum(["must", "should", "could", "wont"])]),
+    }),
+  )
+  .min(1)
+  .max(5);
+
+export type WhatIf = z.infer<typeof whatIfSchema>;
+
+export type Simulation = {
+  baseline: StoredRanking;
+  simulated: StoredRanking;
+  moves: { insight_id: string; from: number | null; to: number | null }[];
+};
+
+const SIMULATION_REASON = "simulation";
+
+export async function simulateRanking(
+  db: Db,
+  mode: ReachMode,
+  whatIf: WhatIf,
+  deps: Pick<PrioritizationDeps, "pack" | "skills" | "now">,
+): Promise<Simulation> {
+  const baseline = await getRanking(db, mode, deps);
+  const changes = whatIf.map((change) => {
+    const { insight } = rankedScore(baseline, change.insight_id);
+    const request =
+      change.param === "moscow"
+        ? overrideRequestSchema.safeParse({ ...change, mode })
+        : overrideRequestSchema.safeParse({ ...change, mode, value: Number(change.value) });
+    if (!request.success) throw new PrioritizationError(z.prettifyError(request.error));
+    const value = storedValue(request.data, insight);
+    const checked = validateOverride(
+      { param: change.param, value, reason: SIMULATION_REASON },
+      deps.pack.weighting,
+    );
+    if (!checked.ok) throw new PrioritizationError(`${change.insight_id} : ${checked.error}.`);
+    return { insight_id: change.insight_id, param: change.param, value };
+  });
+
+  const simulated = await computeStoredRanking(db, scoringOptions(deps, mode), (insights) =>
+    insights.map((insight) => {
+      const mine = changes.filter((c) => c.insight_id === insight.id);
+      if (mine.length === 0) return insight;
+      const params = new Set(mine.map((c) => c.param));
+      return {
+        ...insight,
+        overrides: [
+          ...insight.overrides.filter((o) => !params.has(o.param)),
+          ...mine.map((c) => ({
+            id: SIMULATION_REASON,
+            param: c.param,
+            value: c.value,
+            feedback_ids: null,
+            context_changed: false,
+          })),
+        ],
+      };
+    }),
+  );
+
+  const before = new Map(baseline.scores.map((s) => [s.insight_id, s.rank]));
+  const after = new Map(simulated.scores.map((s) => [s.insight_id, s.rank]));
+  const moves = [...new Set([...before.keys(), ...after.keys()])]
+    .map((id) => ({ insight_id: id, from: before.get(id) ?? null, to: after.get(id) ?? null }))
+    .filter((m) => m.from !== m.to)
+    .sort((a, b) => (a.to ?? Infinity) - (b.to ?? Infinity));
+  return { baseline, simulated, moves };
+}

@@ -1287,6 +1287,18 @@ export type Database = {
         Args: { n: number; prefix: string; width: number };
         Returns: string;
       };
+      match_feedback_items: {
+        Args: {
+          match_count?: number;
+          min_similarity?: number;
+          query_embedding: string;
+        };
+        Returns: {
+          feedback_id: string;
+          item_id: string;
+          similarity: number;
+        }[];
+      };
       sync_id_sequence: { Args: { entity: string }; Returns: number };
     };
     Enums: {

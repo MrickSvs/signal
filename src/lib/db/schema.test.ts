@@ -271,3 +271,39 @@ describe("feedback_inbox", () => {
     expect(ids.rows.map((r) => r.id)).toEqual(["R-900"]);
   });
 });
+
+describe("match_feedback_items", () => {
+  const vec = (head: number[]) => `[${[...head, ...Array(1024 - head.length).fill(0)].join(",")}]`;
+
+  beforeAll(async () => {
+    await db.exec(`
+      insert into feedbacks (id, channel, source_type, received_at, raw_text) values
+        ('R-950', 'email_client', 'client_direct', now(), 'a'),
+        ('R-951', 'email_client', 'client_direct', now(), 'b');
+      insert into feedback_items (feedback_id, item_index, type, product_area, underlying_problem, summary) values
+        ('R-950', 1, 'bug', 'notifications', 'p', 's'),
+        ('R-950', 2, 'bug', 'notifications', 'p', 's'),
+        ('R-951', 1, 'bug', 'notifications', 'p', 's');
+    `);
+    await db.query(`update feedback_items set embedding = $1::vector where id = 'R-950.1'`, [
+      vec([1, 0]),
+    ]);
+    await db.query(`update feedback_items set embedding = $1::vector where id = 'R-950.2'`, [
+      vec([0.8, 0.6]),
+    ]);
+    await db.query(`update feedback_items set embedding = $1::vector where id = 'R-951.1'`, [
+      vec([0, 1]),
+    ]);
+  });
+
+  it("returns the best item per feedback above the threshold", async () => {
+    const { rows } = await db.query<{ feedback_id: string; item_id: string; similarity: number }>(
+      `select * from match_feedback_items($1::vector, 10, 0.5)`,
+      [vec([1, 0])],
+    );
+    // Other tests' vectors (R-001.2) may match too: only this fixture is checked.
+    const own = rows.filter((r) => r.feedback_id.startsWith("R-95"));
+    expect(own.map((r) => [r.feedback_id, r.item_id])).toEqual([["R-950", "R-950.1"]]);
+    expect(own[0].similarity).toBeCloseTo(1, 5);
+  });
+});

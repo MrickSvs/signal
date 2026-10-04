@@ -24,7 +24,9 @@ import { loadSkill } from "@/lib/skills";
 import { compilePipeline, runPipeline, type PipelineStateType } from "@/pipeline/graph";
 import { PipelineBusyError, withPipelineLock } from "@/pipeline/lock";
 
-export const CHECKPOINT_SCHEMA = "langgraph";
+import { CHECKPOINT_SCHEMA } from "@/agent/checkpointer";
+
+export { CHECKPOINT_SCHEMA };
 
 export type RunArgs = { resume?: string; reachMode?: ReachMode; batchSize?: number };
 

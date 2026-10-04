@@ -182,9 +182,17 @@ type RunStats = {
 
 export async function loadDigestFacts(
   db: Db,
-  options: { weighting: Weighting; now: Date; clock: Date },
+  options: {
+    weighting: Weighting;
+    now: Date;
+    clock: Date;
+    /** The agent's briefing (SPEC §10.8): changes since this date instead of the digest period. */
+    since?: string | null;
+    /** Size of `ranking.top` (5 in the digest, 10 in the briefing). */
+    topSize?: number;
+  },
 ): Promise<DigestFacts> {
-  const { weighting, now, clock } = options;
+  const { weighting, now, clock, topSize = 5 } = options;
   const page = <T>(
     what: string,
     q: (
@@ -200,11 +208,14 @@ export async function loadDigestFacts(
   if (lastDigest.error)
     throw new Error(`Digest : lecture des digests (${lastDigest.error.message})`);
   if (state.error) throw new Error(`Digest : lecture de po_state (${state.error.message})`);
-  const period = digestPeriod(
-    lastDigest.data?.[0]?.period_end ?? null,
-    state.data?.[0]?.last_seen_at ?? null,
-    clock,
-  );
+  const period =
+    options.since !== undefined
+      ? { start: options.since, end: clock.toISOString() }
+      : digestPeriod(
+          lastDigest.data?.[0]?.period_end ?? null,
+          state.data?.[0]?.last_seen_at ?? null,
+          clock,
+        );
 
   const [
     alerts,
@@ -355,7 +366,7 @@ export async function loadDigestFacts(
     period.start !== null && scores.some((s) => new Date(s.created_at) <= new Date(period.start!));
   const top = [...currentRank.entries()]
     .sort((a, b) => a[1] - b[1])
-    .slice(0, 5)
+    .slice(0, topSize)
     .map(([id, rank]) => ({
       insight_id: id,
       title: title.get(id) ?? "",

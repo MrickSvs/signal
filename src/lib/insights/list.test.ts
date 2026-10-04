@@ -24,6 +24,7 @@ const card = (id: string, extra: Partial<InsightCard> = {}): InsightCard => ({
   mrr_exposed: 100,
   renewals_90d: 0,
   plans: {},
+  segments: {},
   weekly: [0, 1, 2, 3, 4, 5],
   growth: 1,
   is_emerging: false,

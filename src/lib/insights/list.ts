@@ -68,6 +68,8 @@ export type InsightCard = {
   mrr_exposed: number;
   renewals_90d: number;
   plans: Record<string, number>;
+  /** Distinct accounts by customer segment (agence_com, cabinet_conseil…). */
+  segments: Record<string, number>;
   weekly: number[];
   growth: number | null;
   is_emerging: boolean;

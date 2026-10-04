@@ -2,7 +2,13 @@ import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  resolve: { alias: { "@": path.resolve(import.meta.dirname, "src") } },
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "src"),
+      // Server-side query modules guard against client bundles; tests run them in plain Node.
+      "server-only": path.resolve(import.meta.dirname, "src/lib/server-only-stub.ts"),
+    },
+  },
   test: {
     environment: "node",
     include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],

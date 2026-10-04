@@ -975,8 +975,12 @@ export type StoredRanking = ComputeResult & {
 export async function computeStoredRanking(
   db: Db,
   options: Pick<RunScoringOptions, "mode" | "weighting" | "now" | "commitments" | "context">,
+  /** Changes the loaded insights before computing (the agent's « what if », never written). */
+  adjust?: (insights: ScoringInsight[]) => ScoringInsight[],
 ): Promise<StoredRanking> {
-  const { insights, commitments } = await loadScoringInsights(db, options);
+  const loaded = await loadScoringInsights(db, options);
+  const commitments = loaded.commitments;
+  const insights = adjust ? adjust(loaded.insights) : loaded.insights;
   const [current, estimates] = await Promise.all([
     loadCurrentScores(db),
     loadCachedInsightEstimates(db, insights),

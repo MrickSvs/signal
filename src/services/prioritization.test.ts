@@ -18,6 +18,7 @@ import {
   createManualTopic,
   getRanking,
   PrioritizationError,
+  simulateRanking,
 } from "./prioritization";
 
 const pack = await loadContextPack();
@@ -310,5 +311,43 @@ describe("createManualTopic (CL-25)", () => {
     expect(
       (await getRanking(db, "comptes", deps)).scores.find((s) => s.insight_id === "I-03")?.reach,
     ).toBe(30);
+  });
+});
+
+describe("simulateRanking (agent's « what if »)", () => {
+  it("recomputes with hypothetical values and writes nothing", async () => {
+    const { db, deps, tables, invoke } = await seeded();
+    const snapshot = JSON.stringify([tables.overrides, tables.decisions, tables.scores]);
+    const baseline = (await getRanking(db, "comptes", deps)).scores[0];
+    const impact = baseline.impact === 3 ? 0.5 : 3;
+    const { simulated } = await simulateRanking(
+      db,
+      "comptes",
+      [{ insight_id: "I-01", param: "impact", value: impact }],
+      deps,
+    );
+    expect(simulated.scores[0].impact).toBe(impact);
+    expect(simulated.scores[0].rice).not.toBe(baseline.rice);
+    expect(simulated.scores[0].overridden.impact).toEqual({
+      original: baseline.impact,
+      value: impact,
+    });
+    expect(JSON.stringify([tables.overrides, tables.decisions, tables.scores])).toBe(snapshot);
+    expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it("refuses a value outside the scales and an unranked insight", async () => {
+    const { db, deps } = await seeded();
+    await expect(
+      simulateRanking(
+        db,
+        "comptes",
+        [{ insight_id: "I-01", param: "confidence", value: 70 }],
+        deps,
+      ),
+    ).rejects.toThrow(/Confidence attendue/);
+    await expect(
+      simulateRanking(db, "comptes", [{ insight_id: "I-99", param: "impact", value: 2 }], deps),
+    ).rejects.toThrow(PrioritizationError);
   });
 });

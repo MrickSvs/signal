@@ -781,13 +781,13 @@ Consulte la doc actuelle de LangChain v1 (createAgent, middleware, dont le middl
 
 **Test** :
 
-- [ ] « Qu'est-ce qui remonte le plus chez les clients Enterprise ce mois-ci ? » → réponse structurée avec ID d'insights et de retours.
-- [ ] « Quel a été le taux de churn le mois dernier ? » → Signal dit que la donnée n'existe pas, sans rien calculer.
-- [ ] « Et si l'Impact du Gantt passait à 3 ? » → `get_priority` en simulation, rien n'est enregistré.
-- [ ] « Quoi de neuf ? » → réponse depuis le briefing, sans appel d'outil, ou avec `get_briefing` pour le détail.
-- [ ] Une question de Léa collée entre guillemets n'est pas ajoutée comme retour.
-- [ ] « Voici un mail que je viens de recevoir : … » → `add_feedback`, retour trié et rattaché.
-- [ ] Trace complète dans Langfuse.
+- [x] « Qu'est-ce qui remonte le plus chez les clients Enterprise ce mois-ci ? » → réponse structurée avec ID d'insights et de retours.
+- [x] « Quel a été le taux de churn le mois dernier ? » → Signal dit que la donnée n'existe pas, sans rien calculer.
+- [x] « Et si l'Impact du Gantt passait à 3 ? » → `get_priority` en simulation, rien n'est enregistré.
+- [x] « Quoi de neuf ? » → réponse depuis le briefing, sans appel d'outil, ou avec `get_briefing` pour le détail.
+- [x] Une question de Léa collée entre guillemets n'est pas ajoutée comme retour.
+- [x] « Voici un mail que je viens de recevoir : … » → `add_feedback`, retour trié et rattaché.
+- [x] Trace complète dans Langfuse.
 
 **Commit** : `feat(agent): single agent with read tools, skills, memory and guardrails`
 

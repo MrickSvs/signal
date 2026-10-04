@@ -114,6 +114,7 @@ export async function getInsightsScreen(db: Db): Promise<InsightsScreen> {
       mrr_exposed: Number(i.mrr_exposed),
       renewals_90d: i.renewals_90d,
       plans: asBreakdown(i.segments_breakdown).plans,
+      segments: asBreakdown(i.segments_breakdown).segments,
       weekly: trend.weekly ?? [],
       growth: trend.growth ?? null,
       is_emerging: trend.is_emerging ?? false,
