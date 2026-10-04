@@ -688,11 +688,11 @@ Page d'accueil : le dernier digest, sections dans l'ordre de SPEC §12.2 (alerte
 
 **Test** :
 
-- [ ] L'insight S3 montre « export Excel », « rapport PDF », « lien client »… face au besoin de reporting.
-- [ ] L'insight S1 affiche ses 4 canaux ; S5a affiche sa tension avec S5b.
-- [ ] Les petits regroupements du bruit sont dans « Signaux faibles ».
-- [ ] Après le premier run, la section « À valider » liste tous les insights ; « Tout accepter » sauf un, puis rejet de celui-ci → décisions journalisées, l'insight rejeté sort du classement.
-- [ ] Reformuler un titre puis relancer `pnpm pipeline:cluster` → le titre reformulé est conservé.
+- [x] L'insight S3 montre « export Excel », « rapport PDF », « lien client »… face au besoin de reporting.
+- [x] L'insight S1 affiche ses 4 canaux ; S5a affiche sa tension avec S5b.
+- [x] Les petits regroupements du bruit sont dans « Signaux faibles ».
+- [x] Après le premier run, la section « À valider » liste tous les insights ; « Tout accepter » sauf un, puis rejet de celui-ci → décisions journalisées, l'insight rejeté sort du classement. _(Vérifié via le service sur la base réelle, puis base remise en l'état ; parcours dans l'interface à refaire par le PO.)_
+- [ ] Reformuler un titre puis relancer `pnpm pipeline:cluster` → le titre reformulé est conservé. _(Vérifié en test sur base en mémoire, run complet compris ; à confirmer sur la base réelle.)_
 
 **Commit** : `feat(ui): insights list, detail and review of proposed insights`
 

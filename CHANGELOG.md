@@ -5,7 +5,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 3 (cockpit) commencée** : 3.1 (shell, composants de preuve, formatage en heure de Paris), 3.2 (écran Digest) et 3.3 (écran Retours) faites. Prochaine étape : 3.4 (écran Insights).
+- **Phase 3 (cockpit) commencée** : 3.1 (shell, composants de preuve, formatage en heure de Paris), 3.2 (écran Digest), 3.3 (écran Retours) et 3.4 (écran Insights) faites.
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
@@ -43,6 +43,16 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Test instable corrigé** (`8001d0f`) : `loadContextPack` lisait les fichiers en parallèle et l'erreur nommait le premier fichier manquant à échouer ; elle nomme désormais le premier dans l'ordre du pack.
 - **Digest** : faits calculés en code, rédaction refusée si elle cite un ID inconnu, une ligne chiffrée sans ID ou une date absolue (une nouvelle tentative, puis repli sur un rendu brut). Compte à risque = renouvellement < 90 jours + churn ou santé rouge (le sentiment négatif seul ne suffit pas). Un retour est « nouveau » selon sa date d'entrée en base. Le cron ne retente pas les triages en échec : le run complet le fait. Cron à 4 h UTC : 6 h à Paris l'été, 5 h l'hiver. → ADR-014
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [3.4] Écran Insights — 2026-10-03
+
+`1ea4d24` · ADR-018
+
+- Revue des insights proposés par un service partagé (`services/insight-review.ts`, réutilisé par l'agent en 4.4) : accepter (en lot), reformuler (`title_locked`), fusionner (items vers la cible, items figés gardés pour rejouer la fusion), rejeter ; une décision journalisée par insight ; re-classement en code avec les jugements stockés, sous le verrou du pipeline.
+- `/insights` : section « À valider » (cases cochées, « Tout accepter »), cartes des insights classés (rang, MoSCoW, comptes et MRR cliquables, sparkline), signaux faibles, sujets à surveiller, filtre des rejetés ; tri et filtres dans l'URL.
+- `/insights/[id]` : « Ce qu'ils demandent / Ce dont ils ont besoin », répartition par plan et segment, comptes concernés, canaux, tendance, tensions, retours représentatifs puis les autres, score décomposé avec lien vers Priorisation ; « Rédiger le backlog » désactivé jusqu'à 4.3.
+- Vérifié sur la base réelle : S3 (I-28) montre export Excel, lien de partage, rapport PDF ; S1 (I-27) 4 canaux ; S5a (I-30) en tension avec I-32 ; 14 signaux faibles ; 24 acceptations + rejet de I-35 → 25 décisions, I-35 hors classement, rangs recalculés (7 s, 0 €), puis base remise en l'état.
+- Reste à vérifier par le PO : parcours de revue dans l'interface ; reformulation puis `pnpm pipeline:cluster` sur la base réelle (couvert par les tests en mémoire).
 
 ## [3.3] Écran Retours — 2026-10-03
 
