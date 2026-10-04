@@ -287,3 +287,15 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Conséquences** :
   - Mesuré sur la base réelle : classement recalculé en 0,6 à 1,5 s, identique aux rangs stockés en mode comptes ; un override re-classe en ~8 s (verrou, deux calculs, écritures séquentielles, re-rendu) ; sujet manuel avec jugement ~10 s. Base remise dans son état initial après les essais (D-051 à D-057 et I-51 supprimés ; les séquences ne réutilisent pas ces ID).
   - À 110 % de zoom chat ouvert, le tableau défile horizontalement dans son cadre (pas la page).
+
+## ADR-020 — Écran Contexte : le pack lu tel quel, rendu markdown sans HTML
+
+- **Date** : 2026-10-03
+- **Statut** : acceptée
+- **Contexte** : étape 3.6. Montrer ce que Signal sait de Jalon et où cela se modifie (SPEC §6.4, §12.8), sans dupliquer le contenu du pack.
+- **Décision** :
+  - `/contexte` lit les fichiers du repo à chaque requête (`server/queries/context.ts`) : les 7 documents de `CONTEXT_DOCUMENTS`, `weighting.yaml`, les skills par `listSkills` / `loadSkill`. Lecture seule, aucune action.
+  - Rendu markdown par `react-markdown` 10 + `remark-gfm` 4 (tableaux), HTML brut désactivé (comportement par défaut), styles par composants (pas de plugin typography).
+  - `weighting.yaml` en tableau (`lib/context-view.ts`, testé) : une section par clé de premier niveau avec son commentaire, une ligne par clé de second niveau, valeur sur une ligne, commentaire en ligne ou au-dessus d'une collection conservé. Les clés restent celles du fichier : c'est là qu'on les modifie.
+  - L'encadré « Adapter Signal à un autre produit » est la section du même nom de `context/jalon/README.md` : une seule source pour les 3 étapes.
+- **Conséquences** : modifier un fichier du pack se voit au rechargement de la page. `prototype-kit/` n'existe pas encore (étape du prototype) et n'est pas affiché.

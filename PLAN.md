@@ -749,7 +749,7 @@ Page en lecture : fichiers du pack rendus en markdown, weighting.yaml présenté
 
 **Test** :
 
-- [ ] Les 9 skills et les fichiers du pack sont lisibles.
+- [x] Les 9 skills et les fichiers du pack sont lisibles.
 
 **Commit** : `feat(ui): context pack page`
 
