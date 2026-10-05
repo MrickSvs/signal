@@ -17,3 +17,43 @@ export const agentRequestSchema = z.object({
 export function sseEvent(event: AgentEvent): string {
   return `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`;
 }
+
+/**
+ * A turn streamed as Server-Sent Events. Léa may leave or start a new conversation mid-turn: the
+ * turn ends server-side (checkpoint, trace, cost) even if nobody reads the stream any more.
+ */
+export function sseResponse(
+  run: (send: (event: AgentEvent) => void) => Promise<void>,
+  failure: string,
+): Response {
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      let closed = false;
+      const send = (event: AgentEvent) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(sseEvent(event)));
+        } catch {
+          closed = true;
+        }
+      };
+      try {
+        await run(send);
+      } catch (error) {
+        console.error("[agent]", error);
+        send({ type: "error", message: failure });
+      } finally {
+        if (!closed) controller.close();
+      }
+    },
+  });
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
+}

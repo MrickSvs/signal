@@ -893,9 +893,9 @@ Test scripté (scripts/chat.ts) : « Passe le Gantt en Must » → objection →
 
 **Test** :
 
-- [ ] Le scénario scripté passe.
-- [ ] Refuser une carte d'approbation n'applique rien et journalise le refus.
-- [ ] Trois retours collés dans le chat sur un sujet inédit → carte « Nouveau sujet proposé » ; Reformuler → insight `actif` au titre verrouillé, décision journalisée.
+- [x] Le scénario scripté passe.
+- [x] Refuser une carte d'approbation n'applique rien et journalise le refus.
+- [x] Trois retours collés dans le chat sur un sujet inédit → carte « Nouveau sujet proposé » ; Reformuler → insight `actif` au titre verrouillé, décision journalisée.
 
 **Commit** : `feat(agent): human-in-the-loop decisions, insight review and challenge mode`
 

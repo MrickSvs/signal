@@ -1,7 +1,7 @@
 // The Signal agent (SPEC §6.2, §10): one agent with tools, built on LangChain v1 createAgent.
 // Every turn gets a briefing computed in code, streams its tokens and tool calls, is traced in
 // Langfuse (one trace per turn, session = conversation) and costed.
-import type { BaseCheckpointSaver } from "@langchain/langgraph";
+import { Command, type BaseCheckpointSaver, type StateSnapshot } from "@langchain/langgraph";
 import {
   AIMessage,
   AIMessageChunk,
@@ -12,6 +12,7 @@ import {
   summarizationMiddleware,
   SystemMessage,
   type BaseMessage,
+  type HITLResponse,
 } from "langchain";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { getModel } from "@/lib/llm";
@@ -20,6 +21,13 @@ import { MODELS } from "@/lib/llm/models";
 import { currentTraceId, langfuseCallbacks, traceUrl, withTrace } from "@/lib/llm/tracing";
 import type { SkillSummary } from "@/lib/skills";
 import { loadBriefingFacts } from "@/services/briefing";
+import {
+  approvalConfig,
+  danglingToolResults,
+  toPendingApproval,
+  withTargets,
+  type PendingApproval,
+} from "./approval";
 import { renderBriefing, type PageContext } from "./briefing";
 import {
   PARTIAL_ANSWER,
@@ -80,10 +88,12 @@ export function createSignalAgent(options: SignalAgentOptions) {
         minMessagesToCache: 1,
         unsupportedModelBehavior: "ignore",
       }),
+      // Validation by the PO (SPEC §10.6): apply_decision (and push_to_notion in 5.2) pause on an
+      // approval card; the run resumes from the checkpointer (resumeTurn). afterModel hooks run
+      // in reverse order: the cost and the tool budget are counted before the pause.
+      humanInTheLoopMiddleware({ interruptOn: approvalConfig(options.deps.pack.weighting) }),
       toolBudgetMiddleware(),
       traceMiddleware(modelsOf),
-      // Validation by the PO (SPEC §10.6): apply_decision and push_to_notion are added in 4.4/5.2.
-      humanInTheLoopMiddleware({ interruptOn: {} }),
     ],
   });
 }
@@ -93,7 +103,8 @@ export type SignalAgent = ReturnType<typeof createSignalAgent>;
 export type AgentEvent =
   | { type: "token"; text: string }
   | TraceEvent
-  | { type: "interrupt"; value: unknown }
+  /** An approval card: the turn stops until Léa answers it (POST /api/agent/resume). */
+  | { type: "interrupt"; approval: PendingApproval }
   | {
       type: "done";
       thread_id: string;
@@ -108,9 +119,12 @@ export type AgentEvent =
 
 export type TurnInput = {
   threadId: string;
-  message: string;
   page: PageContext | null;
-};
+} & (
+  | { message: string }
+  /** Léa's answer to the pending approval card (the run resumes where it paused). */
+  | { resume: HITLResponse }
+);
 
 export const TRUNCATED_NOTICE =
   "\n\n_Réponse coupée : limite de longueur atteinte. Demande-moi la suite ou une question plus ciblée._";
@@ -144,9 +158,39 @@ export function turnMessages(message: string, briefing: string): BaseMessage[] {
   return [new HumanMessage(message), new SystemMessage(briefing)];
 }
 
+/** The conversation's checkpointed state (messages and pending interrupts). */
+export function threadState(agent: SignalAgent, threadId: string): Promise<StateSnapshot> {
+  return agent.graph.getState({ configurable: { thread_id: threadId } });
+}
+
+/** The approval card waiting for Léa in a conversation, if any. */
+export async function pendingApproval(
+  agent: SignalAgent,
+  threadId: string,
+): Promise<{ approval: PendingApproval; messages: BaseMessage[] } | null> {
+  const state = await threadState(agent, threadId);
+  const approval = toPendingApproval(state.tasks.flatMap((t) => t.interrupts ?? []));
+  if (!approval) return null;
+  const messages = (state.values as { messages?: BaseMessage[] }).messages ?? [];
+  return { approval, messages };
+}
+
 /**
- * One turn of the conversation: records the thread, computes the briefing, streams the agent and
- * reports every event through `emit`. Traced as « chat-turn » in Langfuse, session = thread.
+ * Input of a turn. A new message while a card waits: the card is dropped (nothing applied, the
+ * insight stays « propose »), its tool calls get a result first so the history stays valid.
+ */
+async function turnInput(agent: SignalAgent, deps: AgentDeps, input: TurnInput) {
+  if ("resume" in input) return new Command({ resume: input.resume });
+  const pending = await pendingApproval(agent, input.threadId);
+  const dropped = pending ? danglingToolResults(pending.messages) : [];
+  const briefing = await turnBriefing(deps, input.page);
+  return { messages: [...dropped, ...turnMessages(input.message, briefing)] };
+}
+
+/**
+ * One turn of the conversation (a message, or the answer to an approval card): records the thread,
+ * computes the briefing, streams the agent and reports every event through `emit`. Traced as
+ * « chat-turn » in Langfuse, session = thread.
  */
 export async function runTurn(
   agent: SignalAgent,
@@ -167,22 +211,21 @@ export async function runTurn(
       tags: ["agent", "chat"],
       metadata: { page: input.page?.page ?? "" },
     },
-    { message: input.message, page: input.page },
+    "resume" in input
+      ? { resume: input.resume, page: input.page }
+      : { message: input.message, page: input.page },
     async () => {
       traceId = currentTraceId();
-      await touchThread(deps.db, input.threadId, input.message, input.page, new Date());
+      const first = "message" in input ? input.message : "Validation";
+      await touchThread(deps.db, input.threadId, first, input.page, new Date());
       const context: TurnContext = { threadId: input.threadId, runCost, page: input.page };
-      const briefing = await turnBriefing(deps, input.page);
-      const stream = await agent.stream(
-        { messages: turnMessages(input.message, briefing) },
-        {
-          configurable: { thread_id: input.threadId },
-          context,
-          streamMode: ["messages", "custom", "updates"],
-          recursionLimit: RECURSION_LIMIT,
-          callbacks: langfuseCallbacks(),
-        },
-      );
+      const stream = await agent.stream(await turnInput(agent, deps, input), {
+        configurable: { thread_id: input.threadId },
+        context,
+        streamMode: ["messages", "custom", "updates"],
+        recursionLimit: RECURSION_LIMIT,
+        callbacks: langfuseCallbacks(),
+      });
       for await (const [mode, chunk] of stream as AsyncIterable<[string, unknown]>) {
         if (mode === "messages") {
           const [message, meta] = chunk as [BaseMessage, { langgraph_node?: string }];
@@ -194,7 +237,9 @@ export async function runTurn(
         } else if (mode === "updates") {
           for (const [node, update] of Object.entries(chunk as Record<string, unknown>)) {
             if (node === "__interrupt__") {
-              await emit({ type: "interrupt", value: update });
+              const approval = toPendingApproval(update);
+              if (approval)
+                await emit({ type: "interrupt", approval: await withTargets(deps.db, approval) });
               continue;
             }
             // The partial answer of the tool budget is written by a middleware, not streamed.

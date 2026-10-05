@@ -1,6 +1,7 @@
 // The agent's tools (SPEC §10.5). Step 4.1: the nine read tools and add_feedback; 4.3: the backlog
-// drafting and edition; the prototype, decision and Notion tools come with steps 4.4, 5.2 and 7.1.
+// drafting and edition; 4.4: apply_decision; the Notion and prototype tools come with 5.2 and 7.1.
 import { addFeedbackTool } from "./add-feedback";
+import { applyDecisionTool } from "./apply-decision";
 import { draftBacklogItemsTool } from "./draft-backlog-items";
 import { estimateComplexityTool } from "./estimate-complexity";
 import { getBriefingTool } from "./get-briefing";
@@ -36,6 +37,7 @@ export function chatTools(deps: AgentDeps, options: { skillsDir?: string } = {})
     addFeedbackTool(deps),
     draftBacklogItemsTool(deps),
     updateBacklogItemTool(deps),
+    applyDecisionTool(deps),
   ];
 }
 

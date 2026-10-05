@@ -3,10 +3,11 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { AgentEvent } from "@/agent";
+import type { CardDecision, PendingApproval } from "@/agent/approval";
 import type { ChatHistoryMessage } from "@/agent/history";
 import { createSseParser } from "@/lib/chat/sse";
 import { pageContext, type ChatPageContext } from "@/lib/chat/suggestions";
-import { loadThreadHistory, verifyAnswerIds } from "@/server/actions/chat";
+import { loadPendingApproval, loadThreadHistory, verifyAnswerIds } from "@/server/actions/chat";
 import type { IdStatuses } from "./chat-markdown";
 
 // State of the Signal chat panel (SPEC §12.9): the conversation, its streamed answers, the live
@@ -67,6 +68,9 @@ type ChatState = {
   focusSignal: number;
   context: ChatPageContext;
   send: (message: string) => Promise<void>;
+  /** The approval card waiting for Léa (SPEC §10.6), and her answer to it. */
+  approval: PendingApproval | null;
+  answerApproval: (decisions: CardDecision[], label: string) => Promise<void>;
   prefill: (message: string) => void;
   newThread: () => void;
   openThread: (id: string) => Promise<void>;
@@ -110,6 +114,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [draft, setDraft] = useState("");
   const [focusSignal, setFocusSignal] = useState(0);
   const [threadsVersion, setThreadsVersion] = useState(0);
+  const [approval, setApproval] = useState<PendingApproval | null>(null);
   const abort = useRef<AbortController | null>(null);
   // The search part is read when sending (useSearchParams would opt the layout out of prerender).
   const context = pageContext(pathname);
@@ -132,12 +137,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const send = useCallback(
-    async (raw: string) => {
-      const message = raw.trim();
-      if (!message || busy) return;
+  /**
+   * Streams one turn (a message to /api/agent, or the answer to a card to /api/agent/resume):
+   * `shown` is what appears as Léa's message, `body` what the route receives.
+   */
+  const stream = useCallback(
+    async (url: string, shown: string, body: Record<string, unknown>) => {
       setBusy(true);
-      setDraft("");
+      const message = shown;
       const turnKey = nextKey("turn");
       const answerKey = nextKey("a");
       setMessages((all) => [
@@ -169,20 +176,22 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       let text = "";
       let currentThread = threadId;
       let failed: string | null = null;
+      let refused: number | null = null;
       const controller = new AbortController();
       abort.current = controller;
       try {
-        const response = await fetch("/api/agent", {
+        const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...(threadId ? { thread_id: threadId } : {}),
-            message,
+            ...body,
             page_context: pageContext(window.location.pathname, window.location.search),
           }),
           signal: controller.signal,
         });
         if (!response.ok || !response.body) {
+          refused = response.status;
           const body = (await response.json().catch(() => null)) as { error?: string } | null;
           throw new Error(body?.error ?? `Signal ne répond pas (${response.status}).`);
         }
@@ -232,6 +241,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                 ),
               }));
               break;
+            case "interrupt":
+              setApproval(event.approval);
+              break;
             case "done":
               currentThread = event.thread_id;
               patchTurn(turnKey, () => ({ done: event, status: "done", endedAt: Date.now() }));
@@ -271,8 +283,36 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       // A failed check leaves them unchecked (dashed, not clickable) rather than all « inconnus ».
       const ids = text ? await checkIds(text, currentThread, true) : {};
       patchAssistant(answerKey, () => ({ ids }));
+      return { refused };
     },
-    [busy, threadId, patchAssistant, patchTurn],
+    [threadId, patchAssistant, patchTurn],
+  );
+
+  const send = useCallback(
+    async (raw: string) => {
+      const message = raw.trim();
+      if (!message || busy) return;
+      setDraft("");
+      // Writing instead of answering the card drops it: nothing is applied (SPEC §8.10).
+      setApproval(null);
+      await stream("/api/agent", message, { message });
+    },
+    [busy, stream],
+  );
+
+  const answerApproval = useCallback(
+    async (decisions: CardDecision[], label: string) => {
+      if (!approval || !threadId || busy) return;
+      const card = approval;
+      setApproval(null);
+      const { refused } = await stream("/api/agent/resume", label, {
+        interrupt_id: card.interrupt_id,
+        decisions,
+      });
+      // An invalid edit (400) leaves the card open with the error above it; a stale card (409) goes.
+      if (refused === 400) setApproval(card);
+    },
+    [approval, threadId, busy, stream],
   );
 
   const prefill = useCallback((message: string) => {
@@ -286,6 +326,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     abort.current?.abort();
     setThreadId(null);
     setMessages([]);
+    setApproval(null);
     setThreadError(null);
     setTab("chat");
   }, []);
@@ -296,8 +337,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages([]);
     setThreadError(null);
     setTab("chat");
+    setApproval(null);
     setLoadingThread(true);
-    const result = await loadThreadHistory(id).catch(() => null);
+    const [result, pending] = await Promise.all([
+      loadThreadHistory(id).catch(() => null),
+      loadPendingApproval(id).catch(() => null),
+    ]);
+    if (pending?.ok) setApproval(pending.data);
     setLoadingThread(false);
     if (!result?.ok) {
       setThreadError(result?.message ?? "Impossible de relire cette conversation.");
@@ -348,6 +394,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         focusSignal,
         context,
         send,
+        approval,
+        answerApproval,
         prefill,
         newThread,
         openThread,

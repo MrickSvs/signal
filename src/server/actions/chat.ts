@@ -1,7 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { pendingApproval } from "@/agent";
+import { withTargets, type PendingApproval } from "@/agent/approval";
 import { visibleHistory, type ChatHistoryMessage } from "@/agent/history";
+import { getAgentRuntime } from "@/agent/runtime";
 import { getCheckpointer } from "@/agent/checkpointer";
 import { citedIds, excerptAround } from "@/lib/chat/ids";
 import { getDb } from "@/lib/db/client";
@@ -35,6 +38,22 @@ export async function loadThreadHistory(id: string): Promise<ActionResult<ChatHi
   } catch (error) {
     console.error("[chat]", error);
     return { ok: false, message: "Impossible de relire cette conversation." };
+  }
+}
+
+/** The approval card still waiting in a conversation (shown again when it is reopened). */
+export async function loadPendingApproval(
+  id: string,
+): Promise<ActionResult<PendingApproval | null>> {
+  if (!threadId.safeParse(id).success) return { ok: false, message: "Conversation inconnue." };
+  try {
+    const db = getDb();
+    const { agent } = await getAgentRuntime(db);
+    const pending = await pendingApproval(agent, id);
+    return { ok: true, data: pending ? await withTargets(db, pending.approval) : null };
+  } catch (error) {
+    console.error("[chat]", error);
+    return { ok: false, message: "Impossible de relire la carte en attente." };
   }
 }
 

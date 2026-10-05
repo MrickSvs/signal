@@ -213,9 +213,15 @@ describe("tools", () => {
       "add_feedback",
       "draft_backlog_items",
       "update_backlog_item",
+      "apply_decision",
     ]);
     const read = readTools(real as unknown as AgentDeps).map((t) => t.name);
-    for (const writer of ["add_feedback", "draft_backlog_items", "update_backlog_item"]) {
+    for (const writer of [
+      "add_feedback",
+      "draft_backlog_items",
+      "update_backlog_item",
+      "apply_decision",
+    ]) {
       expect(read).not.toContain(writer);
     }
   });

@@ -26,6 +26,7 @@ import { formatCost, formatDateTime, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { loadThreads } from "@/server/actions/chat";
 import type { ThreadSummary } from "@/server/queries/threads";
+import { ApprovalCard } from "./approval-card";
 import { ChatMarkdown } from "./chat-markdown";
 import { useChat, type ChatMessage, type ChatTurn, type TraceTool } from "./chat-provider";
 
@@ -177,7 +178,7 @@ function ChatView() {
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "end" });
-  }, [chat.messages.length, lastText]);
+  }, [chat.messages.length, lastText, chat.approval]);
 
   return (
     <>
@@ -200,6 +201,7 @@ function ChatView() {
             {chat.messages.map((message) => (
               <MessageView key={message.key} message={message} />
             ))}
+            {chat.approval && <ApprovalCard key={chat.approval.interrupt_id} />}
           </div>
         )}
         <div ref={bottom} />

@@ -61,7 +61,7 @@ export function getPriorityTool(deps: AgentDeps) {
         "Classement RICE recalculé en code (scores, robustesse, alignement, MoSCoW recommandé et final) et capacité des Must. Avec what_if : simulation, mouvements de rang, rien n'est enregistré.",
       when: "Le classement, la robustesse d'un rang, la capacité des Must ; « et si l'Impact de I-07 passait à 3 ? ».",
       notWhen:
-        "Enregistrer un changement : c'est une décision du PO (outil de décision, pas encore disponible ici : renvoie Léa vers l'écran Priorisation). Liste de sujets sans score (→ list_insights).",
+        "Enregistrer un changement : c'est une décision du PO (→ apply_decision). Liste de sujets sans score (→ list_insights).",
       schema: getPrioritySchema,
     },
     async (input) => {

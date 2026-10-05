@@ -1006,6 +1006,50 @@ export async function patchBacklogItem(
 }
 
 /**
+ * Léa validates a draft (brouillon → valide, ready for Notion) or rejects it (→ rejete), from the
+ * chat's apply_decision (PLAN 4.4). Only drafts; logged in `decisions`.
+ */
+export async function reviewBacklogItem(
+  db: Db,
+  id: string,
+  status: "valide" | "rejete",
+  deps: Pick<BacklogDeps, "source" | "now" | "withLock">,
+  reason?: string,
+): Promise<{ id: string; title: string; status: "valide" | "rejete"; decision: string }> {
+  const withLock = deps.withLock ?? (<T>(fn: () => Promise<T>) => fn());
+  return withLock(async () => {
+    const row = await loadItem(db, id);
+    editable(row);
+    fail(
+      (
+        await db
+          .from("backlog_items")
+          .update({ status, updated_at: deps.now.toISOString() })
+          .eq("id", id)
+      ).error,
+      "changement de statut",
+    );
+    const { data, error } = await db
+      .from("decisions")
+      .insert({
+        actor: "po",
+        source: deps.source,
+        entity_type: "backlog_item",
+        entity_id: id,
+        action: status === "valide" ? "validation" : "rejet",
+        field: "status",
+        before: row.status,
+        after: status,
+        reason: reason?.trim() || null,
+      })
+      .select("id")
+      .single();
+    fail(error, "journalisation de la validation");
+    return { id, title: row.title, status, decision: data!.id };
+  });
+}
+
+/**
  * Change of type (CL-54): after Léa's confirmation, the item is regenerated entirely in the format
  * of its new type (new id: each type has its own sequence), keeps its points and evidence, and the
  * decision records both ids. Dependencies on the old id follow.

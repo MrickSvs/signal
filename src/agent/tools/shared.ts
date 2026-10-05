@@ -89,6 +89,7 @@ export function toolErrorMessage(name: string, error: unknown): string {
         "SkillError",
         "PipelineBusyError",
         "BacklogError",
+        "InsightReviewError",
       ].includes(error.name));
   if (known) return `Erreur : ${message}`;
   return (
