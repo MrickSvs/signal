@@ -2,6 +2,7 @@ import { LangfuseClient } from "@langfuse/client";
 import { CallbackHandler } from "@langfuse/langchain";
 import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { getActiveTraceId, propagateAttributes, startActiveObservation } from "@langfuse/tracing";
+import { context, ROOT_CONTEXT } from "@opentelemetry/api";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 
 // One shared OpenTelemetry setup for the app (src/instrumentation.ts) and the CLI scripts.
@@ -49,6 +50,11 @@ export type TraceContext = {
   sessionId?: string;
   tags?: string[];
   metadata?: Record<string, string>;
+  /**
+   * A trace of its own even when started inside another one (an alert investigation launched by
+   * add_feedback during a chat turn): without it, the chat turn's trace would be renamed.
+   */
+  root?: boolean;
 };
 
 /**
@@ -63,6 +69,11 @@ export async function withTrace<T>(
   fn: () => Promise<T>,
   toOutput: (result: T) => unknown = (result) => result,
 ): Promise<T> {
+  if (ctx.root) {
+    return context.with(ROOT_CONTEXT, () =>
+      withTrace(name, { ...ctx, root: false }, input, fn, toOutput),
+    );
+  }
   return startActiveObservation(name, async (span) => {
     span.update({ input });
     const metadata: Record<string, string> = { step: ctx.step, ...ctx.metadata };

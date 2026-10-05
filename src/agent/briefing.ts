@@ -10,6 +10,18 @@ export type PageContext = {
   /** Path of the page Léa is on (e.g. "/insights"). */
   page: string;
   entity_id?: string | null;
+  /** The alert Léa opened from its card (« En parler à Signal »): its dossier joins the briefing. */
+  alert_id?: string | null;
+};
+
+/** The alert Léa wants to talk about, with its investigation dossier (SPEC §10.10). */
+export type AlertInFocus = {
+  id: string;
+  kind: DigestFacts["alerts"][number]["kind"];
+  insight_id: string | null;
+  feedback_ids: string[];
+  dossier_status: DigestFacts["alerts"][number]["dossier_status"];
+  dossier: string | null;
 };
 
 export type BriefingFacts = {
@@ -33,6 +45,7 @@ export type BriefingFacts = {
   /** Recent decisions of the period (journal), newest first. */
   decisions: { id: string; entity_id: string; action: string; field: string | null }[];
   page: (PageContext & { entity_label: string | null }) | null;
+  alert_in_focus?: AlertInFocus | null;
 };
 
 export type BriefingLimits = { list: number; ids: number };
@@ -123,6 +136,18 @@ export function renderBriefing(
       ? ` · ${facts.page.entity_id}${facts.page.entity_label ? ` « ${facts.page.entity_label} »` : ""}`
       : "";
     out.push("", `Page courante : ${pageLabel(facts.page.page)}${entity}`);
+  }
+
+  const focus = facts.alert_in_focus;
+  if (focus) {
+    out.push(
+      "",
+      "### Alerte dont Léa veut parler",
+      `${focus.id} · ${ALERT_KIND_LABELS[focus.kind]} · ${focus.insight_id ?? "compte"} · retours ${idList(focus.feedback_ids, limits.ids)}`,
+      focus.dossier
+        ? `Dossier de ton enquête (rédigé par toi, en lecture seule) :\n${focus.dossier}`
+        : "Dossier indisponible : l'enquête a échoué ou n'est pas terminée.",
+    );
   }
 
   out.push("", `### Top ${facts.top.length} du classement`);

@@ -9,6 +9,7 @@ export const agentRequestSchema = z.object({
     .object({
       page: z.string().trim().min(1).max(200),
       entity_id: z.string().trim().max(40).nullish(),
+      alert_id: z.uuid().nullish(),
     })
     .nullish(),
 });

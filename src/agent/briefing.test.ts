@@ -127,4 +127,23 @@ describe("helpers", () => {
     expect(pageLabel("/insights/I-07")).toBe("Insights");
     expect(pageLabel("/inconnue")).toBe("/inconnue");
   });
+
+  it("adds the dossier of the alert Léa wants to talk about", () => {
+    const focus = {
+      id: "a1",
+      kind: "churn" as const,
+      insight_id: "I-27",
+      feedback_ids: ["R-226"],
+      dossier_status: "pret" as const,
+      dossier: "**Faits**\n- R-226 cite un concurrent.",
+    };
+    const text = renderBriefing(facts({ alert_in_focus: focus }));
+    expect(text).toContain("### Alerte dont Léa veut parler");
+    expect(text).toContain("R-226 cite un concurrent.");
+    const failed = renderBriefing(
+      facts({ alert_in_focus: { ...focus, dossier_status: "echec", dossier: null } }),
+    );
+    expect(failed).toContain("Dossier indisponible");
+    expect(renderBriefing(facts())).not.toContain("Alerte dont Léa");
+  });
 });

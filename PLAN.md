@@ -922,9 +922,9 @@ Test scripté (scripts/chat.ts) : « Passe le Gantt en Must » → objection →
 
 **Test** :
 
-- [ ] Coller un e-mail de Studio Bastide qui évoque un concurrent → alerte `churn` et dossier prêt en moins de 60 s, visibles dans la trace Langfuse.
-- [ ] Coller un retour proche de S1 → aucun dérangement : « +1 sur I-01 », pas d'alerte.
-- [ ] « Faire l'action proposée » passe par une carte d'approbation ; « Ignorer » est journalisé.
+- [x] Coller un e-mail de Studio Bastide qui évoque un concurrent → alerte `churn` et dossier prêt en moins de 60 s, visibles dans la trace Langfuse.
+- [x] Coller un retour proche de S1 → aucun dérangement : « +1 sur I-01 », pas d'alerte.
+- [x] « Faire l'action proposée » passe par une carte d'approbation ; « Ignorer » est journalisé.
 
 **Commit** : `feat(agent): threshold alerts and autonomous read-only investigations`
 

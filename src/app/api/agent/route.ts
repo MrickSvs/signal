@@ -35,7 +35,11 @@ export async function POST(request: NextRequest) {
         threadId,
         message,
         page: page_context
-          ? { page: page_context.page, entity_id: page_context.entity_id ?? null }
+          ? {
+              page: page_context.page,
+              entity_id: page_context.entity_id ?? null,
+              alert_id: page_context.alert_id ?? null,
+            }
           : null,
       },
       send,

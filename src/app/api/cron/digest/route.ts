@@ -1,4 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
+import { pendingInvestigations } from "@/agent/investigate";
+import { investigateInBackground } from "@/agent/runtime";
 import { isBearerAuthorized } from "@/lib/basic-auth";
 import { loadContextPack } from "@/lib/context";
 import { getDb } from "@/lib/db/client";
@@ -48,6 +50,10 @@ export async function GET(request: NextRequest) {
         { budgetMs: INCREMENTAL_BUDGET_MS },
       ),
     );
+    // Dossiers of the alerts the batches created, and of any investigation lost earlier (§10.10).
+    await pendingInvestigations(db)
+      .then((ids) => investigateInBackground(db, ids))
+      .catch((error) => console.error("[enquête]", error));
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof PipelineBusyError) {

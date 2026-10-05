@@ -26,6 +26,7 @@ import { formatCost, formatDateTime, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { loadThreads } from "@/server/actions/chat";
 import type { ThreadSummary } from "@/server/queries/threads";
+import { AlertCard } from "@/components/alerts/alert-card";
 import { ApprovalCard } from "./approval-card";
 import { ChatMarkdown } from "./chat-markdown";
 import { useChat, type ChatMessage, type ChatTurn, type TraceTool } from "./chat-provider";
@@ -178,7 +179,7 @@ function ChatView() {
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ block: "end" });
-  }, [chat.messages.length, lastText, chat.approval]);
+  }, [chat.messages.length, lastText, chat.approval, chat.alerts.length]);
 
   return (
     <>
@@ -202,6 +203,19 @@ function ChatView() {
               <MessageView key={message.key} message={message} />
             ))}
             {chat.approval && <ApprovalCard key={chat.approval.interrupt_id} />}
+            {chat.alerts.map((alert) => (
+              <div
+                key={alert.id}
+                role="status"
+                className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 dark:border-amber-900 dark:bg-amber-950/40"
+              >
+                <p className="mb-1.5 flex items-center gap-1.5 text-[13px] font-medium text-amber-800 dark:text-amber-200">
+                  <TriangleAlert aria-hidden className="size-3.5" />
+                  Alerte levée pendant la conversation
+                </p>
+                <AlertCard alert={alert} now={new Date().toISOString()} defaultOpen />
+              </div>
+            ))}
           </div>
         )}
         <div ref={bottom} />

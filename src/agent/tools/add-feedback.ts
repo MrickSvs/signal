@@ -108,6 +108,7 @@ export function addFeedbackTool(deps: AgentDeps) {
         });
       });
       ctx?.runCost.addEur(result.costEur);
+      deps.onAlerts?.(result.alerts.created.map((a) => a.id));
       return compactIncremental(result);
     },
   );

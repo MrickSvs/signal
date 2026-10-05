@@ -1,6 +1,6 @@
 // In-memory stand-in for the Supabase client, for tests only (CLAUDE.md rule 11: tests never
 // call a remote database). It covers the query-builder calls the pipeline uses: select with
-// eq / in / is / not-is-null / gt / gte / order / range / single, insert (+ select().single()),
+// eq / in / is / not-is-null / gt / gte / order / range / single / maybeSingle, insert (+ select().single()),
 // upsert (onConflict), update and delete. Column lists are applied when they are plain (no embedded relations).
 import type { Db } from "./create";
 
@@ -19,7 +19,7 @@ class Query implements PromiseLike<Result> {
   private orders: { column: string; ascending: boolean }[] = [];
   private window: [number, number] | null = null;
   private columns: string[] | null = null;
-  private wantSingle = false;
+  private wantSingle: "one" | "maybe" | false = false;
   private returning = false;
 
   constructor(
@@ -36,7 +36,8 @@ class Query implements PromiseLike<Result> {
 
   select(columns?: string) {
     if (this.action.kind !== "select") this.returning = true;
-    if (columns && columns.trim() !== "*" && !columns.includes("(")) this.columns = columns.split(",").map((c) => c.trim());
+    if (columns && columns.trim() !== "*" && !columns.includes("("))
+      this.columns = columns.split(",").map((c) => c.trim());
     return this;
   }
   eq(column: string, value: unknown) {
@@ -76,7 +77,11 @@ class Query implements PromiseLike<Result> {
     return this;
   }
   single() {
-    this.wantSingle = true;
+    this.wantSingle = "one";
+    return this;
+  }
+  maybeSingle() {
+    this.wantSingle = "maybe";
     return this;
   }
   then<T1 = Result, T2 = never>(
@@ -140,6 +145,7 @@ class Query implements PromiseLike<Result> {
     }
     if (this.window) out = out.slice(this.window[0], this.window[1] + 1);
     const data = out.map((r) => this.project(r));
+    if (this.wantSingle === "maybe" && data.length === 0) return { data: null, error: null };
     if (this.wantSingle) {
       return data.length === 1
         ? { data: data[0], error: null }

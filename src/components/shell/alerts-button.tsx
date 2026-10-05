@@ -1,28 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
+import { AlertCard } from "@/components/alerts/alert-card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { buttonVariants } from "@/components/ui/button";
-import { EvidenceChip, InsightChip } from "@/components/signal/chips";
-import { Pill } from "@/components/signal/badges";
-import { formatRelative } from "@/lib/format";
-import { ALERT_KIND_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { OpenAlert } from "@/server/queries/shell";
 
-const MAX_EVIDENCE = 3;
+/** While an investigation runs, the header is re-read so its dossier appears (~30 s). */
+const REFRESH_MS = 5_000;
 
-const DOSSIER_LABELS = {
-  en_cours: "Dossier en cours",
-  pret: "Dossier prêt",
-  echec: "Dossier indisponible",
-} as const;
-
-/** Badge of open alerts (SPEC §10.10) that opens their list. */
+/** Badge of open alerts (SPEC §10.10) that opens their list and their dossiers. */
 export function AlertsButton({ alerts, now }: { alerts: OpenAlert[]; now: string }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
   const count = alerts.length;
+  const investigating = alerts.some((a) => a.dossier_status === "en_cours");
+
+  useEffect(() => {
+    if (!investigating) return;
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") router.refresh();
+    }, REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [investigating, router]);
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         aria-label={`${count} alerte${count > 1 ? "s" : ""} ouverte${count > 1 ? "s" : ""}`}
         className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
@@ -38,45 +44,22 @@ export function AlertsButton({ alerts, now }: { alerts: OpenAlert[]; now: string
           {count}
         </span>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[30rem] gap-0 p-0 text-sm">
+      <PopoverContent align="end" className="w-[34rem] gap-0 p-0 text-sm">
         <p className="border-b px-4 py-3 font-medium">Alertes ouvertes</p>
         {count === 0 ? (
           <p className="px-4 py-6 text-center text-muted-foreground">
             Aucune alerte ouverte. Le reste est dans le digest.
           </p>
         ) : (
-          <ul className="max-h-[28rem] divide-y overflow-y-auto">
+          <ul className="max-h-[32rem] divide-y overflow-y-auto">
             {alerts.map((alert) => (
-              <li key={alert.id} className="flex flex-col gap-2 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{ALERT_KIND_LABELS[alert.kind]}</span>
-                  {alert.status === "nouvelle" && (
-                    <Pill className="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-                      Nouvelle
-                    </Pill>
-                  )}
-                  <span className="ml-auto text-muted-foreground">
-                    {formatRelative(alert.created_at, now)}
-                  </span>
-                </div>
-                {alert.insight_id && (
-                  <InsightChip id={alert.insight_id} title={alert.insight_title} />
-                )}
-                <div className="flex flex-wrap items-center gap-1">
-                  {alert.feedback_ids.slice(0, MAX_EVIDENCE).map((id) => (
-                    <EvidenceChip key={id} id={id} />
-                  ))}
-                  {alert.feedback_ids.length > MAX_EVIDENCE && (
-                    <span className="text-muted-foreground">
-                      +{alert.feedback_ids.length - MAX_EVIDENCE}
-                    </span>
-                  )}
-                  <span className="ml-auto text-muted-foreground">
-                    {alert.dossier_status
-                      ? DOSSIER_LABELS[alert.dossier_status]
-                      : "Pas encore de dossier"}
-                  </span>
-                </div>
+              <li key={alert.id} className="px-4 py-3">
+                <AlertCard
+                  alert={alert}
+                  now={now}
+                  defaultOpen={count === 1}
+                  onDone={() => setOpen(false)}
+                />
               </li>
             ))}
           </ul>

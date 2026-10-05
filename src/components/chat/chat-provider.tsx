@@ -1,13 +1,16 @@
 "use client";
 
-import { createContext, useCallback, useContext, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import type { AgentEvent } from "@/agent";
 import type { CardDecision, PendingApproval } from "@/agent/approval";
 import type { ChatHistoryMessage } from "@/agent/history";
+import { discussAlertMessage } from "@/lib/alerts";
 import { createSseParser } from "@/lib/chat/sse";
 import { pageContext, type ChatPageContext } from "@/lib/chat/suggestions";
+import { loadOpenAlerts } from "@/server/actions/alerts";
 import { loadPendingApproval, loadThreadHistory, verifyAnswerIds } from "@/server/actions/chat";
+import type { OpenAlert } from "@/server/queries/shell";
 import type { IdStatuses } from "./chat-markdown";
 
 // State of the Signal chat panel (SPEC §12.9): the conversation, its streamed answers, the live
@@ -67,7 +70,8 @@ type ChatState = {
   /** Bumped when a page pre-fills the input, so the panel focuses it. */
   focusSignal: number;
   context: ChatPageContext;
-  send: (message: string) => Promise<void>;
+  /** Sends a message; `alertId` puts an alert's dossier in the turn's briefing. */
+  send: (message: string, alertId?: string | null) => Promise<void>;
   /** The approval card waiting for Léa (SPEC §10.6), and her answer to it. */
   approval: PendingApproval | null;
   answerApproval: (decisions: CardDecision[], label: string) => Promise<void>;
@@ -75,7 +79,16 @@ type ChatState = {
   newThread: () => void;
   openThread: (id: string) => Promise<void>;
   threadsVersion: number;
+  /** Open alerts raised while the conversation is open (cards in the chat, SPEC §10.10). */
+  alerts: OpenAlert[];
+  /** « En parler à Signal » from an alert: pre-filled message, the dossier joins the briefing. */
+  discussAlert: (alert: OpenAlert) => void;
+  /** « Faire l'action proposée »: sends the action to Signal with the alert's dossier in context. */
+  sendAboutAlert: (message: string, alertId: string) => void;
 };
+
+/** Polling of the alerts while a conversation is open (an investigation takes ~30 s). */
+const ALERTS_POLL_MS = 5_000;
 
 const ChatContext = createContext<ChatState | null>(null);
 
@@ -115,7 +128,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [focusSignal, setFocusSignal] = useState(0);
   const [threadsVersion, setThreadsVersion] = useState(0);
   const [approval, setApproval] = useState<PendingApproval | null>(null);
+  const [alerts, setAlerts] = useState<OpenAlert[]>([]);
+  const [alertFocus, setAlertFocus] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
+  const router = useRouter();
+  // Alerts shown in the chat: those created since the panel opened (the older ones are in the badge).
+  const [openedAt] = useState(() => new Date().toISOString());
   // The search part is read when sending (useSearchParams would opt the layout out of prerender).
   const context = pageContext(pathname);
 
@@ -142,7 +160,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
    * `shown` is what appears as Léa's message, `body` what the route receives.
    */
   const stream = useCallback(
-    async (url: string, shown: string, body: Record<string, unknown>) => {
+    async (
+      url: string,
+      shown: string,
+      body: Record<string, unknown>,
+      alertId: string | null = null,
+    ) => {
       setBusy(true);
       const message = shown;
       const turnKey = nextKey("turn");
@@ -186,7 +209,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({
             ...(threadId ? { thread_id: threadId } : {}),
             ...body,
-            page_context: pageContext(window.location.pathname, window.location.search),
+            page_context: {
+              ...pageContext(window.location.pathname, window.location.search),
+              ...(alertId ? { alert_id: alertId } : {}),
+            },
           }),
           signal: controller.signal,
         });
@@ -289,15 +315,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   );
 
   const send = useCallback(
-    async (raw: string) => {
+    async (raw: string, alertId: string | null = alertFocus) => {
       const message = raw.trim();
       if (!message || busy) return;
       setDraft("");
+      setAlertFocus(null);
       // Writing instead of answering the card drops it: nothing is applied (SPEC §8.10).
       setApproval(null);
-      await stream("/api/agent", message, { message });
+      await stream("/api/agent", message, { message }, alertId);
     },
-    [busy, stream],
+    [busy, stream, alertFocus],
   );
 
   const answerApproval = useCallback(
@@ -321,6 +348,48 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setDraft(message);
     setFocusSignal((n) => n + 1);
   }, []);
+
+  const discussAlert = useCallback(
+    (alert: OpenAlert) => {
+      setAlertFocus(alert.id);
+      prefill(discussAlertMessage(alert));
+    },
+    [prefill],
+  );
+
+  const sendAboutAlert = useCallback(
+    (message: string, alertId: string) => {
+      setOpen(true);
+      setTab("chat");
+      void send(message, alertId);
+    },
+    [send],
+  );
+
+  // Alert cards in the chat while a conversation is open; the header badge is refreshed when a
+  // dossier changes state (the layout is a server component).
+  const conversationOpen = threadId !== null || messages.length > 0;
+  const signature = useRef("");
+  useEffect(() => {
+    if (!conversationOpen) return;
+    let stopped = false;
+    const poll = async () => {
+      const open = await loadOpenAlerts().catch(() => null);
+      if (stopped || !open) return;
+      const next = open.map((a) => `${a.id}:${a.status}:${a.dossier_status}`).join("|");
+      if (signature.current && next !== signature.current) router.refresh();
+      signature.current = next;
+      setAlerts(open.filter((a) => a.created_at >= openedAt).toReversed());
+    };
+    void poll();
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") void poll();
+    }, ALERTS_POLL_MS);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [conversationOpen, openedAt, router]);
 
   const newThread = useCallback(() => {
     abort.current?.abort();
@@ -400,6 +469,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         newThread,
         openThread,
         threadsVersion,
+        alerts,
+        discussAlert,
+        sendAboutAlert,
       }}
     >
       {children}

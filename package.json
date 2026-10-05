@@ -14,7 +14,7 @@
     "db:push": "supabase db push",
     "db:types": "supabase gen types typescript --linked --schema public > src/lib/db/types.ts && prettier --write src/lib/db/types.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "pipeline:run": "tsx scripts/pipeline-run.ts",
+    "pipeline:run": "tsx --conditions=react-server scripts/pipeline-run.ts",
     "pipeline:reset": "tsx scripts/pipeline-reset.ts",
     "pipeline:triage": "tsx scripts/pipeline-triage.ts",
     "pipeline:enrich": "tsx scripts/pipeline-enrich.ts",
@@ -22,7 +22,8 @@
     "pipeline:score": "tsx scripts/pipeline-score.ts",
     "digest": "tsx scripts/digest.ts",
     "estimate": "tsx scripts/estimate.ts",
-    "chat": "tsx --conditions=react-server scripts/chat.ts"
+    "chat": "tsx --conditions=react-server scripts/chat.ts",
+    "investigate": "tsx --conditions=react-server scripts/investigate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.122.0",
@@ -35,6 +36,7 @@
     "@langfuse/langchain": "^5.11.1",
     "@langfuse/otel": "^5.11.1",
     "@langfuse/tracing": "^5.11.1",
+    "@opentelemetry/api": "1.9.1",
     "@opentelemetry/sdk-node": "^0.222.0",
     "@supabase/supabase-js": "^2.117.2",
     "class-variance-authority": "^0.7.1",

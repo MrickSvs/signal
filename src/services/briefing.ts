@@ -1,7 +1,7 @@
 // Facts of the agent's briefing (SPEC §10.8), shared by the injected briefing and the get_briefing
 // tool. Same facts as the digest (pipeline/nodes/digest.ts), over « since the last visit », plus a
 // top 10, the recent decisions and the page Léa is on.
-import type { BriefingFacts, PageContext } from "@/agent/briefing";
+import type { AlertInFocus, BriefingFacts, PageContext } from "@/agent/briefing";
 import type { Weighting } from "@/lib/context";
 import type { Db } from "@/lib/db/create";
 import { loadDigestFacts } from "@/pipeline/nodes/digest";
@@ -27,6 +27,18 @@ async function entityLabel(db: Db, id: string): Promise<string | null> {
     return data?.title ?? null;
   }
   return null;
+}
+
+async function alertInFocus(db: Db, id: string): Promise<AlertInFocus | null> {
+  const { data, error } = await db
+    .from("alerts")
+    .select("id, kind, insight_id, feedback_ids, dossier_status, dossier_markdown")
+    .eq("id", id)
+    .maybeSingle();
+  check(error, "lecture de l'alerte");
+  if (!data) return null;
+  const { dossier_markdown, ...alert } = data;
+  return { ...alert, dossier: dossier_markdown };
 }
 
 export async function lastSeenAt(db: Db): Promise<string | null> {
@@ -63,6 +75,7 @@ export async function loadBriefingFacts(
       .limit(10),
     options.page?.entity_id ? entityLabel(db, options.page.entity_id) : Promise.resolve(null),
   ]);
+  const focus = options.page?.alert_id ? await alertInFocus(db, options.page.alert_id) : null;
   check(moscow.error, "lecture des MoSCoW finaux");
   check(decisions.error, "lecture des décisions");
   const finalOf = new Map((moscow.data ?? []).map((o) => [o.insight_id, String(o.value)]));
@@ -86,5 +99,6 @@ export async function loadBriefingFacts(
     pending: facts.pending,
     decisions: decisions.data ?? [],
     page: options.page ? { ...options.page, entity_label: label } : null,
+    alert_in_focus: focus,
   };
 }

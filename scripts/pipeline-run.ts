@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import pg from "pg";
 import { loadContextPack } from "@/lib/context";
+import type { Db } from "@/lib/db/create";
 import { getScriptDb } from "@/lib/db/script-client";
 import type { Json } from "@/lib/db/types";
 import { getDemoNow } from "@/lib/demo-now";
@@ -25,6 +26,8 @@ import { compilePipeline, runPipeline, type PipelineStateType } from "@/pipeline
 import { PipelineBusyError, withPipelineLock } from "@/pipeline/lock";
 
 import { CHECKPOINT_SCHEMA } from "@/agent/checkpointer";
+import { investigateAll, pendingInvestigations } from "@/agent/investigate";
+import { loadAgentDeps } from "@/agent/runtime";
 
 export { CHECKPOINT_SCHEMA };
 
@@ -75,6 +78,20 @@ function report(state: PipelineStateType, seconds: number): void {
   if (s.alert) console.log(`Alertes : ${JSON.stringify(s.alert)}`);
   for (const f of state.failures)
     console.log(`ÉCHEC ${f.step}${f.id ? ` ${f.id}` : ""} : ${f.error}`);
+}
+
+/** Dossiers of the alerts created by the run, and of any investigation lost earlier (§10.10). */
+async function investigatePending(db: Db): Promise<void> {
+  const ids = await pendingInvestigations(db);
+  if (ids.length === 0) return;
+  console.log(`\nEnquêtes : ${ids.length} alerte(s) sans dossier…`);
+  const { deps, skills } = await loadAgentDeps(db);
+  for (const r of await investigateAll(ids, deps, { skills })) {
+    console.log(
+      `- ${r.alertId} : ${r.status === "pret" ? "dossier prêt" : `dossier indisponible (${r.error})`} · ` +
+        `${r.costEur.toFixed(4)} € · ${(r.durationMs / 1000).toFixed(1)} s`,
+    );
+  }
 }
 
 async function main() {
@@ -146,6 +163,7 @@ async function main() {
       );
       const seconds = (Date.now() - started) / 1000;
       report(state, seconds);
+      await investigatePending(db);
       await shutdownTracing();
       const url = await traceUrl(traceId);
       const { data: previous } = await db

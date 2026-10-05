@@ -33,6 +33,8 @@ export type AgentDeps = {
   backlog?: Pick<BacklogDeps, "invoke" | "estimate" | "draftSkills">;
   /** Work done after the answer (the quality badge): Next's after() in the app. */
   background?: (task: () => Promise<void>) => void;
+  /** Alerts created by add_feedback: their investigations start in the background (§10.10). */
+  onAlerts?: (alertIds: string[]) => void;
 };
 
 export function isRunCost(value: unknown): value is RunCost {
