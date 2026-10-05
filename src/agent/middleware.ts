@@ -1,10 +1,9 @@
-// Middleware of the agent (LangChain v1 createAgent): briefing injected after the cached blocks,
-// per-turn budget of tool calls (CL-31), live trace events and cost of the turn.
+// Middleware of the agent (LangChain v1 createAgent): per-turn budget of tool calls (CL-31), live
+// trace events and cost of the turn.
 import {
   AIMessage,
   createMiddleware,
   HumanMessage,
-  SystemMessage,
   ToolMessage,
   type BaseMessage,
 } from "langchain";
@@ -98,29 +97,10 @@ export function toolBudgetMiddleware(limit = MAX_TOOL_CALLS_PER_TURN) {
   });
 }
 
-/** The briefing goes after the cached system blocks, so the cache prefix stays stable (§10.8). */
-export function briefingMiddleware() {
-  return createMiddleware({
-    name: "SignalBriefing",
-    contextSchema: turnContextSchema,
-    wrapModelCall: (request, handler) => {
-      const ctx = request.runtime.context as TurnContext | undefined;
-      if (!ctx?.briefing) return handler(request);
-      const content = request.systemMessage.content;
-      const blocks =
-        typeof content === "string" ? [{ type: "text" as const, text: content }] : content;
-      return handler({
-        ...request,
-        systemMessage: new SystemMessage({
-          content: [...blocks, { type: "text", text: ctx.briefing }],
-        }),
-      });
-    },
-  });
-}
-
 export type TraceEvent =
   | { type: "tool_start"; id: string; name: string; args: string }
+  /** A step of a long tool (the incremental pipeline of add_feedback), shown while it runs. */
+  | { type: "tool_progress"; id: string; message: string }
   | {
       type: "tool_end";
       id: string;

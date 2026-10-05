@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageSquare, PanelRightClose } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import { ChatPanel } from "@/components/chat/chat-panel";
+import { ChatProvider, useChat } from "@/components/chat/chat-provider";
 import { Button } from "@/components/ui/button";
 import { activeNavItem } from "./nav";
 
 /**
- * Header (page title + server-rendered status), main area and the collapsible slot of the
- * Signal chat panel on the right (empty until step 4.2).
+ * Header (page title + server-rendered status), main area and the collapsible Signal chat panel
+ * on the right (SPEC §12.1, §12.9), shared by every page.
  */
 export function AppFrame({
   status,
@@ -17,7 +18,15 @@ export function AppFrame({
   status: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const [chatOpen, setChatOpen] = useState(true);
+  return (
+    <ChatProvider>
+      <Frame status={status}>{children}</Frame>
+    </ChatProvider>
+  );
+}
+
+function Frame({ status, children }: { status: React.ReactNode; children: React.ReactNode }) {
+  const chat = useChat();
   const page = activeNavItem(usePathname());
 
   return (
@@ -27,43 +36,23 @@ export function AppFrame({
           <h1 className="text-lg font-semibold tracking-tight">{page.label}</h1>
           <div className="ml-auto flex items-center gap-3">
             {status}
-            {!chatOpen && (
-              <Button variant="outline" onClick={() => setChatOpen(true)}>
+            {!chat.open && (
+              <Button variant="outline" onClick={() => chat.setOpen(true)}>
                 <MessageSquare aria-hidden className="text-signal" />
                 Signal
+                {chat.busy && (
+                  <span
+                    aria-label="Réponse en cours"
+                    className="size-1.5 animate-pulse rounded-full bg-signal"
+                  />
+                )}
               </Button>
             )}
           </div>
         </header>
         <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
       </div>
-      {chatOpen && (
-        <aside
-          aria-label="Chat avec Signal"
-          className="flex w-[22rem] shrink-0 flex-col border-l bg-sidebar"
-        >
-          <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
-            <span className="flex items-center gap-2 font-semibold">
-              <MessageSquare aria-hidden className="size-4 text-signal" />
-              Signal
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Replier le chat"
-              onClick={() => setChatOpen(false)}
-            >
-              <PanelRightClose aria-hidden />
-            </Button>
-          </div>
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-            <p className="font-medium">Le chat arrive bientôt</p>
-            <p className="leading-relaxed text-muted-foreground">
-              Tu pourras ici interroger Signal sur la page ouverte, avec les preuves à l&apos;appui.
-            </p>
-          </div>
-        </aside>
-      )}
+      {chat.open && <ChatPanel />}
     </div>
   );
 }

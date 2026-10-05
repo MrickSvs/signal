@@ -231,7 +231,6 @@ const ctx = (): TurnContext => ({
   threadId: "t",
   runCost: new RunCost(),
   page: null,
-  briefing: "",
 });
 
 describe("get_priority", () => {

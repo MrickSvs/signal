@@ -5,10 +5,12 @@ import type { BaseCheckpointSaver } from "@langchain/langgraph";
 import {
   AIMessage,
   AIMessageChunk,
+  anthropicPromptCachingMiddleware,
   createAgent,
   HumanMessage,
   humanInTheLoopMiddleware,
   summarizationMiddleware,
+  SystemMessage,
   type BaseMessage,
 } from "langchain";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
@@ -20,7 +22,6 @@ import type { SkillSummary } from "@/lib/skills";
 import { loadBriefingFacts } from "@/services/briefing";
 import { renderBriefing, type PageContext } from "./briefing";
 import {
-  briefingMiddleware,
   PARTIAL_ANSWER,
   toolBudgetMiddleware,
   traceMiddleware,
@@ -71,7 +72,14 @@ export function createSignalAgent(options: SignalAgentOptions) {
         keep: { messages: SUMMARY_KEEP_MESSAGES },
         summaryPrompt: SUMMARY_PROMPT,
       }),
-      briefingMiddleware(),
+      // Conversation history cache (PLAN 4.2): automatic breakpoint on the last block, 5 minutes,
+      // after the system blocks cached for 1 hour (longer TTL first, as the API requires). The tool
+      // rounds of a turn and the next turns read the history instead of paying it again.
+      anthropicPromptCachingMiddleware({
+        ttl: "5m",
+        minMessagesToCache: 1,
+        unsupportedModelBehavior: "ignore",
+      }),
       toolBudgetMiddleware(),
       traceMiddleware(modelsOf),
       // Validation by the PO (SPEC §10.6): apply_decision and push_to_notion are added in 4.4/5.2.
@@ -104,6 +112,18 @@ export type TurnInput = {
   page: PageContext | null;
 };
 
+export const TRUNCATED_NOTICE =
+  "\n\n_Réponse coupée : limite de longueur atteinte. Demande-moi la suite ou une question plus ciblée._";
+
+/** The model hit its output cap (thinking included) in the middle of its answer. */
+export function isTruncated(message: BaseMessage): boolean {
+  return (
+    AIMessage.isInstance(message) &&
+    (message.response_metadata as { stop_reason?: string } | undefined)?.stop_reason ===
+      "max_tokens"
+  );
+}
+
 /** Text of a streamed model chunk, without the thinking blocks. */
 export function chunkText(message: BaseMessage): string {
   return AIMessageChunk.isInstance(message) || AIMessage.isInstance(message) ? message.text : "";
@@ -113,6 +133,15 @@ async function turnBriefing(deps: AgentDeps, page: PageContext | null): Promise<
   const now = deps.now();
   const facts = await loadBriefingFacts(deps.db, { weighting: deps.pack.weighting, now, page });
   return briefingBlock(renderBriefing(facts), now);
+}
+
+/**
+ * The messages a turn adds: Léa's question, then the briefing as a system message right after it
+ * (SPEC §10.8, ADR-022). Kept in the history, it never changes the prefix of the earlier turns, so
+ * the history stays cached from one turn to the next; the system prompt stays cached too.
+ */
+export function turnMessages(message: string, briefing: string): BaseMessage[] {
+  return [new HumanMessage(message), new SystemMessage(briefing)];
 }
 
 /**
@@ -142,14 +171,10 @@ export async function runTurn(
     async () => {
       traceId = currentTraceId();
       await touchThread(deps.db, input.threadId, input.message, input.page, new Date());
-      const context: TurnContext = {
-        threadId: input.threadId,
-        runCost,
-        page: input.page,
-        briefing: await turnBriefing(deps, input.page),
-      };
+      const context: TurnContext = { threadId: input.threadId, runCost, page: input.page };
+      const briefing = await turnBriefing(deps, input.page);
       const stream = await agent.stream(
-        { messages: [new HumanMessage(input.message)] },
+        { messages: turnMessages(input.message, briefing) },
         {
           configurable: { thread_id: input.threadId },
           context,
@@ -175,6 +200,10 @@ export async function runTurn(
             // The partial answer of the tool budget is written by a middleware, not streamed.
             const messages = (update as { messages?: BaseMessage[] } | null)?.messages ?? [];
             for (const m of messages) {
+              if (node === "model_request" && isTruncated(m)) {
+                await emit({ type: "token", text: TRUNCATED_NOTICE });
+                continue;
+              }
               if (
                 node !== "model_request" &&
                 AIMessage.isInstance(m) &&

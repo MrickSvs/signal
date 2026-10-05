@@ -198,6 +198,8 @@ export type IncrementalContext = {
   embedFn?: (texts: string[]) => Promise<number[][]>;
   estimate?: Omit<EstimateRunDeps, "runCost">;
   sleep?: (ms: number) => Promise<void>;
+  /** Called when a step starts (the chat's live trace shows it during add_feedback). */
+  onStep?: (step: string) => void;
 };
 
 export function describeFeedback(outcome: Omit<FeedbackOutcome, "summary">): string {
@@ -332,6 +334,7 @@ async function incrementalSteps(
   const timings: Record<string, number> = {};
   const step = async <T>(name: string, input: unknown, fn: () => Promise<T>): Promise<T> => {
     const t0 = Date.now();
+    ctx.onStep?.(name);
     try {
       return await withSpan(`pipeline-${name}`, input, fn);
     } finally {

@@ -5,14 +5,14 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 4 (agent) commencée** : 4.1 (cœur de l'agent Signal) faite — agent unique, 10 outils, briefing, mémoire, garde-fous, route `POST /api/agent` en SSE et `pnpm chat`. Le chat n'est pas encore dans l'interface (4.2) : on parle à l'agent en terminal. Prochaine étape : 4.2 (chat et trace en direct, plus réduction du coût par tour).
+- **Phase 4 (agent) en cours** : 4.1 (cœur de l'agent) et 4.2 (chat et trace en direct) faites — le panneau Signal est sur toutes les pages, avec trace en direct, ID vérifiés et conversations. Prochaine étape : 4.3 (rédaction du backlog).
 - **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 484 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
-- Base : migration 0006 (`match_feedback_items`, recherche par le sens). Retour d'essai R-226 (mail collé dans le chat, rattaché à C-013 / I-27) et ses 3 alertes ajoutés en 4.1.
-- Coût LLM cumulé : ~5,8 € (essais de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 504 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- Base : migrations 0006 (`match_feedback_items`, recherche par le sens) et 0007 (`id_incidents`, journal des ID inconnus, 1 ligne d'essai : R-999). Retour d'essai R-226 (mail collé dans le chat, rattaché à C-013 / I-27) et ses 3 alertes ajoutés en 4.1.
+- Coût LLM cumulé : ~6,0 € (essais du chat en 4.2 ~0,23 €, de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
 
 ## Points d'attention
 
@@ -47,7 +47,19 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Coût d'un tour d'agent** : ~0,01 à 0,05 € mesuré en 4.1, plus ~0,05 € d'écriture du cache du prompt système (~14 700 tokens, TTL 1 h) une fois par heure. Premier poste : la sortie (réponses de 1 800 à 2 400 tokens, réflexion comprise). **Décision du PO** : réponses courtes par défaut et cache de l'historique en 4.2 ; ni changement de modèle ni réduction de la réflexion avant les evals (6.2). Latence 30 à 60 s par tour. → ADR-021
 - **Budget de 15 appels d'outils** : middleware maison (celui de LangChain répond en anglais et termine sans réponse un tour entièrement bloqué) ; le compteur vit dans l'état de l'agent, car le middleware de résumé peut réécrire les messages au milieu d'un long tour. → ADR-021
 - **`server-only`** : `src/server/queries` l'importe ; `pnpm chat` tourne avec `tsx --conditions=react-server`, et Vitest le remplace par un module vide. → ADR-021
+- **Coût d'un tour après 4.2** : 0,0212 € en moyenne sur les questions de 4.1 (0,0372 € avant ; 0,0225 € contre 0,0277 € sans l'écriture horaire du cache), latence 28 s. Le briefing est devenu un message système du tour, placé après l'historique, pour que l'historique reste en cache d'un tour à l'autre ; plafond de sortie à 4 000 tokens et non 1 200, car la réflexion compte dans `max_tokens` (décision du PO). → ADR-022
+- **« ID inconnu »** : un ID cité sans exister est journalisé dans `id_incidents`, y compris quand Signal dit lui-même qu'il n'existe pas (« R-999 n'existe pas »). → ADR-022
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+
+## [4.2] Chat et trace en direct — 2026-10-04
+
+ADR-022
+
+- Panneau Signal à droite sur toutes les pages, repliable : réponses en streaming, contexte de page envoyé à `/api/agent`, 3 suggestions selon la page (sur un insight : « Pourquoi est-il classé ici ? », « Qui est concerné ? », « Prépare le backlog »), liste des conversations et « Nouvelle conversation », bouton « En parler à Signal » du Digest (champ pré-rempli).
+- Markdown sans HTML brut ; ID transformés en puces après vérification en base ; un ID inexistant apparaît « ID inconnu » et entre au journal `id_incidents` (migration 0007).
+- Onglet « Trace » : outils appelés en direct (arguments résumés, statut, durée, modèle), progression du pipeline incrémental pendant `add_feedback`, skills chargées, coût et tokens du tour, lien Langfuse.
+- Coût d'un tour : réponses courtes par défaut, cache de l'historique, briefing déplacé après l'historique ; 0,0372 → 0,0212 € par tour en moyenne sur les questions de 4.1, latence 33,9 → 28,1 s.
+- Tests : rendu d'une réponse avec HTML, script, image et ID inexistant ; vérification et journal des ID ; flux SSE ; historique ; suggestions ; progression de l'incrémental.
 
 ## [4.1] Cœur de l'agent — 2026-10-04
 

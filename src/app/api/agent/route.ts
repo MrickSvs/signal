@@ -29,7 +29,17 @@ export async function POST(request: NextRequest) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      const send = (event: AgentEvent) => controller.enqueue(encoder.encode(sseEvent(event)));
+      let closed = false;
+      // Léa may leave or start a new conversation mid-turn: the turn ends server-side (checkpoint,
+      // trace, cost) even if nobody reads the stream any more.
+      const send = (event: AgentEvent) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(sseEvent(event)));
+        } catch {
+          closed = true;
+        }
+      };
       try {
         const { agent, deps } = await getAgentRuntime(getDb());
         await runTurn(
@@ -51,7 +61,7 @@ export async function POST(request: NextRequest) {
           message: "Signal n'a pas pu terminer sa réponse. Réessaie dans un instant.",
         });
       } finally {
-        controller.close();
+        if (!closed) controller.close();
       }
     },
   });

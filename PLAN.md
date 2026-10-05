@@ -821,9 +821,9 @@ Tests : rendu d'une réponse contenant du HTML et un ID inexistant.
 
 **Test** :
 
-- [ ] Une question sur un insight affiche dans la trace les outils appelés, en direct.
-- [ ] Les ID de la réponse ouvrent les bons aperçus ; un ID inventé apparaît comme « ID inconnu ».
-- [ ] Sur les mêmes questions qu'en 4.1, le coût moyen d'un tour baisse (hors écriture horaire du cache), sans perte de qualité visible.
+- [x] Une question sur un insight affiche dans la trace les outils appelés, en direct.
+- [x] Les ID de la réponse ouvrent les bons aperçus ; un ID inventé apparaît comme « ID inconnu ».
+- [x] Sur les mêmes questions qu'en 4.1, le coût moyen d'un tour baisse (hors écriture horaire du cache), sans perte de qualité visible.
 
 **Commit** : `feat(ui): agent chat panel with live trace and ID checks`
 

@@ -36,6 +36,18 @@ export const addFeedbackSchema = z.object({
     .max(MAX_INCREMENTAL_FEEDBACKS),
 });
 
+/** Steps of the incremental pipeline, as the live trace shows them. */
+export const STEP_LABELS: Record<string, string> = {
+  triage: "Triage des retours",
+  enrich: "Rattachement au compte",
+  embed: "Vectorisation",
+  load: "Lecture des insights",
+  match: "Rattachement aux insights",
+  label: "Nommage des sujets proposés",
+  score: "Re-score des insights touchés",
+  alert: "Alertes",
+};
+
 /** What the chat shows for each pasted feedback (pure). */
 export function compactIncremental(result: IncrementalResult) {
   return {
@@ -71,7 +83,7 @@ export function addFeedbackTool(deps: AgentDeps) {
       schema: addFeedbackSchema,
       models: ["triage", "reasoning"],
     },
-    async ({ feedbacks }, ctx) => {
+    async ({ feedbacks }, ctx, progress) => {
       const now = deps.now();
       const result = await deps.withLock(async () => {
         const ids = await insertFeedbacks(
@@ -92,6 +104,7 @@ export function addFeedbackTool(deps: AgentDeps) {
           skills: deps.skills,
           now,
           ...deps.incremental,
+          onStep: (step) => progress(STEP_LABELS[step] ?? step),
         });
       });
       ctx?.runCost.addEur(result.costEur);

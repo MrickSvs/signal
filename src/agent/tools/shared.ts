@@ -32,14 +32,13 @@ export type AgentDeps = {
 };
 
 /**
- * Per-turn runtime context: cost of the turn, where Léa is and the briefing computed in code
- * before the turn (SPEC §10.8). A middleware only sees the context fields its own schema declares.
+ * Per-turn runtime context: cost of the turn and where Léa is. A middleware only sees the context
+ * fields its own schema declares. (The briefing is a message of the turn, see runTurn.)
  */
 export const turnContextSchema = z.object({
   threadId: z.string(),
   runCost: z.custom<RunCost>((v) => v instanceof RunCost),
   page: z.custom<PageContext | null>(),
-  briefing: z.string(),
 });
 
 export type TurnContext = z.infer<typeof turnContextSchema>;
@@ -99,12 +98,19 @@ export type SignalTool = DynamicStructuredTool<any, any, any, any> & { models: M
  */
 export function signalTool<S extends z.ZodObject>(
   contract: ToolContract<S>,
-  run: (input: z.infer<S>, ctx: TurnContext) => Promise<unknown>,
+  run: (
+    input: z.infer<S>,
+    ctx: TurnContext,
+    progress: (message: string) => void,
+  ) => Promise<unknown>,
 ): SignalTool {
   const instance = tool(
     async (input: z.infer<S>, runtime: ToolRuntime<unknown, TurnContext>) => {
+      // Steps of a long tool reach the live trace as custom stream events (no-op outside a stream).
+      const progress = (message: string) =>
+        runtime?.writer?.({ type: "tool_progress", id: runtime.toolCallId, message });
       try {
-        const output = await run(input, runtime.context);
+        const output = await run(input, runtime?.context, progress);
         const text = typeof output === "string" ? output : JSON.stringify(output);
         return contract.wrap === false ? text : wrapExternal(`outil ${contract.name}`, text);
       } catch (error) {

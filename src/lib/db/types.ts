@@ -694,6 +694,38 @@ export type Database = {
           },
         ];
       };
+      id_incidents: {
+        Row: {
+          cited_id: string;
+          created_at: string;
+          excerpt: string | null;
+          id: number;
+          thread_id: string | null;
+        };
+        Insert: {
+          cited_id: string;
+          created_at?: string;
+          excerpt?: string | null;
+          id?: never;
+          thread_id?: string | null;
+        };
+        Update: {
+          cited_id?: string;
+          created_at?: string;
+          excerpt?: string | null;
+          id?: never;
+          thread_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "id_incidents_thread_id_fkey";
+            columns: ["thread_id"];
+            isOneToOne: false;
+            referencedRelation: "threads";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       insight_items: {
         Row: {
           feedback_id: string;

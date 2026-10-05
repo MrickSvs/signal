@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowDown, ArrowRight, ArrowUp, MessageSquare, TriangleAlert } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowDown, ArrowRight, ArrowUp, TriangleAlert } from "lucide-react";
 import { ChannelBadge, HealthBadge, Pill, PlanBadge } from "@/components/signal/badges";
 import { EvidenceChip, InsightChip } from "@/components/signal/chips";
+import { AskSignalButton } from "@/components/chat/ask-signal-button";
+import { recommendationPrompt } from "@/lib/chat/suggestions";
 import { MetricWithSource } from "@/components/signal/metric-with-source";
 import type { Database } from "@/lib/db/types";
 import { pendingDecisions, type Recommendation } from "@/lib/digest/content";
@@ -526,14 +527,7 @@ export function RecommendationsSection({ recommendations }: { recommendations: R
                     <span className="text-muted-foreground">Preuves :</span>
                     <IdText text={r.preuves.join(" ")} />
                   </span>
-                  <Button
-                    variant="outline"
-                    disabled
-                    title="Le chat avec Signal arrive à l'étape 4.2."
-                  >
-                    <MessageSquare aria-hidden />
-                    En parler à Signal
-                  </Button>
+                  <AskSignalButton prompt={recommendationPrompt(r.titre, r.preuves)} />
                 </div>
               </div>
             </li>

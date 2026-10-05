@@ -1,13 +1,13 @@
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import type { ChatResult } from "@langchain/core/outputs";
 import { MemorySaver } from "@langchain/langgraph";
-import { AIMessage, HumanMessage, SystemMessage, ToolMessage, type BaseMessage } from "langchain";
+import { AIMessage, SystemMessage, ToolMessage, type BaseMessage } from "langchain";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { loadContextPack } from "@/lib/context";
 import { RunCost } from "@/lib/llm/cost";
 import { listSkills } from "@/lib/skills";
-import { createSignalAgent, SUMMARY_TRIGGER_MESSAGES } from "./index";
+import { createSignalAgent, isTruncated, SUMMARY_TRIGGER_MESSAGES, turnMessages } from "./index";
 import {
   currentTurn,
   MAX_TOOL_CALLS_PER_TURN,
@@ -52,12 +52,7 @@ const ping = signalTool(
   },
 );
 
-const context = (briefing = "## Briefing\nTop 1 : I-03"): TurnContext => ({
-  threadId: "t",
-  runCost: new RunCost(),
-  page: null,
-  briefing,
-});
+const context = (): TurnContext => ({ threadId: "t", runCost: new RunCost(), page: null });
 
 const call = (id: string) => ({ id, name: "ping", args: {} });
 
@@ -72,9 +67,14 @@ function agentWith(model: BaseChatModel, summaryModel?: BaseChatModel) {
   });
 }
 
-async function turn(agent: ReturnType<typeof agentWith>, text: string, thread = "t1") {
+async function turn(
+  agent: ReturnType<typeof agentWith>,
+  text: string,
+  thread = "t1",
+  briefing = "## Briefing\nTop 1 : I-03",
+) {
   return agent.invoke(
-    { messages: [new HumanMessage(text)] },
+    { messages: turnMessages(text, briefing) },
     { configurable: { thread_id: thread }, context: context(), recursionLimit: 200 },
   );
 }
@@ -136,22 +136,44 @@ describe("tool budget (CL-31)", () => {
 });
 
 describe("prompt", () => {
-  it("puts the briefing after the cached blocks (SPEC §10.8)", async () => {
+  it("keeps the briefing out of the cached system blocks (SPEC §10.8)", async () => {
     const model = new ScriptedModel(() => new AIMessage("ok"));
     await turn(agentWith(model), "Quoi de neuf ?");
-    const system = model.received[0][0] as SystemMessage;
-    const blocks = system.content as { type: string; text: string; cache_control?: unknown }[];
-    expect(blocks.at(-1)!.text).toContain("Top 1 : I-03");
-    expect(blocks.at(-1)!.cache_control).toBeUndefined();
-    expect(blocks.at(-2)!.cache_control).toEqual({ type: "ephemeral", ttl: "1h" });
-    const stable = blocks
-      .slice(0, -1)
-      .map((b) => b.text)
-      .join("\n");
+    const [system, ...rest] = model.received[0];
+    const blocks = (system as SystemMessage).content as {
+      type: string;
+      text: string;
+      cache_control?: unknown;
+    }[];
+    expect(blocks.at(-1)!.cache_control).toEqual({ type: "ephemeral", ttl: "1h" });
+    const stable = blocks.map((b) => b.text).join("\n");
     expect(stable).toContain("Signal — rôle et règles");
     expect(stable).toContain("`challenge`");
     expect(stable).toContain("Pack de contexte : strategy.md");
     expect(stable).not.toContain("Top 1 : I-03");
+    // The question, then the briefing as a system message right after it.
+    expect(rest.map((m) => m.type)).toEqual(["human", "system"]);
+    expect(rest[1].text).toContain("Top 1 : I-03");
+  });
+
+  it("never rewrites the earlier turns, so the history stays cached (ADR-022)", async () => {
+    const model = new ScriptedModel(() => new AIMessage("ok"));
+    const agent = agentWith(model);
+    await turn(agent, "Tour 1", "cache", "Briefing A");
+    await turn(agent, "Tour 2", "cache", "Briefing B");
+    const first = model.received[0].map((m) => `${m.type}:${m.text}`);
+    const second = model.received[1].map((m) => `${m.type}:${m.text}`);
+    expect(second.slice(0, first.length)).toEqual(first);
+    expect(second.slice(first.length)).toEqual(["ai:ok", "human:Tour 2", "system:Briefing B"]);
+  });
+
+  it("detects an answer cut by the output cap", () => {
+    const cut = new AIMessage({
+      content: "Faits",
+      response_metadata: { stop_reason: "max_tokens" },
+    });
+    expect(isTruncated(cut)).toBe(true);
+    expect(isTruncated(new AIMessage("ok"))).toBe(false);
   });
 
   it("summarizes the oldest messages of a long conversation (CL-30)", async () => {

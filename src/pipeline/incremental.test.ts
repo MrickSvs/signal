@@ -1,3 +1,4 @@
+import { STEP_LABELS } from "@/agent/tools/add-feedback";
 import { MemorySaver } from "@langchain/langgraph";
 import { describe, expect, it } from "vitest";
 import { loadContextPack } from "@/lib/context";
@@ -148,9 +149,14 @@ async function seededWorld() {
   await runPipeline(graph, { runId: "11111111-1111-4111-8111-111111111111", reachMode: "comptes" });
   const db = memoryDb(tables);
   const invoke = fakeInvoke();
+  const steps: string[] = [];
   const add = async (feedbacks: NewFeedback[]) =>
-    runIncremental(db, await insertFeedbacks(db, feedbacks, NOW), { ...common, invoke });
-  return { tables, add, invoke };
+    runIncremental(db, await insertFeedbacks(db, feedbacks, NOW), {
+      ...common,
+      invoke,
+      onStep: (step) => steps.push(step),
+    });
+  return { tables, add, invoke, steps };
 }
 
 const fb = (raw_text: string, extra: Partial<NewFeedback> = {}): NewFeedback => ({
@@ -162,7 +168,7 @@ const fb = (raw_text: string, extra: Partial<NewFeedback> = {}): NewFeedback => 
 
 describe("runIncremental (in-memory database, simulated models)", () => {
   it("attaches a feedback close to a known topic and re-scores it in code", async () => {
-    const { tables, add, invoke } = await seededWorld();
+    const { tables, add, invoke, steps } = await seededWorld();
     const result = await add([fb("[topic:a] encore une notification ratée")]);
 
     expect(result.feedbacks).toMatchObject([
@@ -183,6 +189,9 @@ describe("runIncremental (in-memory database, simulated models)", () => {
     ]);
     expect(tables.pipeline_runs.at(-1)).toMatchObject({ kind: "incremental", status: "termine" });
     expect(result.alerts).toEqual({ created: [], enriched: [] });
+    // Each step is announced as it starts (the chat's live trace shows it, PLAN 4.2).
+    expect(steps).toEqual(expect.arrayContaining(["triage", "enrich", "embed", "match", "score"]));
+    expect(steps.every((step) => step in STEP_LABELS)).toBe(true);
   });
 
   it("queues an unknown topic, then proposes an insight at the third close item (CL-16, CL-51)", async () => {
