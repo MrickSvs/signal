@@ -70,6 +70,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - Vérifié en réel : setup (base, vue, relance sans effet) ; US-015 avec un jeton invalide → « validé » + erreur, puis réessai → page dans Notion, relance sans doublon ; chat « Envoie BUG-002 dans Notion » → carte avec aperçu → validation → page « Prêt » en 6 s ; « Envoie toute l'epic E-04 dans Notion » → une carte, trois pages (TT-003, US-014, US-016).
 - Validé par le PO : checklist de l'étape, écran Backlog compris (« Valider et envoyer », « Ouvrir dans Notion »).
 
+## [Plan] Notion recentré — 2026-10-05
+
+- Phase 5 réduite de ~6 h à ~2 h + 45 min de bonus : une seule base Notion (Backlog), envoi à la validation du PO, sans synchronisation retour (ADR-026).
+- PLAN (phase 5, ligne de coupe, durées), SPEC (§3, §6, §7, §9, §10, §11, §12, §14 à §19), CLAUDE.md, skill digest et `.env.example` mis à jour.
+
 ## [4.5] Alertes et enquêtes autonomes — 2026-10-05
 
 `bb95396` · ADR-025
@@ -79,11 +84,6 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - Interface : carte d'alerte dans l'en-tête et dans le chat ; « Faire l'action proposée » passe par le chat et sa carte d'approbation, « Ignorer » est journalisé, « En parler à Signal » met le dossier dans le briefing.
 - Vérifié en réel : e-mail de Studio Bastide → alerte churn et dossier « Prévenir le CSM » ≈ 49 s après l'envoi ; retour proche de S1 → rattaché à I-27 sans alerte ; « Ignorer » → D-078.
 - Validé par le PO : checklist de l'étape.
-
-## [Plan] Notion recentré — 2026-10-05
-
-- Phase 5 réduite de ~6 h à ~2 h + 45 min de bonus : une seule base Notion (Backlog), envoi à la validation du PO, sans synchronisation retour (ADR-026).
-- PLAN (phase 5, ligne de coupe, durées), SPEC (§3, §6, §7, §9, §10, §11, §12, §14 à §19), CLAUDE.md, skill digest et `.env.example` mis à jour.
 
 ## [4.4] Validation humaine et challenge — 2026-10-05
 
