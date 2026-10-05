@@ -35,13 +35,21 @@ export type AgentDeps = {
   background?: (task: () => Promise<void>) => void;
 };
 
+export function isRunCost(value: unknown): value is RunCost {
+  if (value instanceof RunCost) return true;
+  const v = value as Partial<RunCost> | null;
+  return typeof v === "object" && v !== null && typeof v.add === "function" && "eur" in v;
+}
+
 /**
  * Per-turn runtime context: cost of the turn and where Léa is. A middleware only sees the context
  * fields its own schema declares. (The briefing is a message of the turn, see runTurn.)
  */
 export const turnContextSchema = z.object({
   threadId: z.string(),
-  runCost: z.custom<RunCost>((v) => v instanceof RunCost),
+  // Checked by shape, not instanceof: in dev, a hot reload gives RunCost a new class while the
+  // agent cached in globalThis keeps the old schema (the turn then failed on « Invalid input »).
+  runCost: z.custom<RunCost>(isRunCost),
   page: z.custom<PageContext | null>(),
 });
 

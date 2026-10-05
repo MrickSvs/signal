@@ -17,7 +17,14 @@ import {
   toolBudget,
 } from "./middleware";
 import { chatTools, readTools } from "./tools";
-import { signalTool, ToolError, type AgentDeps, type TurnContext } from "./tools/shared";
+import {
+  isRunCost,
+  signalTool,
+  ToolError,
+  turnContextSchema,
+  type AgentDeps,
+  type TurnContext,
+} from "./tools/shared";
 
 const pack = await loadContextPack();
 const skills = await listSkills();
@@ -186,6 +193,26 @@ describe("prompt", () => {
     const seen = model.received.at(-1)!;
     expect(seen.length).toBeLessThan(SUMMARY_TRIGGER_MESSAGES);
     expect(seen.some((m) => m.text.includes("Résumé : Léa suit I-03."))).toBe(true);
+  });
+});
+
+describe("turn context", () => {
+  it("accepts a RunCost from a reloaded module (dev hot reload), refuses anything else", () => {
+    // Same shape, other class: what a hot reload produces.
+    class ReloadedRunCost {
+      add() {}
+      get eur() {
+        return 0;
+      }
+    }
+    const reloaded = new ReloadedRunCost();
+    expect(isRunCost(new RunCost())).toBe(true);
+    expect(isRunCost(reloaded)).toBe(true);
+    expect(isRunCost({})).toBe(false);
+    expect(isRunCost(null)).toBe(false);
+    expect(
+      turnContextSchema.safeParse({ threadId: "t", runCost: reloaded, page: null }).success,
+    ).toBe(true);
   });
 });
 
