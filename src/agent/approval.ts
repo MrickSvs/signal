@@ -15,7 +15,7 @@ import { z } from "zod";
 import type { Weighting } from "@/lib/context";
 import type { Db } from "@/lib/db/create";
 import { checkDecision, describeDecision } from "@/lib/decisions/apply-decision";
-import { previewPush } from "@/services/notion/push-backlog";
+import { previewPush, PushTargetError, resolvePushIds } from "@/services/notion/push-backlog";
 
 /** Tools that never run without Léa's explicit approval. */
 export const APPROVAL_TOOLS = ["apply_decision", "push_to_notion"] as const;
@@ -46,7 +46,24 @@ export function approvalConfig(weighting: Weighting): Record<string, InterruptOn
 /** « Envoyer US-004, US-005 dans le kanban Notion (colonne « Prêt ») » (pure). */
 export function describePush(args: Record<string, unknown>): string {
   const ids = Array.isArray(args.item_ids) ? args.item_ids.map(String) : [];
-  return `Envoyer ${ids.join(", ") || "ces éléments"} dans le kanban Notion (colonne « Prêt »)`;
+  const what = args.epic_id
+    ? `l'epic ${String(args.epic_id)} (ses éléments pas encore envoyés)`
+    : ids.join(", ") || "ces éléments";
+  return `Envoyer ${what} dans le kanban Notion (colonne « Prêt »)`;
+}
+
+/** The pages a push would create, resolved as the tool will (an epic becomes its items). */
+async function pushPreview(db: Db, args: Record<string, unknown>): Promise<string> {
+  try {
+    const ids = await resolvePushIds(db, {
+      item_ids: Array.isArray(args.item_ids) ? args.item_ids.map(String) : undefined,
+      epic_id: typeof args.epic_id === "string" ? args.epic_id : undefined,
+    });
+    return await previewPush(db, ids);
+  } catch (error) {
+    if (error instanceof PushTargetError) return error.message;
+    throw error;
+  }
 }
 
 export type ApprovalAction = {
@@ -114,9 +131,7 @@ export async function withTargets(db: Db, approval: PendingApproval): Promise<Pe
   const itemOf = new Map((items.data ?? []).map((i) => [i.id, i]));
   const previews = await Promise.all(
     approval.actions.map((a) =>
-      a.tool === "push_to_notion" && Array.isArray(a.args.item_ids)
-        ? previewPush(db, a.args.item_ids.map(String))
-        : Promise.resolve(null),
+      a.tool === "push_to_notion" ? pushPreview(db, a.args) : Promise.resolve(null),
     ),
   );
   return {

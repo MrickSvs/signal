@@ -609,7 +609,7 @@ Quinze outils, chacun avec un contrat : quand l'utiliser, quand ne pas l'utilise
 | `update_backlog_item` | Modifier un brouillon ou changer son type | Élément déjà envoyé (« à modifier dans Notion ») | `id`, `patch` ou `kind` → élément mis à jour | interne |
 | `generate_prototype` | Esquisser l'écran d'une story qui touche une interface, à la demande du PO | Bug, tâche, story sans écran ; jamais de sa propre initiative | `story_id`, `consigne?` → URL du prototype ou message d'échec clair | interne |
 | `apply_decision` | Enregistrer une décision exprimée dans le chat : override, MoSCoW, validation d'un élément, revue d'un insight proposé, sujet manuel | Simulation (→ `get_priority`) | `kind`, `target`, `value`, `reason` → décision journalisée | interne · **validation PO** |
-| `push_to_notion` | Envoyer des éléments du backlog dans le kanban Notion, à la demande du PO ; son clic valide aussi un brouillon | Valider sans envoyer (→ `apply_decision`) ; élément rejeté ; de sa propre initiative | `item_ids` → pages créées (ou déjà envoyées), erreurs par élément | **externe** · **validation PO** |
+| `push_to_notion` | Envoyer des éléments du backlog dans le kanban Notion, à la demande du PO ; son clic valide aussi un brouillon | Valider sans envoyer (→ `apply_decision`) ; élément rejeté ; de sa propre initiative | `item_ids` ou `epic_id` (ses éléments pas encore envoyés, résolus en code, 10 au plus) → pages créées (ou déjà envoyées), erreurs par élément | **externe** · **validation PO** |
 
 **Outils disponibles selon l'entrée.** Dans le chat : les quinze. Pendant une enquête sur une alerte (§10.10) : les outils de lecture, `estimate_complexity` et `load_skill` seulement ; aucun outil qui écrit.
 

@@ -181,6 +181,49 @@ async function loadRows(db: Db, ids: readonly string[]): Promise<Map<string, Ite
   return new Map((data ?? []).map((r) => [r.id, r]));
 }
 
+/** Items a push targets: listed ids, or every item of an epic still to send (ADR-027). */
+export type PushTarget = { item_ids?: readonly string[]; epic_id?: string };
+
+/** At most 10 pages per push: one approval card stays readable. */
+export const PUSH_MAX = 10;
+
+/** A push that cannot be resolved (unknown epic, nothing left to send): shown as is. */
+export class PushTargetError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PushTargetError";
+  }
+}
+
+/**
+ * The item ids of a push. For an epic: its drafts and validated items, in order; rejected and
+ * already sent ones are left out. Resolved in code, never by the model (rule 9).
+ */
+export async function resolvePushIds(db: Db, target: PushTarget): Promise<string[]> {
+  if (!target.epic_id)
+    return [...new Set((target.item_ids ?? []).map((id) => id.trim().toUpperCase()))];
+  const epicId = target.epic_id.trim().toUpperCase();
+  const epic = await db.from("epics").select("id").eq("id", epicId).maybeSingle();
+  fail(epic.error, "lecture de l'epic");
+  if (!epic.data) throw new PushTargetError(`${epicId} introuvable.`);
+  const { data, error } = await db
+    .from("backlog_items")
+    .select("id, status")
+    .eq("epic_id", epicId)
+    .order("id");
+  fail(error, "lecture des éléments de l'epic");
+  const ids = (data ?? [])
+    .filter((r) => r.status === "brouillon" || r.status === "valide")
+    .map((r) => r.id);
+  if (ids.length === 0)
+    throw new PushTargetError(`${epicId} n'a plus d'élément à envoyer (tous envoyés ou rejetés).`);
+  if (ids.length > PUSH_MAX)
+    throw new PushTargetError(
+      `${epicId} a ${ids.length} éléments : envoie-les en deux fois (${PUSH_MAX} au plus).`,
+    );
+  return ids;
+}
+
 /** The approval card's content: each page as Notion will receive it (SPEC §10.6). */
 export async function previewPush(
   db: Db,

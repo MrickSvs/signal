@@ -256,6 +256,18 @@ describe("human-in-the-loop on push_to_notion (SPEC §11.2)", () => {
       "Envoyer US-004, BUG-002 dans le kanban Notion (colonne « Prêt »)",
     );
     expect(describePush({})).toMatch(/ces éléments/);
+    expect(describePush({ epic_id: "E-01" })).toBe(
+      "Envoyer l'epic E-01 (ses éléments pas encore envoyés) dans le kanban Notion (colonne « Prêt »)",
+    );
+  });
+
+  it("takes either items or an epic, not both", () => {
+    expect(pushToNotionSchema.safeParse({ epic_id: "e-01" }).success).toBe(true);
+    expect(pushToNotionSchema.safeParse({ item_ids: ["US-004"] }).success).toBe(true);
+    expect(pushToNotionSchema.safeParse({}).success).toBe(false);
+    expect(pushToNotionSchema.safeParse({ item_ids: ["US-004"], epic_id: "E-01" }).success).toBe(
+      false,
+    );
   });
 });
 

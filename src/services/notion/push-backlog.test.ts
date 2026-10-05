@@ -2,7 +2,13 @@ import { APIErrorCode, APIResponseError, type CreatePageParameters } from "@noti
 import { describe, expect, it } from "vitest";
 import { createMemoryDb, type MemoryTables } from "@/lib/db/memory";
 import { patchBacklogItem } from "@/services/backlog";
-import { logPushRefusal, previewPush, pushBacklogItems, type NotionPort } from "./push-backlog";
+import {
+  logPushRefusal,
+  previewPush,
+  pushBacklogItems,
+  resolvePushIds,
+  type NotionPort,
+} from "./push-backlog";
 
 const NOW = new Date("2026-10-05T10:00:00Z");
 const CONFIG = { backlogDataSourceId: "ds-backlog", appBaseUrl: "https://signal.test" };
@@ -295,5 +301,30 @@ describe("approval card and refusal", () => {
       ["US-001", "rejet", "pas encore"],
       ["US-002", "rejet", "pas encore"],
     ]);
+  });
+});
+
+describe("resolvePushIds: a whole epic (ADR-027)", () => {
+  it("takes the epic's drafts and validated items, without the rejected or sent ones", async () => {
+    const { db } = setup([
+      item({ id: "US-001", status: "brouillon" }),
+      item({ id: "US-002", status: "envoye" }),
+      item({ id: "US-003", status: "rejete" }),
+      item({ id: "TT-001", kind: "tache", status: "valide" }),
+      item({ id: "US-004", epic_id: "E-02" }),
+    ]);
+    expect(await resolvePushIds(db, { epic_id: "e-01" })).toEqual(["TT-001", "US-001"]);
+    expect(await resolvePushIds(db, { item_ids: ["us-004", "US-004"] })).toEqual(["US-004"]);
+  });
+
+  it("says when the epic is unknown or has nothing left to send", async () => {
+    const { db } = setup([item({ status: "envoye" })]);
+    await expect(resolvePushIds(db, { epic_id: "E-09" })).rejects.toThrow(/E-09 introuvable/);
+    await expect(resolvePushIds(db, { epic_id: "E-01" })).rejects.toThrow(/plus d'élément/);
+  });
+
+  it("refuses more than 10 pages in one card", async () => {
+    const { db } = setup(Array.from({ length: 11 }, (_, i) => item({ id: `US-${100 + i}` })));
+    await expect(resolvePushIds(db, { epic_id: "E-01" })).rejects.toThrow(/en deux fois/);
   });
 });

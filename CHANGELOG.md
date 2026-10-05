@@ -64,10 +64,10 @@ ADR-027
 
 - `services/notion` : client (API `2025-09-03`, limiteur à ~3 requêtes/s, retries du SDK sur 429 avec `Retry-After`), mappers purs (propriétés et corps par type, découpage à 2 000 caractères et par lots de 100 blocs, CL-41), service d'envoi (`push-backlog.ts`) : un brouillon est validé par le clic, la page naît « Prêt », lien, statut « envoyé » et décision journalisés ; échec → l'élément reste « validé » avec `push_error` (CL-35) ; jamais de seconde page.
 - `pnpm notion:setup` : crée la base Backlog et sa vue Kanban groupée par Statut, ou ne fait rien si elle existe (propriétés manquantes ajoutées).
-- Outil `push_to_notion` (15ᵉ outil) sous validation humaine : la carte montre le rendu de chaque page ; un refus est journalisé par élément.
+- Outil `push_to_notion` (15ᵉ outil) sous validation humaine, pour des éléments précis ou toute une epic (`epic_id`, résolu en code) : la carte montre le rendu de chaque page ; un refus est journalisé par élément.
 - Écran Backlog : « Valider et envoyer » (modale), « Réessayer » avec l'erreur, « Ouvrir dans Notion » pour un élément envoyé, qui ne se modifie plus dans Signal (CL-36).
 - Nettoyage de l'ADR-026 : conflits Notion retirés du digest et du briefing, lien Notion retiré des retours, route webhook retirée du proxy.
-- Vérifié en réel : setup (base, vue, relance sans effet) ; US-015 avec un jeton invalide → « validé » + erreur, puis réessai → page dans Notion, relance sans doublon ; chat « Envoie BUG-002 dans Notion » → carte avec aperçu → validation → page « Prêt » en 6 s.
+- Vérifié en réel : setup (base, vue, relance sans effet) ; US-015 avec un jeton invalide → « validé » + erreur, puis réessai → page dans Notion, relance sans doublon ; chat « Envoie BUG-002 dans Notion » → carte avec aperçu → validation → page « Prêt » en 6 s ; « Envoie toute l'epic E-04 dans Notion » → une carte, trois pages (TT-003, US-014, US-016).
 
 ## [Plan] Notion recentré — 2026-10-05
 
