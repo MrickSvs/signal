@@ -16,7 +16,7 @@ Le digest est l'écran d'accueil de Léa : « Bonjour Léa. Voici ce qui a chang
 3. **Tendances émergentes** (7 jours glissants) et nouveaux sujets.
 4. **Comptes à risque** : renouvellement dans moins de 90 jours et signal négatif.
 5. **Mouvements dans le classement** depuis la version précédente.
-6. **Décisions en attente** : nouveaux insights à valider, éléments du backlog à valider, conflits Notion, fusions ou scissions d'insights, overrides dont le contexte a changé.
+6. **Décisions en attente** : nouveaux insights à valider, éléments du backlog à valider, fusions ou scissions d'insights, overrides dont le contexte a changé.
 7. **Trois recommandations au plus**, chacune avec ses preuves et un niveau de confiance.
 
 Une section vide s'écrit en une ligne (« Aucune alerte ouverte. ») ou disparaît si elle n'apporte rien ; l'ordre ne change pas.

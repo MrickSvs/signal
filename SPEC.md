@@ -58,7 +58,7 @@ Ces principes tranchent les arbitrages pendant le build.
 | Proposer des critères d'acceptation                  | Gherkin « Étant donné / Quand / Alors » (§9)                            | `eval:backlog`                                    |
 | Estimer la complexité | Estimation par analogie : carte d'architecture + tickets de référence (§8.4) | `eval:estimation` (leave-one-out), `eval:backlog` (justification) |
 
-**Au-delà du brief :** rythme continu (alertes ciblées avec enquête préparée par Signal, digest quotidien), boucle Notion aller-retour, prototype visuel d'une story, sujets hors retours (insights manuels), validation des nouveaux insights par le PO, tableau de bord des evals, registre des cas limites (§19), exposition MCP.
+**Au-delà du brief :** rythme continu (alertes ciblées avec enquête préparée par Signal, digest quotidien), envoi du backlog validé dans Notion, prototype visuel d'une story, sujets hors retours (insights manuels), validation des nouveaux insights par le PO, tableau de bord des evals, registre des cas limites (§19), exposition MCP.
 
 ---
 
@@ -208,8 +208,8 @@ Sources écrites (e-mails, tickets, commentaires, NPS, notes CSM / sales, Slack)
    └─ actions sensibles (envoi Notion, décision) → pause + validation du PO
         │
         ▼
-③ NOTION — l'espace de l'équipe : retours triés, insights, backlog en kanban
-   push à la validation · synchronisation retour des modifications du PO
+③ NOTION — l'espace de l'équipe : backlog en kanban
+   envoi à la validation du PO (un seul sens)
 
 ④ QUALITÉ — tests unitaires, harnais d'evals, juge (Opus) calibré sur un humain
    Observabilité : Langfuse + panneau de trace dans l'app
@@ -257,9 +257,9 @@ Deux modes : **complet** (CLI, ~225 retours) et **incrémental** (route API ou o
 
 Implémentation : `createAgent` de LangChain v1 (qui tourne sur LangGraph), middleware human-in-the-loop, checkpointer Postgres pour reprendre une conversation interrompue. Détails en §10.
 
-### 6.3 Boucle Notion
+### 6.3 Envoi vers Notion
 
-Supabase est la source de vérité ; Notion est l'espace de l'équipe. Signal pousse les retours, les insights et les éléments du backlog validés ; il récupère les modifications du PO selon des règles de propriété des champs. Détails en §11.
+Supabase est la source de vérité ; Notion est l'espace de l'équipe. Signal y envoie les éléments du backlog que le PO a validés, et seulement eux : c'est l'écriture externe de l'agent, toujours soumise à validation humaine. Une fois envoyé, un élément vit dans Notion. Détails en §11.
 
 ### 6.4 Pack de contexte et skills
 
@@ -289,7 +289,7 @@ Le PO modifie une skill (par exemple le gabarit de story) : le pipeline et l'age
 | 004 | Les scores sont calculés en code, jamais par le modèle                            |
 | 005 | Routage Haiku / Sonnet / Opus selon la tâche, validé par les evals                |
 | 006 | Le juge n'est pas le générateur, et il est calibré sur des annotations humaines   |
-| 007 | Supabase source de vérité, Notion espace d'équipe, propriété des champs explicite |
+| 007 | Supabase source de vérité, Notion espace d'équipe : envoi du backlog validé, un seul sens |
 | 008 | Pack de contexte + skills : la connaissance métier hors du code                   |
 | 009 | Pas de code Jalon : une carte d'architecture et un historique de tickets suffisent, et évitent une éval circulaire |
 | 010 | Regroupement sur le problème extrait, pas sur le texte brut                       |
@@ -346,15 +346,15 @@ Identifiants lisibles : retours `R-001` (et leurs items `R-001.1`, `R-001.2`…)
 | `po_state`             | last_seen_at (dernière visite du PO), last_digest_id — une seule ligne |
 | `digests`              | id, period_start, period_end, content (jsonb), markdown, run_id                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `pipeline_runs`        | id, kind (`full` / `incremental` / `digest` / `eval`), started_at, ended_at, status, stats, tokens_in, tokens_out, cost_eur, langfuse_url                                                                                                                                                                                                                                                                                                                                                                 |
-| `notion_links`         | entity_type, entity_id, notion_page_id, data_source (`retours` / `insights` / `backlog`), last_pushed_at, last_notion_edited_time                                                                                                                                                                                                                                                                                                                                                                         |
-| `notion_sync_state`    | data_source, cursor                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `notion_links`         | entity_type, entity_id, notion_page_id, data_source (seul `backlog` est utilisé), last_pushed_at, last_notion_edited_time                                                                                                                                                                                                                                                                                                                                                                         |
+| `notion_sync_state`    | data_source, cursor (inutilisée : synchronisation retour hors périmètre, §17.1)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `eval_runs`            | id, eval_name, config, sample_size, metrics, cost_eur, langfuse_url, git_sha, started_at, ended_at                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `eval_results`         | eval_run_id, item_id, expected, actual, score, pass                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `threads`              | id, title, page_context, created_at, last_message_at (liste des conversations du chat)                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 Plus les tables du checkpointer LangGraph (créées par `PostgresSaver.setup()`).
 
-**Cycle de vie d'un élément du backlog** (story, bug ou tâche) : `brouillon` → `valide` (le PO valide) → `envoye` (page créée dans Notion) → `modifie_notion` (le PO l'a modifiée dans Notion). `rejete` si le PO le refuse ou l'archive dans Notion. Un élément `valide` dont l'envoi a échoué garde l'erreur dans `push_error`. `notion_status_raw` conserve un statut Notion non reconnu.
+**Cycle de vie d'un élément du backlog** (story, bug ou tâche) : `brouillon` → `valide` (le PO valide) → `envoye` (page créée dans Notion). `rejete` si le PO le refuse. Un élément `valide` dont l'envoi a échoué garde l'erreur dans `push_error`. `notion_status_raw` reçoit le statut de la page Notion si l'étape bonus 5.2 est réalisée. `modifie_notion` existe dans l'enum mais n'est plus atteint (synchronisation retour hors périmètre, §17.1).
 
 Accès : uniquement côté serveur, avec la clé service role. Aucun client Supabase dans le navigateur.
 
@@ -551,7 +551,7 @@ Estimation : 5 points — composant : Tableau · analogue T-121
 - Points en Fibonacci (1, 2, 3, 5, 8, 13) ; au-delà de 8, proposer un découpage.
 - Toujours en français.
 - **Relancer la rédaction** pour un insight qui a déjà un backlog : l'epic et les éléments envoyés sont conservés ; les brouillons sont remplacés après confirmation.
-- **Un élément envoyé dans Notion ne se modifie plus dans Signal** : Notion fait foi pour ses champs (§11.4).
+- **Un élément envoyé dans Notion ne se modifie plus dans Signal** : il se modifie dans Notion (§11.2).
 - **Changer de type** (une story qui est en fait un bug) : Signal régénère l'élément au bon format après confirmation du PO.
 
 ---
@@ -619,7 +619,7 @@ Les outils `apply_decision` et `push_to_notion` déclenchent une pause (middlewa
 
 ### 10.7 Garde-fous
 
-- Les retours sont des données tierces : toujours encapsulés (`wrapAsData`) et présentés comme tels ; une suspicion d'injection est signalée, jamais exécutée. Même règle pour les résultats d'outils et pour les textes modifiés par le PO dans Notion.
+- Les retours sont des données tierces : toujours encapsulés (`wrapAsData`) et présentés comme tels ; une suspicion d'injection est signalée, jamais exécutée. Même règle pour les résultats d'outils et pour tout contenu relu depuis Notion.
 - Lecture seule par défaut ; écritures externes sous validation.
 - Aucun accès à `evals/ground-truth/` ni à `evals/holdout/` depuis l'application (garde de chemins + règle ESLint + test).
 - Pas de chiffre sans source : les chiffres viennent des outils (vérifié par `eval:guardrails`).
@@ -662,45 +662,43 @@ Signal n'interrompt le PO que lorsqu'un retour change une décision. Les seuils 
 
 API Notion version `2025-09-03` : les requêtes et la création de pages ciblent un **data source**, plus une base.
 
+**Périmètre (ADR-026).** Le brief ne demande aucune intégration. Notion sert à montrer qu'un backlog validé atterrit là où l'équipe travaille, et surtout que la seule écriture externe de l'agent passe par la validation humaine. On garde donc une seule base et un seul sens : Signal → Notion, pour les éléments du backlog validés. Retours et insights restent dans Signal, qui est fait pour les lire.
+
 ### 11.1 Structure
 
-Page parente « Jalon — Produit (Signal) », trois bases :
+Page parente « Jalon — Produit (Signal) », une base **Backlog** :
 
-| Base         | Propriétés                                                                                                                                                                                                                              |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Retours**  | Nom (résumé), ID, Canal, Source, Compte, Plan, MRR, Type, Domaine, Tags, Sentiment, Insight (relation), Reçu le, Lien Signal. Corps : verbatim.                                                                                         |
-| **Insights** | Nom, ID, Problème, Comptes, MRR exposé, RICE, Rang, Robustesse, MoSCoW (reco), MoSCoW (PO), Alignement, Tendance, Lien Signal                                                                                                           |
-| **Backlog**  | Nom, ID, Type (select : Story / Bug / Tâche), Epic, Insight (relation), Statut (select : Prêt / En cours / En revue / Fait), MoSCoW, Points, Énoncé (« Afin de… », comportement constaté ou objectif), Prototype (URL), Lien Signal, Validé le. Corps : règles de gestion, critères Gherkin, KPI ou définition de terminé, étapes de reproduction pour un bug, preuves. |
+| Propriété | Contenu |
+| --------- | ------- |
+| Nom | Titre de l'élément |
+| ID | `US-001`, `BUG-001`, `TT-001` |
+| Type | select : Story / Bug / Tâche |
+| Statut | select : Prêt / En cours / En revue / Fait (« Prêt » à l'envoi) |
+| Epic | Texte : ID et titre de l'epic, s'il y en a une |
+| Insight | Texte : ID et titre de l'insight (pas de relation : il n'y a pas de base Insights) |
+| MoSCoW | select |
+| Points | nombre |
+| Énoncé | « Afin de… », comportement constaté ou objectif |
+| Prototype | URL |
+| Lien Signal | URL |
+| Validé le | date |
 
-Les vues (kanban du Backlog groupé par Statut) sont créées à la main une fois (guide dans le README).
+Corps de page, selon le type (§9) : règles de gestion, critères Gherkin et KPI pour une story ; attendu, constaté, étapes de reproduction et sévérité pour un bug ; objectif et définition de terminé pour une tâche ; preuves (ID des retours, avec lien vers Signal) dans tous les cas.
 
-### 11.2 Push (Signal → Notion)
+La vue kanban groupée par Statut est créée à la main une fois (guide dans le README). `pnpm notion:setup` crée la base si elle n'existe pas encore.
 
-- Retours et insights : en masse après un run complet (CLI, limité à ~3 requêtes/s, soit la limite de 180 requêtes par minute de l'API). **Ordre : insights d'abord**, puis retours et éléments du backlog, car une relation exige que la page cible existe.
-- Éléments du backlog : à la validation du PO, via `push_to_notion` (validation humaine).
-- Chaque push enregistre `notion_page_id`, `last_pushed_at` et le `last_edited_time` renvoyé.
-- **Échec d'envoi** (Notion indisponible, limite de débit dépassée après retries) : l'élément reste `valide`, l'erreur est stockée dans `push_error` et affichée avec un bouton « Réessayer ».
-- Limites de l'API respectées : 2 000 caractères par objet de texte riche (les textes longs sont découpés), 100 éléments par tableau de blocs (les corps de page longs sont envoyés en plusieurs requêtes).
+### 11.2 Envoi (Signal → Notion)
+
+- À la validation du PO uniquement : via `push_to_notion` dans le chat (carte d'approbation) ou via « Valider et envoyer » sur l'écran Backlog (modale de confirmation). Même service.
+- Chaque envoi enregistre `notion_page_id`, `last_pushed_at` et le `last_edited_time` renvoyé dans `notion_links`. Un élément déjà lié n'est jamais recréé.
+- **Échec d'envoi** (Notion indisponible, limite de débit dépassée après nouvelles tentatives) : l'élément reste `valide`, l'erreur est stockée dans `push_error` et affichée avec un bouton « Réessayer ».
+- Limites de l'API respectées : ~3 requêtes/s, nouvelles tentatives sur 429 en respectant `Retry-After`, 2 000 caractères par objet de texte riche (les textes longs sont découpés), 100 éléments par tableau de blocs (les corps de page longs sont envoyés en plusieurs requêtes).
 - Les URLs poussées (Lien Signal, Prototype) sont construites à partir de `APP_BASE_URL`.
+- **Après l'envoi, l'élément vit dans Notion** : il n'est plus modifiable dans Signal (« Ouvrir dans Notion » remplace « Modifier »). Comme rien ne peut changer des deux côtés, il n'y a pas de conflit à gérer.
 
-### 11.3 Synchronisation retour (Notion → Signal)
+### 11.3 Retour du statut _(bonus, étape 5.2)_
 
-Deux mécanismes complémentaires :
-
-1. **Polling** (fiable, prévisible) : requête des data sources Backlog et Insights filtrée sur `last_edited_time` postérieur au curseur. Déclenché par le bouton « Synchroniser Notion », automatiquement toutes les 30 s quand l'écran Backlog est ouvert, et après chaque push. Un MoSCoW (PO) modifié sur une page Insights devient l'override `moscow` de l'insight.
-2. **Webhook** _(bonus)_ : `/api/notion/webhook` reçoit `page.properties_updated` et `page.content_updated`, vérifie la signature, ignore les événements dont l'auteur est l'intégration elle-même, puis relit la page (les événements sont agrégés et leur contenu est minimal).
-
-**Réconciliation** à chaque synchronisation : chaque story liée est relue, car une page archivée ou supprimée n'apparaît plus dans les requêtes. Une page archivée ou supprimée passe la story en `rejete`, avec une décision journalisée (source notion). Une page créée directement dans le Backlog, sans passer par Signal, n'est pas importée : elle figure dans le rapport comme « non suivie ».
-
-### 11.4 Propriété des champs et conflits
-
-- **Champs du PO** (Notion fait foi) : Backlog → Nom, Type, Statut, MoSCoW, Points, Énoncé, corps de page (critères) ; Insights → MoSCoW (PO).
-- **Champs de Signal** (Supabase fait foi) : tous les autres (IDs, RICE, rang, preuves, comptes, MRR, liens). Une modification dans Notion est ignorée, écrasée au push suivant et signalée dans le rapport de synchronisation.
-- **Conflit** (un champ du PO modifié des deux côtés depuis la dernière synchronisation) : Notion gagne, le PO décide. Une décision `conflit` est journalisée avec les deux valeurs.
-- **Après le premier envoi, Signal ne réécrit jamais les champs du PO** : un nouvel envoi (par exemple après un re-scoring) ne met à jour que les champs de Signal.
-- **Valeurs imprévues :** un statut que Signal ne connaît pas (par exemple une colonne « Bloqué » ajoutée dans Notion) est conservé tel quel (`notion_status_raw`) et signalé ; des points hors suite de Fibonacci sont acceptés, puisque c'est une décision du PO, et signalés.
-- **Anti-boucle :** une page dont le `last_edited_time` égale celui enregistré au dernier push est ignorée.
-- Chaque changement appliqué crée une entrée `decisions` (actor `po`, source `notion`) et passe la story en `modifie_notion`. C'est la matière de la métrique d'acceptation (§14.4).
+S'il reste du temps : un bouton « Synchroniser Notion » relit le Statut des pages envoyées et l'affiche dans Signal (`notion_status_raw`), avec une décision journalisée (actor `po`, source `notion`) pour chaque changement. Un statut que Signal ne connaît pas (une colonne « Bloqué » ajoutée dans Notion) est conservé tel quel et signalé. Rien d'autre ne revient de Notion.
 
 ---
 
@@ -726,7 +724,7 @@ Deux mécanismes complémentaires :
 3. **Tendances émergentes** (§8.8, calculées sur 7 jours glissants).
 4. **Comptes à risque** : renouvellement dans moins de 90 jours + signal négatif.
 5. Mouvements dans le classement (au premier run : « pas encore d'historique »).
-6. Décisions en attente : nouveaux insights à valider, éléments du backlog à valider, conflits Notion, fusions ou scissions d'insights, overrides dont le contexte a changé.
+6. Décisions en attente : nouveaux insights à valider, éléments du backlog à valider, fusions ou scissions d'insights, overrides dont le contexte a changé.
 7. **Trois recommandations** de Signal maximum, chacune avec ses preuves.
 
 Les faits sont calculés en code ; Signal rédige. Généré chaque nuit (cron quotidien) et à la demande ; la période couvre depuis le digest précédent, ou depuis la dernière visite de Léa si elle est plus ancienne.
@@ -752,7 +750,7 @@ Tableau classé : RICE décomposé (R, I, C, E cliquables), badge de robustesse,
 
 ### 12.6 Backlog
 
-Par insight : l'epic s'il y en a une, puis ses éléments, chacun avec un badge de type (Story, Bug, Tâche) et le format qui lui correspond (§9). Critères Gherkin rendus lisiblement, points avec justification (composants touchés, tickets analogues), fourchette de l'insight, preuves, badge qualité du juge, statut. Actions : Modifier ou changer de type (brouillons uniquement ; un élément envoyé se modifie dans Notion), **Visualiser** (stories uniquement, §13), **Valider et envoyer** (validation humaine), Réessayer l'envoi, Synchroniser Notion.
+Par insight : l'epic s'il y en a une, puis ses éléments, chacun avec un badge de type (Story, Bug, Tâche) et le format qui lui correspond (§9). Critères Gherkin rendus lisiblement, points avec justification (composants touchés, tickets analogues), fourchette de l'insight, preuves, badge qualité du juge, statut. Actions : Modifier ou changer de type (brouillons uniquement ; un élément envoyé se modifie dans Notion), **Visualiser** (stories uniquement, §13), **Valider et envoyer** (validation humaine), Réessayer l'envoi, Ouvrir dans Notion (élément envoyé), Synchroniser Notion (bonus, §11.3).
 
 ### 12.7 Évals
 
@@ -773,7 +771,7 @@ Réponses en streaming, IDs cliquables, suggestions contextuelles par page. **Pa
 - **Déclencheur :** bouton « Visualiser » sur une story (pas sur un bug ni une tâche, qui n'ont pas d'écran à montrer), ou demande dans le chat (`generate_prototype`). Jamais automatique : après la rédaction, Signal propose l'esquisse seulement pour les stories qui touchent une interface (« Je peux esquisser l'écran de US-014 ? »).
 - **Entrées :** la story (énoncé, règles, critères), la skill `prototype`, le kit `context/jalon/prototype-kit/` (`DESIGN.md`, `tokens.css`, `shell.html` avec un marqueur `<!-- CONTENT -->`, `components.html`), les composants touchés pour situer l'écran.
 - **Sortie :** un fichier HTML autonome (Tailwind par CDN + tokens intégrés) qui montre la fonctionnalité **dans l'écran Jalon concerné**. Interactions simples en JS (états, modale, bascule), nouveaux éléments marqués d'un badge discret « Nouveau », textes réalistes en français, aucune image externe, moins de 60 Ko. Le modèle ne génère que la zone de contenu ; le shell est réutilisé tel quel.
-- **Rendu :** iframe en bac à sable dans le panneau de la story. Stocké dans Supabase Storage, servi par `/proto/[id]`, URL poussée dans la propriété Prototype de Notion.
+- **Rendu :** iframe en bac à sable dans le panneau de la story. Stocké dans Supabase Storage, servi par `/proto/[id]`, URL poussée dans la propriété Prototype de Notion si le prototype existe au moment de l'envoi.
 - **Performance :** cible < 45 s, état de chargement « Signal esquisse l'écran… », une version pré-générée pour la story de démo.
 - **Échec :** HTML invalide, trop lourd ou qui appelle le réseau → une nouvelle tentative avec une consigne plus stricte, puis un message clair (« Je n'arrive pas à esquisser cet écran, voici la story en texte »). Jamais d'iframe vide.
 
@@ -783,7 +781,7 @@ Réponses en streaming, IDs cliquables, suggestions contextuelles par page. **Pa
 
 ### 14.1 Tests unitaires (Vitest)
 
-Tout le code déterministe : scoring (reach, confidence, effort, rice, robustesse, capacité, égalités, ordre des règles MoSCoW), clustering, appariement entre runs, tendance, rattachement client, troncature, `wrapAsData`, chargement des skills et du pack, correction de biais et élargissement de la fourchette d'estimation, mapping Notion, règles de propriété et de conflit, réconciliation. Les tests unitaires n'appellent aucune API externe (modèles, Voyage, Notion) : tout est simulé, la CI tourne sans clés. CI GitHub Actions : lint, typecheck, tests.
+Tout le code déterministe : scoring (reach, confidence, effort, rice, robustesse, capacité, égalités, ordre des règles MoSCoW), clustering, appariement entre runs, tendance, rattachement client, troncature, `wrapAsData`, chargement des skills et du pack, correction de biais et élargissement de la fourchette d'estimation, mapping Notion (propriétés, blocs, découpage). Les tests unitaires n'appellent aucune API externe (modèles, Voyage, Notion) : tout est simulé, la CI tourne sans clés. CI GitHub Actions : lint, typecheck, tests.
 
 ### 14.2 Evals
 
@@ -811,7 +809,7 @@ Deux jeux : le **jeu de développement** (~225 retours, celui de la démo) sert 
 
 ### 14.4 Métrique de production
 
-Calculée depuis `decisions` : part des éléments du backlog validés sans modification, part des MoSCoW recommandés retenus par le PO, nombre de désaccords et de conflits. C'est la mesure de l'utilité réelle de Signal, au-delà des evals.
+Calculée depuis `decisions` : part des éléments du backlog validés sans modification, part des MoSCoW recommandés retenus par le PO, nombre de désaccords. C'est la mesure de l'utilité réelle de Signal, au-delà des evals.
 
 ---
 
@@ -821,7 +819,7 @@ Calculée depuis `decisions` : part des éléments du backlog validés sans modi
 - **Panneau de trace in-app** pour la démo (§12.9).
 - **Coût par run** dans `pipeline_runs`, affiché dans Évals. Le coût d'un run complet est dominé par le triage (volume) et par l'étiquetage et le scoring des insights ; l'estimation, un seul appel structuré mis en cache par insight (§8.4), pèse peu.
 - **Maîtrise des coûts :** prompt caching sur le pack de contexte et les skills, Haiku pour le volume, plafond de dépense dans la console Anthropic. Piste non implémentée : l'API Message Batches pour le triage en masse (asynchrone, moins chère).
-- **Budgets de latence**, vérifiés en répétition : premier token du chat < 3 s ; ajout d'un retour < 15 s ; rédaction du backlog < 30 s ; alerte et dossier d'enquête < 60 s après l'ajout du retour ; prototype < 45 s ; synchronisation Notion < 10 s. Au-delà, le chat montre la progression dans la trace plutôt qu'un écran figé.
+- **Budgets de latence**, vérifiés en répétition : premier token du chat < 3 s ; ajout d'un retour < 15 s ; rédaction du backlog < 30 s ; alerte et dossier d'enquête < 60 s après l'ajout du retour ; prototype < 45 s ; envoi d'un élément dans Notion < 10 s. Au-delà, le chat montre la progression dans la trace plutôt qu'un écran figé.
 
 ---
 
@@ -847,15 +845,14 @@ Variables d'environnement :
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`                                                             | Base (serveur uniquement)                                                          |
 | `DATABASE_URL`                                                                                          | Connexion Postgres (pooler) pour le checkpointer LangGraph                         |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`                                       | Observabilité                                                                      |
-| `NOTION_TOKEN`, `NOTION_PARENT_PAGE_ID`, `NOTION_DS_RETOURS`, `NOTION_DS_INSIGHTS`, `NOTION_DS_BACKLOG` | Notion                                                                             |
-| `NOTION_WEBHOOK_SECRET`                                                                                 | Vérification du webhook (bonus)                                                    |
+| `NOTION_TOKEN`, `NOTION_PARENT_PAGE_ID`, `NOTION_DS_BACKLOG`                                            | Notion                                                                             |
 | `SITE_PASSWORD`                                                                                         | Protection de l'app déployée (Basic Auth)                                          |
 | `APP_BASE_URL`                                                                                          | URL publique de l'app, pour les liens poussés dans Notion (Lien Signal, Prototype) |
 | `CRON_SECRET`                                                                                           | Protection des routes cron                                                         |
 | `MCP_TOKEN`                                                                                             | Accès au serveur MCP (bonus)                                                       |
 | `DEMO_NOW`                                                                                              | Date de référence du scénario (défaut : maintenant)                                |
 
-Sécurité : données entièrement fictives, clés uniquement côté serveur, app protégée par mot de passe, routes cron et webhook protégées par secret, plafond de dépense API.
+Sécurité : données entièrement fictives, clés uniquement côté serveur, app protégée par mot de passe, routes cron et MCP protégées par secret, plafond de dépense API.
 
 ---
 
@@ -866,7 +863,7 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 - Retours non écrits (audio, images).
 - Connecteurs réels vers Zendesk, Intercom ou Gmail (les canaux sont simulés).
 - Multi-utilisateur, authentification, rôles.
-- Synchronisation Notion temps réel parfaite.
+- **Notion au-delà de l'envoi du backlog validé (ADR-026)** : bases Retours et Insights, envoi en masse, synchronisation retour des modifications du PO (champs, corps de page, MoSCoW), propriété des champs et conflits, réconciliation des pages archivées ou créées hors Signal, webhook. Seul le retour du statut existe, en bonus (§11.3).
 - Interface dans une autre langue que le français (les retours en anglais sont traités, §5.3).
 - Apprentissage automatique des préférences du PO.
 
@@ -876,6 +873,7 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 - **Souveraineté :** les modèles sont appelés par une API hors UE ; les options sont une région d'hébergement adaptée, des modèles alternatifs ou l'anonymisation en amont.
 - **Connecteurs réels :** Zendesk, Intercom, Gmail, via leurs API ou des serveurs MCP.
 - **Multi-produit, multi-équipe :** un pack de contexte par produit, des droits d'accès.
+- **Boucle complète avec l'outil de l'équipe :** synchronisation retour des modifications du PO dans Notion (ou Jira, Linear), avec des règles de propriété des champs, la gestion des conflits et la réconciliation des pages archivées. Le journal des décisions y gagnerait les corrections faites après envoi.
 - **Échelle :** le clustering agglomératif convient jusqu'à quelques milliers d'items ; au-delà, un clustering incrémental.
 - **Les retours ne sont qu'une source :** analytics produit, dette technique et paris stratégiques entrent aujourd'hui par les insights manuels (§8.9), pas encore par des connecteurs.
 - **Apprentissage :** le journal des décisions permettrait de recalibrer les recommandations sur les choix réels du PO.
@@ -896,7 +894,7 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 | 3:20  | **Le signal et le bruit**                        | Priorisation : le Gantt devant en mode comptes ; bascule MRR + engagement Atelier Mercure → les permissions passent devant. Override de Léa, re-classement, robustesse. Signal challenge la demande Forgeval (hors stratégie). |
 | 5:30  | **Signal rédige**                                | Dans le chat : « Prépare les stories des permissions. » Trace en direct : skills, carte d'architecture, tickets analogues → une fourchette justifiée, puis epic, stories, Gherkin, points choisis dans la fourchette.                                    |
 | 7:20  | **Visualiser**                                   | Prototype de la story dans l'interface de Jalon.                                                                                                                                                                               |
-| 8:00  | **Valider → Notion**                             | Carte d'approbation → la story apparaît dans le kanban Notion. Léa la modifie dans Notion → synchronisation → journal des décisions.                                                                                           |
+| 8:00  | **Valider → Notion**                             | Carte d'approbation → la story apparaît dans le kanban Notion, colonne « Prêt », corps complet. Dans Signal, elle n'est plus modifiable : « Ouvrir dans Notion ».                                                                                           |
 | 9:00  | **Le fil continu**                               | Coller deux e-mails : le premier rejoint I-01 en silence (+1) ; le second, de Studio Bastide, déclenche une alerte churn : Signal a déjà enquêté et présente son dossier.                                                                                                                                                               |
 | 10:00 | Architecture                                     | Schéma, choix agent unique / workflow, routage et coûts, evals, Langfuse.                                                                                                                                                      |
 | 13:00 | Challenges                                       | Non-déterminisme et scoring hybride ; problème vs solution ; validation humaine en serverless ; injection ; évaluer un livrable subjectif (juge calibré).                                                                      |
@@ -922,7 +920,7 @@ Chaque cas a un traitement, une étape du plan qui l'implémente et une façon d
 | CL-07 | Retour sans compte identifiable                                 | 1 compte sans extrapolation (mode comptes), 0 (mode MRR)                                           | 1.4, 2.2, 2.5                | tests (E7)                |
 | CL-08 | Retour de prospect                                              | Reach 0, visible dans les preuves et la justification                                              | 1.4, 2.2, 2.5                | tests                     |
 | CL-09 | Ironie                                                          | Sentiment correct                                                                                  | 1.2, 1.4, 2.1                | `eval:triage --edge` (E8) |
-| CL-10 | Injection (retour, résultat d'outil, texte modifié dans Notion) | Encapsulation, drapeau, jamais exécutée                                                            | 0.3, 2.1, 4.1, 5.3           | `eval:guardrails`         |
+| CL-10 | Injection (retour, résultat d'outil, contenu relu depuis Notion) | Encapsulation, drapeau, jamais exécutée                                                            | 0.3, 2.1, 4.1                | `eval:guardrails`         |
 
 ### Pipeline
 
@@ -967,13 +965,13 @@ Chaque cas a un traitement, une étape du plan qui l'implémente et une façon d
 
 | ID    | Cas                                                         | Traitement                                            | Étapes | Vérifié par |
 | ----- | ----------------------------------------------------------- | ----------------------------------------------------- | ------ | ----------- |
-| CL-35 | Échec d'envoi                                               | Élément `valide` + `push_error` + « Réessayer »         | 5.2    | test        |
-| CL-36 | Élément modifié dans Signal après envoi                     | Refusé : à modifier dans Notion                       | 5.2    | test        |
-| CL-37 | Page archivée ou supprimée dans Notion                      | Réconciliation : élément `rejete`, décision journalisée | 5.3    | test        |
-| CL-38 | Page créée directement dans Notion                          | Non importée, listée « non suivie »                   | 5.3    | test        |
-| CL-39 | Statut inconnu, points hors Fibonacci                       | Conservés, signalés                                   | 5.3    | test        |
-| CL-40 | Nouvel envoi après re-scoring                               | Seuls les champs de Signal sont mis à jour            | 5.3    | test        |
-| CL-41 | Limites de l'API (débit, texte, blocs, ordre des relations) | Limiteur, découpage, insights envoyés en premier      | 5.1    | tests       |
+| CL-35 | Échec d'envoi                                               | Élément `valide` + `push_error` + « Réessayer »         | 5.1    | test        |
+| CL-36 | Élément modifié dans Signal après envoi                     | Refusé : à modifier dans Notion                       | 5.1    | test        |
+| CL-37 | Page archivée ou supprimée dans Notion                      | Hors périmètre (ADR-026) : non détecté, limite connue (§17.1) | —      | —           |
+| CL-38 | Page créée directement dans Notion                          | Hors périmètre (ADR-026) : ignorée, limite connue (§17.1) | —      | —           |
+| CL-39 | Statut inconnu, points hors Fibonacci                       | Statut inconnu conservé et signalé (bonus) ; points : hors périmètre | 5.2 (bonus) | test        |
+| CL-40 | Nouvel envoi après re-scoring                               | Sans objet : un élément envoyé n'est jamais renvoyé (ADR-026) | —      | —           |
+| CL-41 | Limites de l'API (débit, texte, blocs)                      | Limiteur, nouvelles tentatives sur 429, découpage     | 5.1    | tests       |
 
 ### Prototype, exploitation et démo
 

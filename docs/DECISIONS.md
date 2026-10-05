@@ -369,3 +369,22 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Déclenchement** : `add_feedback` → `deps.onAlerts` démarre les enquêtes tout de suite, en parallèle, gardées en vie par `after()` (le tour de chat continue) ; route incrémentale : idem après la réponse ; cron et `pnpm pipeline:run` : toutes les alertes ouvertes encore `en_cours` (`pendingInvestigations`), ce qui rattrape aussi une enquête perdue. `pipeline:run` passe en `--conditions=react-server` (il importe des requêtes `server-only`).
   - **UI** : une seule carte (`components/alerts/alert-card.tsx`) dans la liste de l'en-tête et dans le chat (alertes nées pendant la conversation, interrogées toutes les 5 s). « Faire l'action proposée » envoie la demande à Signal (`lib/alerts.ts`) : une validation d'insight aboutit à la carte d'approbation `apply_decision`, une rédaction à des brouillons, un CSM à un message que Léa enverra elle-même ; rien n'est écrit sans elle. « Ignorer » et « Faire l'action proposée » sont journalisés (`decisions`, `entity_type = alert`) ; ouvrir le dossier passe l'alerte en `vue`. « En parler à Signal » ajoute `alert_id` au contexte de page : le dossier entre dans le briefing du tour.
 - **Conséquences** : une alerte enrichie par de nouveaux retours (anti-bruit, CL-55) garde son premier dossier. « Prévenir le CSM » et « Rédiger le backlog » ne passent pas par une carte : ils n'écrivent aucune décision (message à copier, brouillons). Le premier dossier d'une série paie l'écriture du cache (~0,04 €), les suivants ~0,02 €.
+
+## ADR-026 — Notion recentré : le backlog validé, dans un seul sens
+
+- **Date** : 2026-10-05
+- **Statut** : acceptée
+- **Contexte** : avant l'étape 5.1, relecture de la phase 5 contre le cas pratique. Le brief ne demande aucune intégration ; ses critères sont la compréhension du métier, la qualité technique (architecture, code, tests), l'expérience, l'exhaustivité et la présentation. La phase 5 prévue (~6 h : bases Retours, Insights et Backlog, envoi en masse, synchronisation retour avec propriété des champs, conflits, réconciliation, webhook) relève de l'ingénierie d'intégration plutôt que de la conception d'agent, pour environ une minute de démo appelée en direct. La phase 6 (tests, evals, juge) répond, elle, à un livrable exigé et à un critère noté.
+- **Décision** :
+  - **Une seule base, Backlog** ; Epic et Insight en propriétés texte (plus de relation, faute de base Insights). Les retours et les insights restent dans Signal.
+  - **Un seul sens, Signal → Notion, à la validation du PO** (`push_to_notion` avec carte d'approbation, ou « Valider et envoyer »). Ce qui compte pour un agent : sa seule écriture externe passe par la validation humaine, avec échec propre (`push_error`, « Réessayer »).
+  - **Un élément envoyé vit dans Notion** : non modifiable dans Signal, jamais renvoyé. Aucun champ ne peut changer des deux côtés, donc aucun conflit à gérer.
+  - **Étapes** : 5.1 + 5.2 fusionnées en 5.1 (~2 h) ; ancienne 5.3 remplacée par une 5.2 bonus (~45 min, après 8.1 et premier élément coupé) qui relit seulement le Statut.
+  - Setup simplifié : si `NOTION_DS_BACKLOG` répond, rien n'est créé ; sinon la base est créée et son ID affiché.
+- **Conséquences** :
+  - Hors périmètre, documentés comme limites connues (SPEC §17) : bases Retours et Insights, envoi en masse, synchronisation des champs et du corps de page, MoSCoW (PO) depuis Notion, réconciliation (CL-37, CL-38), points hors Fibonacci, nouvel envoi après re-scoring (CL-40), webhook. CL-10 ne concerne plus Notion qu'à travers le statut relu en bonus.
+  - Variables `NOTION_DS_RETOURS`, `NOTION_DS_INSIGHTS` et `NOTION_WEBHOOK_SECRET` retirées. Commande `notion:push` retirée.
+  - Schéma inchangé (migrations en ajout seulement) : `modifie_notion`, `notion_sync_state` et les valeurs `retours` / `insights` de `notion_data_source` restent, inutilisés.
+  - Nettoyage à faire en 5.1 : conflits Notion dans les décisions en attente (digest, briefing, contenu du digest), lien Notion du détail d'un retour, exclusion `/api/notion/webhook` du proxy (ADR-001).
+  - Un prototype généré après l'envoi d'une story n'est pas reporté dans Notion.
+  - Gain : ~3 h 15, réaffectées à la qualité (phase 6) et à la démo (phase 8).

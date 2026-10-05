@@ -28,11 +28,11 @@ Les durées sont des estimations prudentes de temps de session ; 👤 signale un
 | 2     | Pipeline d'ingestion                                    | 2.1 → 2.7 | 13 h                           |
 | 3     | Cockpit Signal                                          | 3.1 → 3.6 | 9 h 45                         |
 | 4     | Agent Signal                                            | 4.1 → 4.5 | 12 h 15                        |
-| 5     | Boucle Notion                                           | 5.1 → 5.3 | 6 h                            |
+| 5     | Envoi vers Notion                                       | 5.1 → 5.2 | 2 h + 45 min (bonus)           |
 | 6     | Qualité : tests, evals, juge                            | 6.1 → 6.4 | 8 h 45 + 👤 1 h                |
 | 7     | Prototype et MCP                                        | 7.1 → 7.2 | 4 h 30                         |
 | 8     | Démo et livrables                                       | 8.1 → 8.3 | 5 h 15                         |
-|       | **Total**                                               |           | **~70 h** (dont ~56 h de Cœur) |
+|       | **Total**                                               |           | **~67 h** (dont ~55 h de Cœur) |
 
 ### Points de contrôle
 
@@ -41,14 +41,14 @@ Les durées sont des estimations prudentes de temps de session ; 👤 signale un
 | 1.4   | Le monde de Jalon existe : pack de contexte (dont `architecture.md`), skills, 40 tickets de référence, ~225 retours + ~80 réservés. |
 | 2.6   | `pnpm pipeline:run` tourne de bout en bout ; on retrouve S1 à S7 en base ; un second run garde les mêmes ID d'insights. |
 | 4.3   | Démo minimale possible : digest → insight → priorisation → backlog (epic, stories, bugs) dans le chat.                  |
-| 5.2   | Chaîne complète jusqu'au kanban Notion.                                                                                 |
+| 5.1   | Chaîne complète jusqu'au kanban Notion.                                                                                 |
 | 6.2   | Chiffres de qualité disponibles pour la partie architecture.                                                            |
 | 8.3   | Prêt pour la présentation.                                                                                              |
 
 ### Ligne de coupe et date de gel
 
 - **Gel des fonctionnalités deux jours avant la présentation.** Les deux derniers jours servent aux étapes 8.2 et 8.3, et à rien d'autre.
-- Si le temps manque, couper dans cet ordre : **7.2** → **3.6** → le webhook de **5.3** (garder le polling) → l'enquête de **4.5** (garder les alertes, sans dossier) → **6.4** (montrer `docs/EVALS.md` et Langfuse à la place). Ne pas couper **7.1** ni **6.3** sans réévaluer : ce sont deux des moments les plus forts.
+- Si le temps manque, couper dans cet ordre : **5.2** → **7.2** → **3.6** → l'enquête de **4.5** (garder les alertes, sans dossier) → **6.4** (montrer `docs/EVALS.md` et Langfuse à la place). Ne pas couper **7.1** ni **6.3** sans réévaluer : ce sont deux des moments les plus forts.
 - Un cas limite ne se coupe pas en silence : s'il n'est pas traité, il est documenté dans le README comme limite connue.
 
 ---
@@ -88,7 +88,7 @@ Crée un projet Next.js unique à la racine du repo :
 - Dossiers avec un README d'une ligne : context/jalon/skills, data, evals/ground-truth, evals/holdout, evals/human-labels, evals/reports, docs, scripts, supabase/migrations.
 - docs/BUILD_LOG.md (tableau : date | étape | début | fin | durée | coût LLM | notes) ; docs/DECISIONS.md (gabarit ADR vide).
 - .env.example avec toutes les variables de SPEC §16 (valeurs vides, une ligne de commentaire chacune). .gitignore (env, .next, node_modules).
-- src/proxy.ts (Next.js 16 : ancien middleware) : Basic Auth sur SITE_PASSWORD (désactivée si la variable est vide). Exclusions : /api/cron/*, /api/notion/webhook, /api/mcp (protégées par leur propre secret).
+- src/proxy.ts (Next.js 16 : ancien middleware) : Basic Auth sur SITE_PASSWORD (désactivée si la variable est vide). Exclusions : /api/cron/*, /api/mcp (protégées par leur propre secret).
 - Page d'accueil temporaire « Signal — en construction ».
 - .github/workflows/ci.yml : install, lint, typecheck, test, sur push et pull request, sans aucune clé d'API.
 
@@ -557,7 +557,7 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 ```
 Étape 2.7 — Digest. Lis SPEC §8.8, §12.2, §16 et la skill digest.
 
-1. pipeline/nodes/digest.ts : faits calculés en code sur la période du digest (depuis le digest précédent, ou depuis po_state.last_seen_at si c'est plus ancien ; tendances sur 7 jours glissants) — alertes ouvertes en tête, nouveaux retours par canal (dont ceux qui ont seulement confirmé un sujet connu), insights émergents et nouveaux, mouvements de rang depuis la version précédente (« pas encore d'historique » au premier run), comptes à risque (renouvellement < 90 jours + signal négatif), décisions en attente (nouveaux insights à valider, éléments du backlog à valider, conflits Notion, fusions et scissions d'insights, overrides au contexte modifié). Puis le rôle reasoning rédige le digest avec la voix de Signal : sections fixes, chaque affirmation accompagnée d'ID, 3 recommandations maximum. Stockage dans digests (jsonb + markdown).
+1. pipeline/nodes/digest.ts : faits calculés en code sur la période du digest (depuis le digest précédent, ou depuis po_state.last_seen_at si c'est plus ancien ; tendances sur 7 jours glissants) — alertes ouvertes en tête, nouveaux retours par canal (dont ceux qui ont seulement confirmé un sujet connu), insights émergents et nouveaux, mouvements de rang depuis la version précédente (« pas encore d'historique » au premier run), comptes à risque (renouvellement < 90 jours + signal négatif), décisions en attente (nouveaux insights à valider, éléments du backlog à valider, fusions et scissions d'insights, overrides au contexte modifié). Puis le rôle reasoning rédige le digest avec la voix de Signal : sections fixes, chaque affirmation accompagnée d'ID, 3 recommandations maximum. Stockage dans digests (jsonb + markdown).
 2. Route GET /api/cron/digest protégée par CRON_SECRET : pipeline incrémental sur les retours non traités, puis digest. Cette requête quotidienne garde aussi le projet Supabase actif. vercel.json : cron quotidien à 6 h, heure de Paris, exprimée en UTC ; regions: ["dub1"] pour rapprocher les fonctions de Supabase (eu-west-1), puis remesurer l'incrémental en ligne (budget 15 s, écart noté en 2.6).
 3. CLI : pnpm digest.
 ```
@@ -623,7 +623,7 @@ Tests (API simulée) : fourchette élargie et confiance basse sans analogue proc
 Page d'accueil : le dernier digest, sections dans l'ordre de SPEC §12.2 (alertes ouvertes en tête, avec leur dossier quand il existe), ID cliquables, date de génération, badge du modèle, bouton « Régénérer » (avec confirmation), lien vers le digest précédent.
 - Tendances émergentes et sujets nouveaux : sparkline sur 6 semaines.
 - Comptes à risque : nom, plan, MRR, jours avant renouvellement, santé, insights liés.
-- Décisions en attente : nouveaux insights à valider, éléments du backlog à valider, conflits Notion, fusions et scissions d'insights, overrides au contexte modifié — chacune avec un lien vers l'endroit où la traiter.
+- Décisions en attente : nouveaux insights à valider, éléments du backlog à valider, fusions et scissions d'insights, overrides au contexte modifié — chacune avec un lien vers l'endroit où la traiter.
 - Recommandations : 3 cartes maximum (titre, justification, preuves, bouton « En parler à Signal », désactivé jusqu'à l'étape 4.2).
 - État du premier run : pas de section « Mouvements », mention « pas encore d'historique ».
 - À chaque visite, po_state.last_seen_at est mis à jour.
@@ -653,7 +653,7 @@ Page d'accueil : le dernier digest, sections dans l'ordre de SPEC §12.2 (alerte
 
 - Tableau paginé côté serveur : ID, date relative, canal, compte + plan, résumé, types des items, domaines, insights, badges (churn, injection suspectée, fonctionnalité existante, langue si autre que le français, tronqué, échec d'analyse).
 - Filtres dans l'URL : canal, plan, segment, type, domaine, insight, période, injection, fonctionnalité existante, échec d'analyse ; recherche plein texte simple.
-- Panneau de détail : verbatim complet (rendu comme texte, jamais comme HTML), compte (ou « compte non identifié »), analyse du retour, puis chaque item avec son analyse et son insight, « pourquoi ce classement », lien Notion si existant.
+- Panneau de détail : verbatim complet (rendu comme texte, jamais comme HTML), compte (ou « compte non identifié »), analyse du retour, puis chaque item avec son analyse et son insight, « pourquoi ce classement ».
 - « Ajouter un retour » : modale (canal, compte facultatif, texte) → POST /api/pipeline/incremental → résultat de l'analyse, insights de rattachement ou « sujet à surveiller », durée et coût. Message clair si un run est en cours.
 ```
 
@@ -883,7 +883,7 @@ Tests : rendu d'une réponse contenant du HTML et un ID inexistant.
 Consulte la doc actuelle du middleware human-in-the-loop de LangChain v1 (JS) et de la reprise par Command.
 
 1. Outil apply_decision(kind: override | moscow | validation | insight_review, target, value, reason), soumis à validation (approve / edit / reject). Les valeurs sont validées par lib/scoring/overrides.ts, comme dans l'interface ; une revue d'insight (accepter, reformuler, fusionner, rejeter) passe par services/insight-review.ts (étape 3.4).
-2. Configure le middleware human-in-the-loop pour apply_decision ; prépare la configuration pour push_to_notion (ajouté en 5.2).
+2. Configure le middleware human-in-the-loop pour apply_decision ; prépare la configuration pour push_to_notion (ajouté en 5.1).
 3. Route POST /api/agent/resume {thread_id, decision} : reprise de l'exécution.
 4. UI : carte d'approbation dans le fil (contenu exact en clair ; Valider / Modifier / Refuser ; Modifier ouvre un formulaire prérempli ; Refuser propose une raison). L'issue est journalisée dans decisions.
 5. Nouvel insight pendant la conversation : quand add_feedback fait naître un insight « propose » (file « à surveiller »), Signal le présente et propose une carte d'approbation apply_decision(insight_review) — Accepter / Reformuler / Rejeter. Sans réponse, l'insight reste « propose » et apparaît dans « À valider » : rien ne bloque.
@@ -930,98 +930,69 @@ Test scripté (scripts/chat.ts) : « Passe le Gantt en Must » → objection →
 
 ---
 
-# Phase 5 — Boucle Notion
+# Phase 5 — Envoi vers Notion
 
-### Étape 5.1 — Structure Notion et push en masse
+> **Périmètre réduit (ADR-026).** Le brief ne demande aucune intégration : Notion sert un seul moment de démo, « je valide dans le chat, l'élément apparaît dans le kanban de l'équipe ». Ce qui compte pour un agent, c'est l'écriture externe soumise à validation humaine. Une seule base (Backlog), un seul sens (Signal → Notion). Les bases Retours et Insights, l'envoi en masse, la synchronisation retour, la réconciliation et le webhook sont hors périmètre (SPEC §17).
 
-`[Cœur]` · ~1 h 30
+### Étape 5.1 — Envoi des éléments validés vers Notion
 
-**Objectif** : retours triés et insights visibles dans l'espace de l'équipe.
-**Dépendances** : 2.6.
-**Cas limites** : CL-41.
-
-**Prompt** :
-
-```
-Étape 5.1 — Notion : structure et push en masse. Lis SPEC §11.1, §11.2 et §19 (CL-41).
-Consulte la doc actuelle de l'API Notion (version 2025-09-03 : data sources) et du SDK @notionhq/client.
-
-1. src/services/notion/client.ts : Notion-Version 2025-09-03, limiteur (~3 requêtes/s), retries sur 429 en respectant Retry-After.
-2. scripts/notion-setup.ts : sous NOTION_PARENT_PAGE_ID, crée les bases Retours, Insights et Backlog (propriétés sous initial_data_source ; Statut en select), relations Retours → Insights et Backlog → Insights ; affiche les ID de data sources à copier dans .env. Idempotent. Erreur claire si la page parente n'est pas partagée avec l'intégration.
-3. services/notion/mappers.ts : retour → page Retours, insight → page Insights, élément du backlog → page Backlog avec sa propriété Type (Story, Bug, Tâche) et un corps au format de son type (propriétés + blocs du corps). Textes découpés en morceaux de 2 000 caractères au plus ; corps de page envoyés par lots de 100 blocs au plus ; URLs construites à partir de APP_BASE_URL. Tests unitaires.
-4. scripts/notion-push.ts --insights --feedbacks : toujours les insights d'abord (les relations exigent que la page cible existe) ; upsert via notion_links.
-5. README, section « Notion » : créer l'intégration, partager la page parente, lancer le setup, créer à la main la vue kanban du Backlog groupée par Statut.
-```
-
-**Test** :
-
-- [ ] Les trois bases existent avec les bonnes propriétés.
-- [ ] ~225 retours et les insights sont dans Notion, reliés entre eux.
-- [ ] Relancer le push ne crée aucun doublon ; un texte de plus de 2 000 caractères passe sans erreur.
-
-**Commit** : `feat(notion): workspace setup and bulk push`
-
----
-
-### Étape 5.2 — Envoi des éléments validés
-
-`[Cœur]` · ~1 h 30
+`[Cœur]` · ~2 h
 
 **Objectif** : le moment où un élément validé apparaît dans le kanban de l'équipe — et un comportement propre quand Notion ne répond pas.
-**Dépendances** : 4.4, 5.1.
-**Cas limites** : CL-35, CL-36.
+**Dépendances** : 4.4.
+**Cas limites** : CL-35, CL-36, CL-41.
 
 **Prompt** :
 
 ```
-Étape 5.2 — Envoi des éléments validés. Lis SPEC §7 (cycle de vie d'un élément du backlog), §9, §10.6, §11.2 et §19 (CL-35, CL-36).
+Étape 5.1 — Envoi des éléments validés vers Notion. Lis SPEC §7 (cycle de vie d'un élément du backlog), §9, §10.6, §11 et §19 (CL-35, CL-36, CL-41). Lis ADR-026.
+Consulte la doc actuelle de l'API Notion (version 2025-09-03 : data sources) et du SDK @notionhq/client (retries intégrés ou non).
 
-1. Outil push_to_notion(item_ids), soumis à validation ; la carte d'approbation montre le rendu Notion de chaque élément (story, bug ou tâche).
-2. Bouton « Valider et envoyer » sur l'écran Backlog : modale de confirmation, même service.
-3. services/notion/push-backlog.ts : l'élément passe en « valide », puis l'envoi crée la page Backlog (Type, Statut = Prêt ; l'epic éventuelle dans la propriété Epic), relie l'insight (envoyé d'abord s'il ne l'est pas), écrit notion_links, passe l'élément en « envoye », journalise une décision « validation ». En cas d'échec : l'élément reste « valide », l'erreur va dans push_error, l'écran affiche « Réessayer ».
-4. Un élément envoyé devient non modifiable dans Signal : « Ouvrir dans Notion » remplace « Modifier ».
+1. src/services/notion/client.ts : Notion-Version 2025-09-03 ; limiteur (~3 requêtes/s) ; nouvelles tentatives sur 429 en respectant Retry-After (celles du SDK si elles existent).
+2. scripts/notion-setup.ts (pnpm notion:setup) : si NOTION_DS_BACKLOG est défini et répond, ne fait rien ; sinon crée la base Backlog sous NOTION_PARENT_PAGE_ID (propriétés sous initial_data_source ; Type et Statut en select) et affiche l'ID du data source à copier dans .env. Erreur claire si la page parente n'est pas partagée avec l'intégration.
+3. src/services/notion/mappers.ts (pur, testé) : élément du backlog → propriétés de la page Backlog + blocs du corps au format de son type (story : règles, Gherkin, KPI, preuves ; bug : attendu, constaté, reproduction, sévérité, preuves ; tâche : objectif, définition de terminé, preuves). Insight en propriété texte (ID, titre, lien Signal). Textes découpés en morceaux de 2 000 caractères au plus ; corps envoyés par lots de 100 blocs au plus ; URLs construites à partir de APP_BASE_URL.
+4. src/services/notion/push-backlog.ts : un élément « valide » est envoyé → page créée (Type, Statut = Prêt, Epic, MoSCoW, Points, Énoncé, Insight, Lien Signal, Validé le), notion_links écrit (notion_page_id, last_pushed_at, last_edited_time), notion_page_id sur l'élément, statut « envoye », décision « validation » journalisée. Un élément déjà lié n'est jamais recréé. En cas d'échec : l'élément reste « valide », l'erreur va dans push_error.
+5. Outil push_to_notion(item_ids), soumis à validation (middleware déjà configuré en 4.4) ; la carte d'approbation montre le rendu Notion de chaque élément.
+6. Écran Backlog : bouton « Valider et envoyer » (modale de confirmation, même service) ; « Réessayer » si push_error ; un élément envoyé n'est plus modifiable : « Ouvrir dans Notion » remplace « Modifier ».
+7. Nettoyage du périmètre réduit : retirer les conflits Notion des décisions en attente (digest, briefing, contenu du digest et leurs tests), le lien Notion du détail d'un retour et l'exclusion /api/notion/webhook du proxy.
+8. README, section « Notion » : créer l'intégration, partager la page parente, lancer le setup, créer à la main la vue kanban groupée par Statut.
 ```
 
 **Test** :
 
+- [ ] `pnpm notion:setup` crée la base Backlog avec les bonnes propriétés ; relancé, il ne crée rien.
 - [ ] Depuis le chat comme depuis l'écran : validation → l'élément apparaît dans le kanban Notion, colonne « Prêt », avec son Type.
 - [ ] Le corps de page d'une story contient l'énoncé, les règles, le Gherkin, le KPI et les preuves ; celui d'un bug, l'attendu, le constaté, la reproduction, la sévérité et les preuves.
+- [ ] Un texte de plus de 2 000 caractères passe sans erreur ; renvoyer un élément déjà envoyé ne crée pas de doublon.
 - [ ] Avec un jeton Notion invalide, l'élément reste « valide » avec l'erreur et le bouton « Réessayer ».
 
 **Commit** : `feat(notion): validated backlog push with human approval and retry`
 
 ---
 
-### Étape 5.3 — Synchronisation Notion → Signal
+### Étape 5.2 — Retour du statut depuis Notion
 
-`[Signature]` · ~3 h
+`[Bonus]` · ~45 min · **seulement après 8.1, s'il reste du temps** (premier élément coupé)
 
-**Objectif** : quand Léa modifie un élément du backlog dans Notion, Signal le sait, et l'apprend — y compris quand elle supprime une page ou invente une colonne.
-**Dépendances** : 5.2.
-**Cas limites** : CL-10, CL-37, CL-38, CL-39, CL-40.
+**Objectif** : déplacer une carte dans le kanban Notion se voit dans Signal.
+**Dépendances** : 5.1.
+**Cas limites** : CL-39 (statut inconnu seulement).
 
 **Prompt** :
 
 ```
-Étape 5.3 — Synchronisation Notion → Signal. Lis SPEC §11.3, §11.4 et §19 (cas limites de l'étape) en entier.
+Étape 5.2 — Retour du statut depuis Notion. Lis SPEC §11.3.
 
-1. src/services/notion/sync.ts (logique pure, testée) : compare une page Notion et l'état de Signal ; applique les règles de propriété des champs ; détecte les conflits ; gère les valeurs imprévues (statut inconnu → notion_status_raw, points hors Fibonacci → acceptés et signalés) ; produit les changements et un rapport (appliqués, ignorés, conflits, pages non suivies, pages disparues).
-2. Polling : route POST /api/notion/sync — data sources Backlog ET Insights filtrés sur last_edited_time ≥ curseur ; corps de page (blocs → markdown) relu s'il a changé et traité comme une donnée (wrapExternal) ; un MoSCoW (PO) modifié sur une page Insights devient l'override moscow ; mises à jour des éléments du backlog (edited_in_notion, statut modifie_notion, Type modifié par le PO), decisions (actor po, source notion), notion_sync_state.
-3. Réconciliation : chaque élément lié est relu ; page archivée ou supprimée → élément « rejete » + décision journalisée ; page du Backlog créée hors Signal → listée « non suivie », non importée.
-4. Nouvel envoi après re-scoring : seuls les champs de Signal sont mis à jour, jamais ceux du PO.
-5. UI : bouton « Synchroniser Notion » + rafraîchissement automatique toutes les 30 s sur /backlog ; badge « Modifié dans Notion » ; toast résumant le rapport.
-6. Bonus — webhook : route POST /api/notion/webhook ; vérification de la signature (doc Notion) ; traitement de page.properties_updated et page.content_updated ; événements dont l'auteur est l'intégration ignorés ; relecture de la page puis même logique de sync. Création de l'abonnement documentée dans le README.
-Tests : champ du PO modifié dans Notion → appliqué ; champ de Signal modifié dans Notion → ignoré et signalé ; conflit → Notion gagne + décision « conflit » ; page inchangée → ignorée ; page archivée → élément rejeté ; statut « Bloqué » → conservé et signalé ; points = 4 → acceptés et signalés ; re-push → champs du PO intacts.
+1. src/services/notion/sync-status.ts (pur, testé) : Statut d'une page Notion → statut Notion de l'élément ; statut inconnu (par exemple « Bloqué ») conservé tel quel dans notion_status_raw et signalé.
+2. Bouton « Synchroniser Notion » sur /backlog : relit les pages des éléments envoyés, met à jour notion_status_raw, journalise une décision (actor po, source notion) pour chaque statut changé ; toast résumant le nombre de changements.
 ```
 
 **Test** :
 
-- [ ] Déplacer un élément dans le kanban Notion puis « Synchroniser » → statut mis à jour dans Signal, décision journalisée.
-- [ ] Modifier un critère d'acceptation dans Notion → badge « Modifié dans Notion », texte à jour.
-- [ ] Archiver une page dans Notion → l'élément passe en « rejete » après synchronisation.
-- [ ] Tests de `sync.ts` verts.
+- [ ] Déplacer un élément dans le kanban Notion puis « Synchroniser » → statut visible dans Signal, décision journalisée.
+- [ ] Une colonne « Bloqué » ajoutée dans Notion est affichée telle quelle.
 
-**Commit** : `feat(notion): two-way sync, reconciliation and conflict log`
+**Commit** : `feat(notion): pull backlog status from Notion`
 
 ---
 
@@ -1039,7 +1010,7 @@ Tests : champ du PO modifié dans Notion → appliqué ; champ de Signal modifi�
 ```
 Étape 6.1 — Tests unitaires et CI. Lis SPEC §14.1 et §10.7.
 
-- Complète la couverture du code déterministe de SPEC §14.1 ; objectif 100 % pour lib/scoring, lib/clustering, pipeline/nodes/match.ts et services/notion/sync.ts.
+- Complète la couverture du code déterministe de SPEC §14.1 ; objectif 100 % pour lib/scoring, lib/clustering, pipeline/nodes/match.ts et services/notion/mappers.ts.
 - Aucun test n'appelle une API réelle (modèles, Voyage, Notion) : vérifie que la CI passe sans aucune variable d'environnement secrète.
 - Garde « données d'évaluation » : règle ESLint no-restricted-imports sur src + test qui vérifie qu'aucun fichier de src ne référence evals/ground-truth ni evals/holdout.
 - CI : lint, typecheck, tests, rapport de couverture en artefact. Badge CI dans le README.
@@ -1169,7 +1140,7 @@ Le badge qualité de l'écran Backlog utilise désormais ce juge.
 2. Route GET /proto/[id] : sert le HTML avec une CSP stricte.
 3. Outil generate_prototype(item_id) pour l'agent, réservé aux stories (refus explicite pour un bug ou une tâche).
 4. Écran Backlog : bouton « Visualiser » sur les stories → « Signal esquisse l'écran… » → iframe sandbox="allow-scripts" (sans allow-same-origin), agrandissable en plein écran ; bouton « Régénérer » avec consigne libre.
-5. Push Notion : propriété Prototype = APP_BASE_URL + /proto/[id].
+5. Mapper Notion (5.1) : propriété Prototype = APP_BASE_URL + /proto/[id] si un prototype existe au moment de l'envoi (une page déjà envoyée n'est pas mise à jour, ADR-026).
 6. Pré-génère le prototype de la story de démo et versionne-le dans data/demo/.
 ```
 
@@ -1255,7 +1226,7 @@ Consulte la doc actuelle du SDK MCP TypeScript et de l'adaptateur MCP pour Next.
 Étape 8.2 — Documentation. Lis SPEC en entier, docs/DECISIONS.md et docs/BUILD_LOG.md.
 
 1. README.md : pitch en 5 lignes, captures (fournies dans docs/img/), lien vers la démo déployée (mot de passe communiqué à part), installation pas à pas (comptes, variables, migrations, seed, pipeline, Notion), commandes, structure, tests et evals, limites connues (SPEC §17.2 et cas limites non traités s'il y en a).
-2. docs/ARCHITECTURE.md : schéma global (Mermaid), graphe du pipeline, agent et outils, flux de validation humaine, boucle Notion, routage des modèles et coûts mesurés, budgets de latence mesurés.
+2. docs/ARCHITECTURE.md : schéma global (Mermaid), graphe du pipeline, agent et outils, flux de validation humaine, envoi vers Notion, routage des modèles et coûts mesurés, budgets de latence mesurés.
 3. docs/DECISIONS.md : ADR 001 à 012 de SPEC §6.5, format court (contexte, décision, alternatives écartées, conséquences).
 4. docs/EVALS.md : régénéré.
 5. docs/DEMO_SCRIPT.md : trame minute par minute (SPEC §18), phrases clés, clics exacts, et un plan B pour chaque moment (SPEC §18, « Plans B »).

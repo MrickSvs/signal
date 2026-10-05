@@ -5,7 +5,8 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 4 (agent) en cours** : 4.1 à 4.4 faites — agent, chat et trace en direct, rédaction du backlog (stories, bugs, tâches estimés par analogie), validation humaine des décisions (carte d'approbation, challenge, revue des insights proposés). Prochaine étape : 4.5 (alertes et enquêtes).
+- **Phase 5 recentrée (ADR-026)** : Notion se limite à l'envoi du backlog validé, dans un seul sens (une base Backlog). Prochaine étape : 5.1 (envoi des éléments validés vers Notion).
+- **Phase 4 (agent) terminée** : 4.1 à 4.5 faites — agent, chat et trace en direct, rédaction du backlog (stories, bugs, tâches estimés par analogie), validation humaine des décisions (carte d'approbation, challenge, revue des insights proposés), alertes et enquêtes en lecture seule.
 - **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
@@ -55,6 +56,11 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Validation humaine** : un refus de carte est journalisé par la route de reprise (le middleware n'exécute pas l'outil refusé) ; écrire au lieu de répondre abandonne la carte sans rien appliquer. L'ordre des middlewares compte : les hooks `afterModel` s'exécutent en ordre inverse, le HITL est placé avant le budget et la trace pour que le coût soit compté avant la pause. → ADR-024
 - **Valeurs envoyées en texte** : le modèle peut envoyer « 50 » ou « 50 % » pour une Confidence ; le contrôle les convertit avant de les vérifier sur l'échelle (`d1a95cf`).
 - **Rechargement à chaud en dev** : l'agent est gardé dans `globalThis` ; après un rechargement, une classe rechargée ne passe plus `instanceof`. Le contexte du tour est vérifié par sa forme (`1a98513`). Redémarrer `pnpm dev` après une modification de l'agent (prompt, outils) reste nécessaire pour qu'elle soit prise en compte.
+
+## [Plan] Notion recentré — 2026-10-05
+
+- Phase 5 réduite de ~6 h à ~2 h + 45 min de bonus : une seule base Notion (Backlog), envoi à la validation du PO, sans synchronisation retour (ADR-026).
+- PLAN (phase 5, ligne de coupe, durées), SPEC (§3, §6, §7, §9, §10, §11, §12, §14 à §19), CLAUDE.md, skill digest et `.env.example` mis à jour.
 
 ## [4.4] Validation humaine et challenge — 2026-10-05
 
