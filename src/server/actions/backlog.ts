@@ -19,6 +19,7 @@ import {
   type UpdateResult,
 } from "@/services/backlog";
 import { EstimationError } from "@/services/estimate";
+import { pushBacklogItems, type PushResult } from "@/services/notion/push-backlog";
 
 // The Backlog and Insight screens share the agent's service (SPEC §12.6, PLAN 4.3): a drafting
 // from the « Rédiger le backlog » button, the PO's edits and changes of type (source signal_ui).
@@ -108,4 +109,20 @@ export async function changeBacklogItemKindAction(
     refresh(null);
     return result;
   }, "Le changement de type a échoué. Réessaie.");
+}
+
+/**
+ * « Valider et envoyer » / « Réessayer » (SPEC §11.2): the confirmation dialog is Léa's approval.
+ * A Notion failure is not an action failure: the item stays « valide » with its push_error.
+ */
+export async function pushBacklogItemAction(id: string): Promise<BacklogActionResult<PushResult>> {
+  return guarded(async () => {
+    const [result] = await pushBacklogItems(getDb(), [id], {
+      now: getDemoNow(),
+      source: "signal_ui",
+      withLock: (fn) => withPipelineLock(fn),
+    });
+    refresh(null);
+    return result;
+  }, "L'envoi n'a pas pu être lancé. Réessaie.");
 }

@@ -241,6 +241,7 @@ describe("tools", () => {
       "draft_backlog_items",
       "update_backlog_item",
       "apply_decision",
+      "push_to_notion",
     ]);
     const read = readTools(real as unknown as AgentDeps).map((t) => t.name);
     for (const writer of [
@@ -248,6 +249,7 @@ describe("tools", () => {
       "draft_backlog_items",
       "update_backlog_item",
       "apply_decision",
+      "push_to_notion",
     ]) {
       expect(read).not.toContain(writer);
     }

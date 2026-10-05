@@ -58,6 +58,7 @@ export type BacklogViewItem = Pick<
   | "evidence"
   | "dependencies"
   | "notion_page_id"
+  | "push_error"
 > & {
   business_rules: string[];
   repro_steps: string[];
@@ -195,6 +196,7 @@ export async function getBacklogScreen(
     evidence: r.evidence,
     dependencies: r.dependencies,
     notion_page_id: r.notion_page_id,
+    push_error: r.push_error,
     business_rules: strings(r.business_rules),
     repro_steps: strings(r.repro_steps),
     definition_of_done: strings(r.definition_of_done),

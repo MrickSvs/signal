@@ -124,14 +124,6 @@ export function pendingDecisions(pending: DigestFacts["pending"]): PendingDecisi
       action: "Ouvrir le backlog",
       ids: pending.backlog_to_validate,
     });
-  if (pending.notion_conflicts.length)
-    rows.push({
-      key: "notion",
-      label: `${plural(pending.notion_conflicts.length, "conflit", "conflits")} Notion`,
-      href: "/backlog?conflits=notion",
-      action: "Résoudre",
-      ids: pending.notion_conflicts,
-    });
   for (const m of pending.merges)
     rows.push({
       key: `fusion-${m.from}-${m.into}`,

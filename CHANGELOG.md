@@ -5,7 +5,8 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 5 recentrée (ADR-026)** : Notion se limite à l'envoi du backlog validé, dans un seul sens (une base Backlog). Prochaine étape : 5.1 (envoi des éléments validés vers Notion).
+- **Phase 5 (Notion) faite** : 5.1 faite — envoi des éléments validés dans le kanban Notion, depuis le chat (carte d'approbation) ou l'écran Backlog, dans un seul sens (ADR-026, ADR-027). Le bonus 5.2 (retour du statut) attend la fin de 8.1. Prochaine étape : 6.1 (tests unitaires et CI).
+- Notion : page « Jalon — Produit (Signal) », base Backlog et vue Kanban créées ; US-015 et BUG-002 (insight I-50) envoyés pendant les essais.
 - **Phase 4 (agent) terminée** : 4.1 à 4.5 faites — agent, chat et trace en direct, rédaction du backlog (stories, bugs, tâches estimés par analogie), validation humaine des décisions (carte d'approbation, challenge, revue des insights proposés), alertes et enquêtes en lecture seule.
 - **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
@@ -56,6 +57,17 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Validation humaine** : un refus de carte est journalisé par la route de reprise (le middleware n'exécute pas l'outil refusé) ; écrire au lieu de répondre abandonne la carte sans rien appliquer. L'ordre des middlewares compte : les hooks `afterModel` s'exécutent en ordre inverse, le HITL est placé avant le budget et la trace pour que le coût soit compté avant la pause. → ADR-024
 - **Valeurs envoyées en texte** : le modèle peut envoyer « 50 » ou « 50 % » pour une Confidence ; le contrôle les convertit avant de les vérifier sur l'échelle (`d1a95cf`).
 - **Rechargement à chaud en dev** : l'agent est gardé dans `globalThis` ; après un rechargement, une classe rechargée ne passe plus `instanceof`. Le contexte du tour est vérifié par sa forme (`1a98513`). Redémarrer `pnpm dev` après une modification de l'agent (prompt, outils) reste nécessaire pour qu'elle soit prise en compte.
+
+## [5.1] Envoi des éléments validés vers Notion — 2026-10-05
+
+ADR-027
+
+- `services/notion` : client (API `2025-09-03`, limiteur à ~3 requêtes/s, retries du SDK sur 429 avec `Retry-After`), mappers purs (propriétés et corps par type, découpage à 2 000 caractères et par lots de 100 blocs, CL-41), service d'envoi (`push-backlog.ts`) : un brouillon est validé par le clic, la page naît « Prêt », lien, statut « envoyé » et décision journalisés ; échec → l'élément reste « validé » avec `push_error` (CL-35) ; jamais de seconde page.
+- `pnpm notion:setup` : crée la base Backlog et sa vue Kanban groupée par Statut, ou ne fait rien si elle existe (propriétés manquantes ajoutées).
+- Outil `push_to_notion` (15ᵉ outil) sous validation humaine : la carte montre le rendu de chaque page ; un refus est journalisé par élément.
+- Écran Backlog : « Valider et envoyer » (modale), « Réessayer » avec l'erreur, « Ouvrir dans Notion » pour un élément envoyé, qui ne se modifie plus dans Signal (CL-36).
+- Nettoyage de l'ADR-026 : conflits Notion retirés du digest et du briefing, lien Notion retiré des retours, route webhook retirée du proxy.
+- Vérifié en réel : setup (base, vue, relance sans effet) ; US-015 avec un jeton invalide → « validé » + erreur, puis réessai → page dans Notion, relance sans doublon ; chat « Envoie BUG-002 dans Notion » → carte avec aperçu → validation → page « Prêt » en 6 s.
 
 ## [Plan] Notion recentré — 2026-10-05
 

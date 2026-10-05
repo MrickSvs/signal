@@ -147,7 +147,6 @@ const facts = (f: Partial<DigestFacts> = {}): DigestFacts => ({
   pending: {
     insights_to_validate: ["I-12"],
     backlog_to_validate: [],
-    notion_conflicts: [],
     merges: [{ from: "I-05", into: "I-02" }],
     splits: [],
     overrides_context_changed: [],

@@ -10,12 +10,14 @@ import { listSkills } from "@/lib/skills";
 import {
   checkCardDecisions,
   danglingToolResults,
+  describePush,
   toHitlResponse,
   toPendingApproval,
   UNANSWERED_CARD,
   type PendingApproval,
 } from "./approval";
 import { createSignalAgent, pendingApproval, turnMessages } from "./index";
+import { pushToNotionSchema } from "./tools/push-to-notion";
 import { signalTool, type AgentDeps, type TurnContext } from "./tools/shared";
 
 const pack = await loadContextPack();
@@ -188,9 +190,74 @@ const approval: PendingApproval = {
       allowed: ["approve", "edit", "reject"],
       target_title: null,
       target_statement: null,
+      preview: null,
     },
   ],
 };
+
+describe("human-in-the-loop on push_to_notion (SPEC §11.2)", () => {
+  it("never sends before Léa's click: the card shows what goes to Notion", async () => {
+    const sent: unknown[] = [];
+    const tool = signalTool(
+      {
+        name: "push_to_notion",
+        summary: "Test.",
+        when: "test",
+        notWhen: "jamais",
+        schema: pushToNotionSchema,
+      },
+      async (input) => {
+        sent.push(input);
+        return [{ element: "US-004", envoye: true }];
+      },
+    );
+    const model = new ScriptedModel((messages, call) =>
+      ToolMessage.isInstance(messages.at(-1))
+        ? new AIMessage("Envoyé.")
+        : new AIMessage({
+            content: "",
+            tool_calls: [
+              { id: `call-${call}`, name: "push_to_notion", args: { item_ids: ["US-004"] } },
+            ],
+          }),
+    );
+    const agent = createSignalAgent({
+      deps: { pack } as unknown as AgentDeps,
+      skills,
+      checkpointer: new MemorySaver(),
+      model,
+      summaryModel: model,
+      tools: [tool],
+    });
+    const config = {
+      configurable: { thread_id: "n" },
+      context: { threadId: "n", runCost: new RunCost(), page: null } satisfies TurnContext,
+      recursionLimit: 100,
+    };
+    await agent.invoke({ messages: turnMessages("Envoie US-004 dans Notion", "b") }, config);
+    expect(sent).toHaveLength(0);
+    const pending = await pendingApproval(agent, "n");
+    expect(pending?.approval.actions).toMatchObject([
+      {
+        tool: "push_to_notion",
+        description: "Envoyer US-004 dans le kanban Notion (colonne « Prêt »)",
+        allowed: ["approve", "reject"],
+      },
+    ]);
+    await agent.invoke(
+      new Command({ resume: toHitlResponse(pending!.approval, [{ type: "approve" }], [null]) }),
+      config,
+    );
+    expect(sent).toEqual([{ item_ids: ["US-004"] }]);
+  });
+
+  it("describes the push in plain words", () => {
+    expect(describePush({ item_ids: ["US-004", "BUG-002"] })).toBe(
+      "Envoyer US-004, BUG-002 dans le kanban Notion (colonne « Prêt »)",
+    );
+    expect(describePush({})).toMatch(/ces éléments/);
+  });
+});
 
 describe("approval helpers", () => {
   it("reads the card from the middleware's interrupt", () => {

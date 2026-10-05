@@ -13,30 +13,20 @@ export type FeedbackEvidence = Pick<
   "id" | "channel" | "received_at" | "subject" | "raw_text" | "truncated" | "author_name"
 > & {
   customer: Pick<Tables<"customers">, "id" | "name" | "plan" | "status" | "health"> | null;
-  notion_page_id: string | null;
 };
 
 export async function getFeedbackEvidence(db: Db, id: string): Promise<FeedbackEvidence | null> {
-  const [feedback, link] = await Promise.all([
-    db
-      .from("feedbacks")
-      .select(
-        "id, channel, received_at, subject, raw_text, truncated, author_name, customers(id, name, plan, status, health)",
-      )
-      .eq("id", id)
-      .maybeSingle(),
-    db
-      .from("notion_links")
-      .select("notion_page_id")
-      .eq("data_source", "retours")
-      .eq("entity_id", id)
-      .maybeSingle(),
-  ]);
+  const feedback = await db
+    .from("feedbacks")
+    .select(
+      "id, channel, received_at, subject, raw_text, truncated, author_name, customers(id, name, plan, status, health)",
+    )
+    .eq("id", id)
+    .maybeSingle();
   if (feedback.error) throw new Error(`Lecture du retour ${id} (${feedback.error.message})`);
-  if (link.error) throw new Error(`Lecture du lien Notion de ${id} (${link.error.message})`);
   if (!feedback.data) return null;
   const { customers, ...rest } = feedback.data;
-  return { ...rest, customer: customers, notion_page_id: link.data?.notion_page_id ?? null };
+  return { ...rest, customer: customers };
 }
 
 export type InsightPreview = Pick<

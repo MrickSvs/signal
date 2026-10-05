@@ -609,13 +609,13 @@ Quinze outils, chacun avec un contrat : quand l'utiliser, quand ne pas l'utilise
 | `update_backlog_item` | Modifier un brouillon ou changer son type | Élément déjà envoyé (« à modifier dans Notion ») | `id`, `patch` ou `kind` → élément mis à jour | interne |
 | `generate_prototype` | Esquisser l'écran d'une story qui touche une interface, à la demande du PO | Bug, tâche, story sans écran ; jamais de sa propre initiative | `story_id`, `consigne?` → URL du prototype ou message d'échec clair | interne |
 | `apply_decision` | Enregistrer une décision exprimée dans le chat : override, MoSCoW, validation d'un élément, revue d'un insight proposé, sujet manuel | Simulation (→ `get_priority`) | `kind`, `target`, `value`, `reason` → décision journalisée | interne · **validation PO** |
-| `push_to_notion` | Envoyer des éléments validés dans le backlog Notion | Éléments en brouillon | `item_ids` → pages créées, erreurs par élément | **externe** · **validation PO** |
+| `push_to_notion` | Envoyer des éléments du backlog dans le kanban Notion, à la demande du PO ; son clic valide aussi un brouillon | Valider sans envoyer (→ `apply_decision`) ; élément rejeté ; de sa propre initiative | `item_ids` → pages créées (ou déjà envoyées), erreurs par élément | **externe** · **validation PO** |
 
 **Outils disponibles selon l'entrée.** Dans le chat : les quinze. Pendant une enquête sur une alerte (§10.10) : les outils de lecture, `estimate_complexity` et `load_skill` seulement ; aucun outil qui écrit.
 
 ### 10.6 Validation humaine (human-in-the-loop)
 
-Les outils `apply_decision` et `push_to_notion` déclenchent une pause (middleware human-in-the-loop). Le chat affiche une carte d'approbation avec le contenu exact : **Valider** / **Modifier** / **Refuser** (raison facultative, journalisée). L'exécution reprend là où elle s'était arrêtée grâce au checkpointer. Le bouton « Valider et envoyer » de l'écran Backlog suit le même chemin.
+Les outils `apply_decision` et `push_to_notion` déclenchent une pause (middleware human-in-the-loop). Le chat affiche une carte d'approbation avec le contenu exact (pour un envoi, le rendu de chaque page Notion) : **Valider** / **Modifier** / **Refuser** (raison facultative, journalisée ; pas de « Modifier » pour un envoi). L'exécution reprend là où elle s'était arrêtée grâce au checkpointer. Le bouton « Valider et envoyer » de l'écran Backlog suit le même chemin.
 
 ### 10.7 Garde-fous
 

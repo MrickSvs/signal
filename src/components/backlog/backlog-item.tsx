@@ -6,6 +6,7 @@ import { BACKLOG_STATUS_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { BacklogViewItem, JudgeBadge } from "@/server/queries/backlog";
 import { BacklogItemActions } from "./item-actions";
+import { NotionLink, PushButton } from "./push-button";
 
 const SEVERITY_LABELS = { bloquant: "Bloquant", majeur: "Majeur", mineur: "Mineur" } as const;
 
@@ -231,14 +232,26 @@ export function BacklogItemCard({
         )}
       </div>
 
-      {item.status === "brouillon" ? (
-        <BacklogItemActions item={item} />
-      ) : (
-        (item.status === "envoye" || item.status === "modifie_notion") && (
-          <p className="text-[13px] text-muted-foreground">
+      {item.status === "valide" && item.push_error && (
+        <p role="alert" className="flex items-start gap-1.5 text-[13px] text-destructive">
+          <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+          Envoi vers Notion en échec : {item.push_error}
+        </p>
+      )}
+      {item.status === "brouillon" && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <PushButton item={item} />
+          <BacklogItemActions item={item} />
+        </div>
+      )}
+      {item.status === "valide" && <PushButton item={item} />}
+      {(item.status === "envoye" || item.status === "modifie_notion") && (
+        <div className="flex flex-wrap items-center gap-2">
+          {item.notion_page_id && <NotionLink pageId={item.notion_page_id} />}
+          <span className="text-[13px] text-muted-foreground">
             Envoyé dans Notion : il se modifie dans Notion.
-          </p>
-        )
+          </span>
+        </div>
       )}
     </article>
   );

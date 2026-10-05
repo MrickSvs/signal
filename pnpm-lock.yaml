@@ -196,6 +196,9 @@ importers:
       '@langfuse/tracing':
         specifier: ^5.11.1
         version: 5.11.1(@opentelemetry/api@1.9.1)
+      '@notionhq/client':
+        specifier: 5.27.0
+        version: 5.27.0
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -1136,6 +1139,10 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@notionhq/client@5.27.0':
+    resolution: {integrity: sha512-JnkLtAzSDrEnvtZ8dQ5L4KO+xyL5g01xK5qmKTmhJ5KFY8LWsMyFG033vHCj0mFcsz9thAMjfcAQz/SWxiexag==}
+    engines: {node: '>=18'}
 
   '@opentelemetry/api-logs@0.222.0':
     resolution: {integrity: sha512-9mb1If+IF6u0ZVXkHQ6ogEae5HwA6ajIVUgpSDQyRASxft6BSXHvBvPooRle3yFN/fKnCdSOnuu0OC3PLcF6+g==}
@@ -5459,6 +5466,8 @@ snapshots:
       fastq: 1.20.3
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@notionhq/client@5.27.0': {}
 
   '@opentelemetry/api-logs@0.222.0':
     dependencies:

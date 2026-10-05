@@ -11,6 +11,7 @@ import { wrapExternal } from "@/lib/llm/data";
 import type { ModelRole } from "@/lib/llm/models";
 import type { BacklogDeps } from "@/services/backlog";
 import type { EstimateDeps } from "@/services/estimate";
+import type { PushDeps } from "@/services/notion/push-backlog";
 import type { IncrementalContext } from "@/pipeline/incremental";
 
 /** At most 10 items per list, 5 verbatims per insight (SPEC §10.5). */
@@ -35,6 +36,8 @@ export type AgentDeps = {
   background?: (task: () => Promise<void>) => void;
   /** Alerts created by add_feedback: their investigations start in the background (§10.10). */
   onAlerts?: (alertIds: string[]) => void;
+  /** Injected in tests: a fake Notion (default: the environment's). */
+  notion?: Pick<PushDeps, "notion" | "config">;
 };
 
 export function isRunCost(value: unknown): value is RunCost {

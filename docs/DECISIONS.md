@@ -388,3 +388,17 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Nettoyage à faire en 5.1 : conflits Notion dans les décisions en attente (digest, briefing, contenu du digest), lien Notion du détail d'un retour, exclusion `/api/notion/webhook` du proxy (ADR-001).
   - Un prototype généré après l'envoi d'une story n'est pas reporté dans Notion.
   - Gain : ~3 h 15, réaffectées à la qualité (phase 6) et à la démo (phase 8).
+
+## ADR-027 — Envoi vers Notion : retries du SDK, vue kanban par API, clic qui valide
+
+- **Date** : 2026-10-05
+- **Statut** : acceptée
+- **Contexte** : étape 5.1 (SPEC §11, CL-35, CL-36, CL-41, ADR-026). Sources installées lues : `@notionhq/client` 5.27.0 (version d'API par défaut `2025-09-03`, option `retry` avec respect de `Retry-After` sur 429 et 5xx, `views.create` avec configuration `board`, `pages.create` sous `data_source_id`, `pages.update({ in_trash })`).
+- **Décision** :
+  - **Client** (`services/notion/client.ts`) : retries du SDK (3 tentatives, `Retry-After` respecté) plutôt qu'une boucle maison ; limiteur maison posé sur l'option `fetch` (départs espacés de 340 ms, un budget par processus), testé avec une horloge injectée. Messages d'erreur courts par code Notion, stockés dans `push_error`.
+  - **Setup** : si `NOTION_DS_BACKLOG` répond, rien n'est créé (propriétés manquantes ajoutées) ; sinon la base est créée sous la page parente, puis la vue « Kanban » groupée par Statut par l'API des vues. L'étape manuelle du README ne sert plus qu'en secours.
+  - **Mappers purs** : propriétés et blocs par type (§9), textes découpés à 2 000 caractères, corps par lots de 100 blocs, Epic et Insight en texte « ID · titre », MoSCoW = override du PO sinon recommandation, Prototype si un prototype existe à l'envoi. Le même module produit l'aperçu de la carte d'approbation.
+  - **Le clic valide** : `push_to_notion` et « Valider et envoyer » acceptent un brouillon. Le clic sur la carte (ou dans la modale) est la validation du PO : deux décisions journalisées, `validation` du statut puis `validation` de l'envoi (`field = notion`). Une seule carte au lieu de deux dans la démo. Le contrat de l'outil (SPEC §10.5) est mis à jour.
+  - **Jamais deux pages** : `notion_links` est écrit avant le passage en « envoyé » ; un élément déjà lié est seulement marqué ; une page à moitié créée (échec d'un lot de blocs) est mise à la corbeille. L'envoi passe sous le verrou du pipeline (aucune rédaction ne remplace l'élément pendant l'envoi).
+  - **Refus** : un refus de la carte est journalisé par élément (`rejet`, `proposition_signal`).
+- **Conséquences** : un élément sans score (insight non classé) part sans MoSCoW. La page parente « Jalon — Produit (Signal) » a été créée par l'API à la racine de l'espace, l'intégration ayant accès à l'espace entier. Le nettoyage de l'ADR-026 est fait : plus de conflits Notion dans le digest ni le briefing, plus de lien Notion sur un retour, plus d'exclusion `/api/notion/webhook` dans le proxy.

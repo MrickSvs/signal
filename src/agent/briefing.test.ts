@@ -34,7 +34,6 @@ const facts = (extra: Partial<BriefingFacts> = {}): BriefingFacts => ({
   pending: {
     insights_to_validate: [],
     backlog_to_validate: [],
-    notion_conflicts: [],
     merges: [],
     splits: [],
     overrides_context_changed: [],

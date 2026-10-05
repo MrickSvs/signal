@@ -2,6 +2,7 @@
 // refusal is logged in `decisions` (the middleware never runs a refused tool), then the run resumes
 // from the checkpointer where it paused. Shared by POST /api/agent/resume and the terminal chat.
 import { logRefusal } from "@/services/apply-decision";
+import { logPushRefusal } from "@/services/notion/push-backlog";
 import { checkCardDecisions, toHitlResponse, type CardDecision } from "./approval";
 import type { PageContext } from "./briefing";
 import { pendingApproval, runTurn, type AgentEvent, type SignalAgent } from "./index";
@@ -43,14 +44,16 @@ export async function resumeTurn(
   const approval = await checkResume(agent, deps, input);
   const refusals = await Promise.all(
     input.decisions.map((d, i) =>
-      d.type === "reject"
-        ? logRefusal(
-            deps.db,
-            approval.actions[i].args,
-            { pack: deps.pack, source: "chat" },
-            d.reason,
-          )
-        : Promise.resolve(null),
+      d.type !== "reject"
+        ? Promise.resolve(null)
+        : approval.actions[i].tool === "push_to_notion"
+          ? logPushRefusal(deps.db, approval.actions[i].args, "chat", d.reason)
+          : logRefusal(
+              deps.db,
+              approval.actions[i].args,
+              { pack: deps.pack, source: "chat" },
+              d.reason,
+            ),
     ),
   );
   return runTurn(

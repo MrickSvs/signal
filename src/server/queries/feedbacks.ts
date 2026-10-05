@@ -96,12 +96,11 @@ export type FeedbackDetail = Tables<"feedbacks"> & {
       is_representative: boolean;
     }[];
   })[];
-  notion_page_id: string | null;
 };
 
 /** Everything the detail panel shows about one feedback; null when the id is unknown. */
 export async function getFeedbackDetail(db: Db, id: string): Promise<FeedbackDetail | null> {
-  const [feedback, analysis, items, links, notion] = await Promise.all([
+  const [feedback, analysis, items, links] = await Promise.all([
     db
       .from("feedbacks")
       .select("*, customers(id, name, status, plan, segment, mrr_eur, renewal_date, health)")
@@ -127,19 +126,12 @@ export async function getFeedbackDetail(db: Db, id: string): Promise<FeedbackDet
       .from("insight_items")
       .select("item_id, similarity, is_representative, insights(id, title, status)")
       .eq("feedback_id", id),
-    db
-      .from("notion_links")
-      .select("notion_page_id")
-      .eq("data_source", "retours")
-      .eq("entity_id", id)
-      .maybeSingle(),
   ]);
   for (const [what, result] of [
     ["retour", feedback],
     ["analyse", analysis],
     ["items", items],
     ["insights", links],
-    ["lien Notion", notion],
   ] as const) {
     if (result.error)
       throw new Error(`Lecture du retour ${id} : ${what} (${result.error.message})`);
@@ -161,6 +153,5 @@ export async function getFeedbackDetail(db: Db, id: string): Promise<FeedbackDet
           is_representative: l.is_representative,
         })),
     })),
-    notion_page_id: notion.data?.notion_page_id ?? null,
   };
 }

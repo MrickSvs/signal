@@ -12,6 +12,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Cron, Notion webhook and MCP routes are protected by their own secret.
-  matcher: ["/((?!api/cron|api/notion/webhook|api/mcp|_next/static|_next/image|favicon.ico).*)"],
+  // Cron and MCP routes are protected by their own secret.
+  matcher: ["/((?!api/cron|api/mcp|_next/static|_next/image|favicon.ico).*)"],
 };

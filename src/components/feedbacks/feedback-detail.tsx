@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "lucide-react";
 import { InsightChip } from "@/components/signal/chips";
 import { ChannelBadge, HealthBadge, ModelBadge, PlanBadge, Pill } from "@/components/signal/badges";
 import { explainItem, type WhyOptions } from "@/lib/feedbacks/why";
@@ -17,7 +16,6 @@ import {
   SEGMENT_LABELS,
   URGENCY_LABELS,
   languageLabel,
-  notionPageUrl,
   sentimentLabel,
 } from "@/lib/labels";
 import type { FeedbackDetail as Detail } from "@/server/queries/feedbacks";
@@ -66,17 +64,6 @@ export function FeedbackDetail({
           >
             {formatRelative(feedback.received_at, now)}
           </span>
-          {feedback.notion_page_id && (
-            <a
-              href={notionPageUrl(feedback.notion_page_id)}
-              target="_blank"
-              rel="noreferrer"
-              className="ml-auto inline-flex items-center gap-0.5 font-medium text-signal underline-offset-4 hover:underline"
-            >
-              Notion
-              <ArrowUpRight aria-hidden className="size-3.5" />
-            </a>
-          )}
         </div>
         {feedback.subject && <p className="font-semibold">{feedback.subject}</p>}
         {feedback.author_name && (

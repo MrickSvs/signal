@@ -42,6 +42,8 @@ const REVIEW_LABEL: Record<ReviewAction, string> = {
   rejeter: "Rejeter",
 };
 
+const TOOL_LABEL: Record<string, string> = { push_to_notion: "Envoi dans Notion" };
+
 /** A proposed insight to review, as add_feedback makes it born (« Nouveau sujet proposé »). */
 const isNewTopic = (args: Args) => args.kind === "insight_review" && args.value === "accepter";
 
@@ -114,12 +116,21 @@ function ActionView({
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-1">
         <span className="w-fit rounded bg-muted px-1.5 py-0.5 text-[12px] font-medium text-muted-foreground">
-          {newTopic ? "Nouveau sujet proposé" : args.kind ? KIND_LABEL[args.kind] : action.tool}
+          {newTopic
+            ? "Nouveau sujet proposé"
+            : args.kind
+              ? KIND_LABEL[args.kind]
+              : (TOOL_LABEL[action.tool] ?? action.tool)}
         </span>
         <p className="leading-snug font-medium">{action.description}</p>
         {action.target_title && (
           <p className="leading-snug text-muted-foreground">
             {args.target} · {action.target_title}
+          </p>
+        )}
+        {action.preview && (
+          <p className="rounded-md bg-muted/60 px-2 py-1.5 text-[13px] leading-snug whitespace-pre-line">
+            {action.preview}
           </p>
         )}
         {newTopic && action.target_statement && (

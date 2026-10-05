@@ -3,7 +3,7 @@
 //    po_state.last_seen_at when it is older): open alerts, new feedbacks by channel (and how many
 //    only confirmed a known topic), emerging trends (7 sliding days, §8.8) and new insights,
 //    accounts at risk, rank moves (none on a first run, CL-18), pending decisions (proposed
-//    insights, backlog drafts, Notion conflicts, merges and splits CL-15, overrides whose context
+//    insights, backlog drafts, merges and splits CL-15, overrides whose context
 //    changed);
 // 2. the reasoning role writes each section with Signal's voice; the code checks that every id
 //    it cites exists in the facts and that every line with a number carries an id (P2, rule 9);
@@ -92,7 +92,6 @@ export type DigestFacts = {
   pending: {
     insights_to_validate: string[];
     backlog_to_validate: string[];
-    notion_conflicts: string[];
     merges: { from: string; into: string }[];
     splits: { from: string; into: string }[];
     overrides_context_changed: { insight_id: string; param: string }[];
@@ -226,7 +225,6 @@ export async function loadDigestFacts(
     scores,
     customers,
     backlog,
-    decisions,
     overrides,
     runs,
   ] = await Promise.all([
@@ -287,9 +285,6 @@ export async function loadDigestFacts(
     ),
     page("lecture du backlog", (f, t) =>
       db.from("backlog_items").select("id, status").order("id").range(f, t),
-    ),
-    page("lecture des décisions", (f, t) =>
-      db.from("decisions").select("id, action, created_at").order("id").range(f, t),
     ),
     page("lecture des overrides", (f, t) =>
       db
@@ -445,9 +440,6 @@ export async function loadDigestFacts(
     pending: {
       insights_to_validate: live.filter((i) => i.status === "propose").map((i) => i.id),
       backlog_to_validate: backlog.filter((b) => b.status === "brouillon").map((b) => b.id),
-      notion_conflicts: decisions
-        .filter((d) => d.action === "conflit" && inPeriod(d.created_at, period))
-        .map((d) => d.id),
       merges,
       splits,
       overrides_context_changed: overrides
@@ -658,9 +650,6 @@ export function fallbackWriting(facts: DigestFacts): DigestWriting {
           : null,
         facts.pending.backlog_to_validate.length
           ? `- Backlog à valider : ${facts.pending.backlog_to_validate.join(", ")}.`
-          : null,
-        facts.pending.notion_conflicts.length
-          ? `- Conflits Notion : ${facts.pending.notion_conflicts.join(", ")}.`
           : null,
         ...facts.pending.merges.map((m) => `- Fusion : ${m.into} a absorbé ${m.from}.`),
         ...facts.pending.splits.map((s) => `- Scission : ${s.into} détaché de ${s.from}.`),

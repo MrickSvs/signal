@@ -79,6 +79,7 @@ function printApproval(approval: PendingApproval): void {
     };
     if (reason) process.stdout.write(`│ Raison : ${reason}\n`);
     if (signal_position) process.stdout.write(`│ Désaccord de Signal : ${signal_position}\n`);
+    for (const line of action.preview?.split("\n") ?? []) process.stdout.write(`│   ${line}\n`);
   }
   process.stdout.write("└\n");
 }

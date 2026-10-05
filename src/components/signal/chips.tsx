@@ -96,18 +96,7 @@ export function EvidenceChip({ id }: { id: string }) {
             <p className="text-muted-foreground">Texte tronqué à l&apos;ingestion.</p>
           )}
           <PreviewLinks
-            links={[
-              { href: `/retours?retour=${feedback.id}`, label: "Ouvrir le retour" },
-              ...(feedback.notion_page_id
-                ? [
-                    {
-                      href: notionPageUrl(feedback.notion_page_id),
-                      label: "Notion",
-                      external: true,
-                    },
-                  ]
-                : []),
-            ]}
+            links={[{ href: `/retours?retour=${feedback.id}`, label: "Ouvrir le retour" }]}
           />
         </>
       )}

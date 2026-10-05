@@ -103,10 +103,6 @@ function pendingLines(pending: BriefingFacts["pending"], limits: BriefingLimits)
     lines.push(
       `- ${pending.backlog_to_validate.length} élément(s) du backlog en brouillon : ${idList(pending.backlog_to_validate, limits.ids)}`,
     );
-  if (pending.notion_conflicts.length)
-    lines.push(
-      `- ${pending.notion_conflicts.length} conflit(s) Notion : ${idList(pending.notion_conflicts, limits.ids)}`,
-    );
   for (const m of pending.merges.slice(0, limits.list))
     lines.push(`- fusion à confirmer : ${m.from} → ${m.into}`);
   for (const s of pending.splits.slice(0, limits.list))

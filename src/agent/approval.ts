@@ -15,8 +15,9 @@ import { z } from "zod";
 import type { Weighting } from "@/lib/context";
 import type { Db } from "@/lib/db/create";
 import { checkDecision, describeDecision } from "@/lib/decisions/apply-decision";
+import { previewPush } from "@/services/notion/push-backlog";
 
-/** Tools that never run without Léa's explicit approval. push_to_notion arrives in 5.2. */
+/** Tools that never run without Léa's explicit approval. */
 export const APPROVAL_TOOLS = ["apply_decision", "push_to_notion"] as const;
 
 /**
@@ -34,12 +35,18 @@ export function approvalConfig(weighting: Weighting): Record<string, InterruptOn
       },
       when: (request) => checkDecision(request.toolCall.args, weighting).ok,
     },
-    // Prepared for 5.2: an external write, sent as is or not at all.
+    // An external write, sent as is or not at all (SPEC §11.2): the card shows each page.
     push_to_notion: {
       allowedDecisions: ["approve", "reject"],
-      description: "Envoyer ces éléments validés dans le backlog Notion",
+      description: (toolCall) => describePush(toolCall.args),
     },
   };
+}
+
+/** « Envoyer US-004, US-005 dans le kanban Notion (colonne « Prêt ») » (pure). */
+export function describePush(args: Record<string, unknown>): string {
+  const ids = Array.isArray(args.item_ids) ? args.item_ids.map(String) : [];
+  return `Envoyer ${ids.join(", ") || "ces éléments"} dans le kanban Notion (colonne « Prêt »)`;
 }
 
 export type ApprovalAction = {
@@ -51,6 +58,8 @@ export type ApprovalAction = {
   /** Title of the targeted insight or backlog item, and an insight's statement (form prefill). */
   target_title: string | null;
   target_statement: string | null;
+  /** push_to_notion: each page as Notion will receive it. */
+  preview: string | null;
 };
 
 export type PendingApproval = { interrupt_id: string; actions: ApprovalAction[] };
@@ -76,13 +85,17 @@ export function toPendingApproval(interrupts: unknown): PendingApproval | null {
         ],
         target_title: null,
         target_statement: null,
+        preview: null,
       })),
     };
   }
   return null;
 }
 
-/** Adds the target's title (and an insight's statement) so the card reads in plain words. */
+/**
+ * Adds the target's title (and an insight's statement) so the card reads in plain words, and the
+ * Notion rendering of the pages a push_to_notion would create.
+ */
 export async function withTargets(db: Db, approval: PendingApproval): Promise<PendingApproval> {
   const targets = approval.actions.map((a) => String(a.args.target ?? ""));
   const insightIds = targets.filter((t) => /^I-\d+$/.test(t));
@@ -99,15 +112,23 @@ export async function withTargets(db: Db, approval: PendingApproval): Promise<Pe
   ]);
   const insightOf = new Map((insights.data ?? []).map((i) => [i.id, i]));
   const itemOf = new Map((items.data ?? []).map((i) => [i.id, i]));
+  const previews = await Promise.all(
+    approval.actions.map((a) =>
+      a.tool === "push_to_notion" && Array.isArray(a.args.item_ids)
+        ? previewPush(db, a.args.item_ids.map(String))
+        : Promise.resolve(null),
+    ),
+  );
   return {
     ...approval,
-    actions: approval.actions.map((a) => {
+    actions: approval.actions.map((a, i) => {
       const target = String(a.args.target ?? "");
       const insight = insightOf.get(target);
       return {
         ...a,
         target_title: insight?.title ?? itemOf.get(target)?.title ?? null,
         target_statement: insight?.problem_statement ?? null,
+        preview: previews[i],
       };
     }),
   };

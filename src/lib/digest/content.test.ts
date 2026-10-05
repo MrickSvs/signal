@@ -98,7 +98,6 @@ describe("pendingDecisions (CL-15)", () => {
   const empty = {
     insights_to_validate: [],
     backlog_to_validate: [],
-    notion_conflicts: [],
     merges: [],
     splits: [],
     overrides_context_changed: [],
@@ -113,7 +112,6 @@ describe("pendingDecisions (CL-15)", () => {
       ...empty,
       insights_to_validate: ["I-12"],
       backlog_to_validate: ["US-001", "BUG-002"],
-      notion_conflicts: ["D-004"],
       merges: [{ from: "I-05", into: "I-02" }],
       splits: [{ from: "I-03", into: "I-14" }],
       overrides_context_changed: [{ insight_id: "I-07", param: "impact" }],
@@ -121,13 +119,12 @@ describe("pendingDecisions (CL-15)", () => {
     expect(rows.map((r) => [r.label, r.href])).toEqual([
       ["1 insight à valider", "/insights?statut=propose"],
       ["2 éléments du backlog à valider", "/backlog?statut=brouillon"],
-      ["1 conflit Notion", "/backlog?conflits=notion"],
       ["Fusion d'insights", "/insights/I-02"],
       ["Scission d'insight", "/insights/I-14"],
       ["Override au contexte modifié", "/priorisation?insight=I-07"],
     ]);
-    expect(rows[3]!.relation).toEqual({ left: "I-02", verb: "a absorbé", right: "I-05" });
-    expect(rows[4]!.relation).toEqual({ left: "I-14", verb: "détaché de", right: "I-03" });
-    expect(rows[5]!.param).toBe("impact");
+    expect(rows[2]!.relation).toEqual({ left: "I-02", verb: "a absorbé", right: "I-05" });
+    expect(rows[3]!.relation).toEqual({ left: "I-14", verb: "détaché de", right: "I-03" });
+    expect(rows[4]!.param).toBe("impact");
   });
 });

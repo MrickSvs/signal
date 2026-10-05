@@ -1,5 +1,5 @@
 // The agent's tools (SPEC §10.5). Step 4.1: the nine read tools and add_feedback; 4.3: the backlog
-// drafting and edition; 4.4: apply_decision; the Notion and prototype tools come with 5.2 and 7.1.
+// drafting and edition; 4.4: apply_decision; 5.1: push_to_notion; the prototype tool comes with 7.1.
 import { addFeedbackTool } from "./add-feedback";
 import { applyDecisionTool } from "./apply-decision";
 import { draftBacklogItemsTool } from "./draft-backlog-items";
@@ -10,6 +10,7 @@ import { getPriorityTool } from "./get-priority";
 import { listBacklogTool } from "./list-backlog";
 import { listInsightsTool } from "./list-insights";
 import { loadSkillTool } from "./load-skill";
+import { pushToNotionTool } from "./push-to-notion";
 import { queryCustomersTool } from "./query-customers";
 import { searchFeedbacksTool } from "./search-feedbacks";
 import { updateBacklogItemTool } from "./update-backlog-item";
@@ -38,6 +39,7 @@ export function chatTools(deps: AgentDeps, options: { skillsDir?: string } = {})
     draftBacklogItemsTool(deps),
     updateBacklogItemTool(deps),
     applyDecisionTool(deps),
+    pushToNotionTool(deps),
   ];
 }
 
