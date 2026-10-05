@@ -95,9 +95,10 @@ export function getRanking(
 
 /**
  * The pipeline's Reach mode is the one stored in `scores` (the URL toggle is only a view): its
- * versions are written again for the touched insights and those whose result changed.
+ * versions are written again for the touched insights and those whose result changed. Also used
+ * after a backlog drafting, whose points refine the effort (SPEC §8.4).
  */
-async function persistRanking(
+export async function persistRanking(
   db: Db,
   deps: PrioritizationDeps,
   touched: readonly string[],

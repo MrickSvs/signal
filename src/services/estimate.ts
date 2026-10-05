@@ -621,6 +621,9 @@ export async function estimateBacklogItems(
     name: BACKLOG_ESTIMATE_GENERATION,
     runCost: deps.runCost,
     metadata: { insight_id: insightId },
+    // Values picked inside a range already reasoned on (the insight's estimate): a low effort keeps
+    // the drafting within its latency budget (SPEC §15).
+    effort: "low",
   });
   const checked = schema.safeParse(data);
   if (!checked.success) {

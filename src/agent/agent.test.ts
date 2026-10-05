@@ -198,7 +198,7 @@ describe("tools", () => {
     withLock: (fn: () => unknown) => fn(),
   };
 
-  it("exposes the step's ten tools; investigations get no writing tool", () => {
+  it("exposes the tools built so far; investigations get no writing tool", () => {
     const names = chatTools(real as unknown as AgentDeps).map((t) => t.name);
     expect(names).toEqual([
       "get_briefing",
@@ -211,10 +211,13 @@ describe("tools", () => {
       "load_skill",
       "list_backlog",
       "add_feedback",
+      "draft_backlog_items",
+      "update_backlog_item",
     ]);
-    expect(readTools(real as unknown as AgentDeps).map((t) => t.name)).not.toContain(
-      "add_feedback",
-    );
+    const read = readTools(real as unknown as AgentDeps).map((t) => t.name);
+    for (const writer of ["add_feedback", "draft_backlog_items", "update_backlog_item"]) {
+      expect(read).not.toContain(writer);
+    }
   });
 
   it("describes when to use each tool and when not to", () => {

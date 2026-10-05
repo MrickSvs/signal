@@ -47,6 +47,36 @@ describe("invokeStructured", () => {
     expect(invoke.mock.calls[0][1]).toMatchObject({ runName: "classify-feedback" });
   });
 
+  it("prompt mode: schema in the prompt, no constrained decoding, fenced JSON read, same retry", async () => {
+    const plain = { invoke, withConfig };
+    vi.mocked(getModel).mockReturnValue(plain as never);
+    invoke
+      .mockResolvedValueOnce(reply('```json\n{"type":"autre","sentiment":0}\n```'))
+      .mockResolvedValueOnce(reply('```json\n{"type":"bug","sentiment":0}\n```'));
+    const result = await invokeStructured("agent", schema, messages, {
+      name: "draft-backlog-items",
+      schemaMode: "prompt",
+      maxTokens: 16000,
+    });
+    expect(result).toMatchObject({ data: { type: "bug", sentiment: 0 }, attempts: 2 });
+    expect(withConfig).not.toHaveBeenCalled();
+    expect(getModel).toHaveBeenCalledWith("agent", { maxTokens: 16000 });
+    const first = invoke.mock.calls[0][0] as BaseMessage[];
+    expect(first).toHaveLength(2);
+    expect(String(first[1].content)).toContain('"sentiment"');
+    // The retry keeps the schema and adds the invalid answer and its issues.
+    const second = invoke.mock.calls[1][0] as BaseMessage[];
+    expect(second).toHaveLength(4);
+    expect(String(second[1].content)).toContain("schéma JSON");
+  });
+
+  it("passes the effort of the call with the output format", async () => {
+    invoke.mockResolvedValueOnce(reply('{"type":"bug","sentiment":0}'));
+    await invokeStructured("reasoning", schema, messages, { name: "x", effort: "low" });
+    const config = withConfig.mock.calls[0][0] as { outputConfig: { effort: string } };
+    expect(config.outputConfig).toMatchObject({ effort: "low", format: { type: "json_schema" } });
+  });
+
   it("ignores thinking blocks and reads the text block", async () => {
     invoke.mockResolvedValueOnce(
       reply([
@@ -125,5 +155,24 @@ describe("toStrictJsonSchema", () => {
     expect(strict.properties.maybe.anyOf.some((v) => v.enum?.includes("a"))).toBe(true);
     expect(strict.properties.score.minimum).toBeUndefined();
     expect(strict.properties.score.description).toContain("minimum");
+  });
+
+  it("enforces the discriminant of a union as a one-value enum", () => {
+    const strict = toStrictJsonSchema(
+      z.object({
+        items: z.array(
+          z.discriminatedUnion("kind", [
+            z.object({ kind: z.literal("story"), want: z.string() }),
+            z.object({ kind: z.literal("bug"), severity: z.enum(["majeur", "mineur"]) }),
+          ]),
+        ),
+      }),
+    ) as {
+      properties: {
+        items: { items: { anyOf: { properties: { kind: { enum: string[] } } }[] } };
+      };
+    };
+    const variants = strict.properties.items.items.anyOf;
+    expect(variants.map((v) => v.properties.kind.enum)).toEqual([["story"], ["bug"]]);
   });
 });

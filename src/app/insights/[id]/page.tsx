@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, FileText, Layers, Scale } from "lucide-react";
+import { ArrowLeft, Layers, Scale } from "lucide-react";
+import { DraftBacklogButton } from "@/components/backlog/draft-button";
 import { EmptyState } from "@/components/shell/states";
 import { Section } from "@/components/digest/sections";
 import { Sparkline } from "@/components/digest/sparkline";
@@ -8,7 +9,6 @@ import { ReviewActions } from "@/components/insights/review-actions";
 import { ScoreBreakdown } from "@/components/insights/score-breakdown";
 import { ChannelBadge, HealthBadge, Pill, PlanBadge } from "@/components/signal/badges";
 import { EvidenceChip, InsightChip } from "@/components/signal/chips";
-import { Button } from "@/components/ui/button";
 import { loadContextPack } from "@/lib/context";
 import { getDb } from "@/lib/db/client";
 import { getDemoNow } from "@/lib/demo-now";
@@ -18,7 +18,8 @@ import { INSIGHT_STATUS_LABELS, PRODUCT_AREA_LABELS, SEGMENT_LABELS } from "@/li
 import { INSIGHT_ID } from "@/server/queries/evidence";
 import { getInsightDetail, listMergeTargets, type DetailFeedback } from "@/server/queries/insights";
 
-export const maxDuration = 60;
+// « Rédiger le backlog » runs here (≈ 30 s: one drafting call and one estimation call).
+export const maxDuration = 120;
 
 const MAX_REQUEST_CHIPS = 4;
 
@@ -144,10 +145,7 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
               canAccept={insight.status === "propose"}
             />
           )}
-          <Button variant="outline" disabled title="Disponible à l'étape 4.3">
-            <FileText aria-hidden />
-            Rédiger le backlog
-          </Button>
+          {live && <DraftBacklogButton insightId={insight.id} />}
         </div>
       </header>
 

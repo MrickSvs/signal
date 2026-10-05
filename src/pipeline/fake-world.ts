@@ -117,6 +117,9 @@ export function world(): MemoryTables {
 
 export function memoryDb(tables: MemoryTables) {
   let n = 0;
+  // Sequences never reuse an id, even after a deletion (SPEC §7).
+  const backlogSeq: Record<string, number> = {};
+  let epicSeq = 0;
   return createMemoryDb(tables, {
     defaults: {
       feedbacks: () => ({
@@ -165,6 +168,29 @@ export function memoryDb(tables: MemoryTables) {
         created_at: new Date().toISOString(),
       }),
       pipeline_runs: () => ({ id: `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}` }),
+      complexity_estimates: () => ({ id: `est-${++n}`, created_at: new Date().toISOString() }),
+      epics: () => ({
+        id: `E-${String(++epicSeq).padStart(2, "0")}`,
+        goal: null,
+        okr_refs: [],
+        kpis: [],
+      }),
+      backlog_items: (row) => {
+        const prefix = { story: "US", bug: "BUG", tache: "TT" }[row.kind as string]!;
+        const next = (backlogSeq[prefix] = (backlogSeq[prefix] ?? 0) + 1);
+        return {
+          id: `${prefix}-${String(next).padStart(3, "0")}`,
+          epic_id: null,
+          status: "brouillon",
+          points: null,
+          complexity_estimate_id: null,
+          dependencies: [],
+          judge: null,
+          notion_page_id: null,
+          notion_status_raw: null,
+          push_error: null,
+        };
+      },
     },
   });
 }

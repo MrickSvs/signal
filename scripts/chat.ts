@@ -9,7 +9,7 @@ import { createInterface } from "node:readline/promises";
 import { pathToFileURL } from "node:url";
 import { runTurn, type AgentEvent } from "@/agent";
 import type { PageContext } from "@/agent/briefing";
-import { getAgentRuntime } from "@/agent/runtime";
+import { getAgentRuntime, settleBackgroundTasks } from "@/agent/runtime";
 import { getScriptDb } from "@/lib/db/script-client";
 import { formatCost } from "@/lib/format";
 import { initTracing, shutdownTracing } from "@/lib/llm/tracing";
@@ -115,6 +115,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
       process.exitCode = 1;
     })
     .finally(async () => {
+      // The quality badge of a drafting runs after the answer.
+      await settleBackgroundTasks();
       await shutdownTracing();
       // The checkpointer's pool keeps the process alive.
       process.exit();

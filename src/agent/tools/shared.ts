@@ -9,6 +9,7 @@ import type { Db } from "@/lib/db/create";
 import { RunCost } from "@/lib/llm/cost";
 import { wrapExternal } from "@/lib/llm/data";
 import type { ModelRole } from "@/lib/llm/models";
+import type { BacklogDeps } from "@/services/backlog";
 import type { EstimateDeps } from "@/services/estimate";
 import type { IncrementalContext } from "@/pipeline/incremental";
 
@@ -29,6 +30,9 @@ export type AgentDeps = {
   embedQuery?: (text: string) => Promise<number[]>;
   estimate?: Omit<EstimateDeps, "runCost">;
   incremental?: Pick<IncrementalContext, "invoke" | "embedFn" | "estimate" | "sleep">;
+  backlog?: Pick<BacklogDeps, "invoke" | "estimate" | "draftSkills">;
+  /** Work done after the answer (the quality badge): Next's after() in the app. */
+  background?: (task: () => Promise<void>) => void;
 };
 
 /**
@@ -79,9 +83,13 @@ export function toolErrorMessage(name: string, error: unknown): string {
   const known =
     error instanceof ToolError ||
     (error instanceof Error &&
-      ["PrioritizationError", "EstimationError", "SkillError", "PipelineBusyError"].includes(
-        error.name,
-      ));
+      [
+        "PrioritizationError",
+        "EstimationError",
+        "SkillError",
+        "PipelineBusyError",
+        "BacklogError",
+      ].includes(error.name));
   if (known) return `Erreur : ${message}`;
   return (
     `Erreur : ${name} a échoué (${message.slice(0, 200)}). ` +

@@ -70,6 +70,7 @@ export type Database = {
           complexity_estimate_id: string | null;
           created_at: string;
           definition_of_done: Json | null;
+          dependencies: string[];
           dor_checklist: Json;
           edited_in_notion: boolean;
           epic_id: string | null;
@@ -87,6 +88,7 @@ export type Database = {
           prototype_id: string | null;
           push_error: string | null;
           repro_steps: Json | null;
+          risks: Json;
           severity: Database["public"]["Enums"]["bug_severity"] | null;
           status: Database["public"]["Enums"]["backlog_status"];
           success_kpi: string | null;
@@ -103,6 +105,7 @@ export type Database = {
           complexity_estimate_id?: string | null;
           created_at?: string;
           definition_of_done?: Json | null;
+          dependencies?: string[];
           dor_checklist?: Json;
           edited_in_notion?: boolean;
           epic_id?: string | null;
@@ -120,6 +123,7 @@ export type Database = {
           prototype_id?: string | null;
           push_error?: string | null;
           repro_steps?: Json | null;
+          risks?: Json;
           severity?: Database["public"]["Enums"]["bug_severity"] | null;
           status?: Database["public"]["Enums"]["backlog_status"];
           success_kpi?: string | null;
@@ -136,6 +140,7 @@ export type Database = {
           complexity_estimate_id?: string | null;
           created_at?: string;
           definition_of_done?: Json | null;
+          dependencies?: string[];
           dor_checklist?: Json;
           edited_in_notion?: boolean;
           epic_id?: string | null;
@@ -153,6 +158,7 @@ export type Database = {
           prototype_id?: string | null;
           push_error?: string | null;
           repro_steps?: Json | null;
+          risks?: Json;
           severity?: Database["public"]["Enums"]["bug_severity"] | null;
           status?: Database["public"]["Enums"]["backlog_status"];
           success_kpi?: string | null;
@@ -834,6 +840,7 @@ export type Database = {
       insights: {
         Row: {
           accounts_count: number;
+          backlog_plan: Json | null;
           channels: Json;
           created_at: string;
           expressed_requests: Json;
@@ -856,6 +863,7 @@ export type Database = {
         };
         Insert: {
           accounts_count?: number;
+          backlog_plan?: Json | null;
           channels?: Json;
           created_at?: string;
           expressed_requests?: Json;
@@ -878,6 +886,7 @@ export type Database = {
         };
         Update: {
           accounts_count?: number;
+          backlog_plan?: Json | null;
           channels?: Json;
           created_at?: string;
           expressed_requests?: Json;

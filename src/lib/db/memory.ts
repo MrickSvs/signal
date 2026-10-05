@@ -36,7 +36,7 @@ class Query implements PromiseLike<Result> {
 
   select(columns?: string) {
     if (this.action.kind !== "select") this.returning = true;
-    if (columns && !columns.includes("(")) this.columns = columns.split(",").map((c) => c.trim());
+    if (columns && columns.trim() !== "*" && !columns.includes("(")) this.columns = columns.split(",").map((c) => c.trim());
     return this;
   }
   eq(column: string, value: unknown) {

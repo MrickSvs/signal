@@ -120,6 +120,15 @@ describe("trace", () => {
     ).toEqual(["challenge"]);
   });
 
+  it("adds the skills a drafting tool loads by itself", () => {
+    expect(
+      loadedSkills([
+        { name: "load_skill", args: '{"name":"estimation"}' },
+        { name: "draft_backlog_items", args: '{"insight_id":"I-31"}' },
+      ]),
+    ).toEqual(["estimation", "backlog-format", "user-story"]);
+  });
+
   it("formats durations", () => {
     expect(formatDuration(850)).toBe("850 ms");
     expect(formatDuration(12_400)).toBe("12,4 s");

@@ -33,6 +33,16 @@ export type StructuredOptions = {
   /** Run-level cost aggregation (pipeline_runs.cost_eur). */
   runCost?: RunCost;
   metadata?: Record<string, string>;
+  /** Output cap for this call, thinking included (default: the role's cap). */
+  maxTokens?: number;
+  /**
+   * "grammar" (default): native structured outputs, the API constrains the decoding.
+   * "prompt": the JSON schema is given in the prompt, without constrained decoding, for a schema
+   * whose compiled grammar the API refuses as too large (ADR-023). Same zod check and retry.
+   */
+  schemaMode?: "grammar" | "prompt";
+  /** Effort of the call (thinking and answer); default: the model's. */
+  effort?: "low" | "medium" | "high";
 };
 
 export type StructuredResult<T> = {
@@ -54,13 +64,24 @@ export async function invokeStructured<T>(
   options: StructuredOptions,
 ): Promise<StructuredResult<T>> {
   const modelId = MODELS[role];
-  const model = getModel(role).withConfig({
-    outputConfig: { format: { type: "json_schema", schema: toStrictJsonSchema(schema) } },
-  });
+  const base = getModel(role, { maxTokens: options.maxTokens });
+  const byPrompt = options.schemaMode === "prompt";
+  const effort = options.effort ? { effort: options.effort } : {};
+  const model = byPrompt
+    ? options.effort
+      ? base.withConfig({ outputConfig: effort })
+      : base
+    : base.withConfig({
+        outputConfig: {
+          ...effort,
+          format: { type: "json_schema", schema: toStrictJsonSchema(schema) },
+        },
+      });
 
   let usage = EMPTY_USAGE;
   let lastIssue = "";
-  let conversation = messages;
+  const prompted = byPrompt ? [...messages, schemaInstruction(schema)] : messages;
+  let conversation = prompted;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     let message: AIMessage;
     try {
@@ -90,7 +111,7 @@ export async function invokeStructured<T>(
     lastIssue = result.error.message;
     // The new attempt sees its invalid answer and the issues: the same prompt would give the same error.
     conversation = [
-      ...messages,
+      ...prompted,
       new AIMessage(text || "(réponse vide)"),
       new HumanMessage(
         `Ta réponse ne respecte pas le schéma attendu :\n${z.prettifyError(result.error)}\n` +
@@ -110,9 +131,13 @@ type JsonSchema = { [key: string]: unknown };
 const isSchema = (value: unknown): value is JsonSchema =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Copies `enum` from the source schema onto the strict one, walking both trees in parallel. */
+/**
+ * Copies `enum` (and `const`, as a one-value enum: the discriminant of a union) from the source
+ * schema onto the strict one, walking both trees in parallel.
+ */
 function restoreEnums(source: JsonSchema, strict: JsonSchema): void {
   if (Array.isArray(source.enum)) strict.enum = source.enum;
+  else if (source.const !== undefined) strict.enum = [source.const];
   for (const key of ["properties", "$defs"] as const) {
     const from = source[key];
     const to = strict[key];
@@ -143,6 +168,14 @@ export function toStrictJsonSchema(schema: z.ZodType): JsonSchema {
   return strict;
 }
 
+/** The schema in the prompt (schemaMode "prompt"), after the caller's messages. */
+export function schemaInstruction(schema: z.ZodType): HumanMessage {
+  return new HumanMessage(
+    "Réponds uniquement par un objet JSON compact (sur une ligne, sans indentation, sans texte autour ni bloc de code) conforme à ce schéma JSON :\n" +
+      JSON.stringify(toJsonSchema(schema)),
+  );
+}
+
 /** Text blocks only: thinking blocks come first when adaptive thinking is on. */
 function textOf(message: AIMessage): string {
   if (typeof message.content === "string") return message.content;
@@ -152,8 +185,10 @@ function textOf(message: AIMessage): string {
 }
 
 function parseJson(text: string): unknown {
+  // Without constrained decoding the model may still wrap its JSON in a code block.
+  const fenced = /^\s*```(?:json)?\s*([\s\S]*?)\s*```\s*$/.exec(text);
   try {
-    return JSON.parse(text);
+    return JSON.parse(fenced ? fenced[1] : text);
   } catch {
     return undefined;
   }

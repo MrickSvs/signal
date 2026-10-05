@@ -15,8 +15,9 @@ const ROLE_CONFIG: Record<ModelRole, { maxTokens: number; temperature?: number }
 };
 
 /** Chat model for a role. The SDK retries 408/409/429/5xx and network errors (maxRetries). */
-export function getModel(role: ModelRole): ChatAnthropic {
-  const { maxTokens, temperature } = ROLE_CONFIG[role];
+export function getModel(role: ModelRole, options: { maxTokens?: number } = {}): ChatAnthropic {
+  const { temperature } = ROLE_CONFIG[role];
+  const maxTokens = options.maxTokens ?? ROLE_CONFIG[role].maxTokens;
   return new ChatAnthropic({
     model: MODELS[role],
     maxTokens,
