@@ -960,11 +960,11 @@ Consulte la doc actuelle de l'API Notion (version 2025-09-03 : data sources) et 
 
 **Test** :
 
-- [ ] `pnpm notion:setup` crée la base Backlog avec les bonnes propriétés ; relancé, il ne crée rien.
-- [ ] Depuis le chat comme depuis l'écran : validation → l'élément apparaît dans le kanban Notion, colonne « Prêt », avec son Type.
-- [ ] Le corps de page d'une story contient l'énoncé, les règles, le Gherkin, le KPI et les preuves ; celui d'un bug, l'attendu, le constaté, la reproduction, la sévérité et les preuves.
-- [ ] Un texte de plus de 2 000 caractères passe sans erreur ; renvoyer un élément déjà envoyé ne crée pas de doublon.
-- [ ] Avec un jeton Notion invalide, l'élément reste « valide » avec l'erreur et le bouton « Réessayer ».
+- [x] `pnpm notion:setup` crée la base Backlog avec les bonnes propriétés ; relancé, il ne crée rien.
+- [x] Depuis le chat comme depuis l'écran : validation → l'élément apparaît dans le kanban Notion, colonne « Prêt », avec son Type.
+- [x] Le corps de page d'une story contient l'énoncé, les règles, le Gherkin, le KPI et les preuves ; celui d'un bug, l'attendu, le constaté, la reproduction, la sévérité et les preuves.
+- [x] Un texte de plus de 2 000 caractères passe sans erreur ; renvoyer un élément déjà envoyé ne crée pas de doublon.
+- [x] Avec un jeton Notion invalide, l'élément reste « valide » avec l'erreur et le bouton « Réessayer ».
 
 **Commit** : `feat(notion): validated backlog push with human approval and retry`
 

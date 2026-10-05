@@ -60,7 +60,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [5.1] Envoi des éléments validés vers Notion — 2026-10-05
 
-ADR-027
+`b153839`, `e195d26` · ADR-027
 
 - `services/notion` : client (API `2025-09-03`, limiteur à ~3 requêtes/s, retries du SDK sur 429 avec `Retry-After`), mappers purs (propriétés et corps par type, découpage à 2 000 caractères et par lots de 100 blocs, CL-41), service d'envoi (`push-backlog.ts`) : un brouillon est validé par le clic, la page naît « Prêt », lien, statut « envoyé » et décision journalisés ; échec → l'élément reste « validé » avec `push_error` (CL-35) ; jamais de seconde page.
 - `pnpm notion:setup` : crée la base Backlog et sa vue Kanban groupée par Statut, ou ne fait rien si elle existe (propriétés manquantes ajoutées).
@@ -68,6 +68,17 @@ ADR-027
 - Écran Backlog : « Valider et envoyer » (modale), « Réessayer » avec l'erreur, « Ouvrir dans Notion » pour un élément envoyé, qui ne se modifie plus dans Signal (CL-36).
 - Nettoyage de l'ADR-026 : conflits Notion retirés du digest et du briefing, lien Notion retiré des retours, route webhook retirée du proxy.
 - Vérifié en réel : setup (base, vue, relance sans effet) ; US-015 avec un jeton invalide → « validé » + erreur, puis réessai → page dans Notion, relance sans doublon ; chat « Envoie BUG-002 dans Notion » → carte avec aperçu → validation → page « Prêt » en 6 s ; « Envoie toute l'epic E-04 dans Notion » → une carte, trois pages (TT-003, US-014, US-016).
+- Validé par le PO : checklist de l'étape, écran Backlog compris (« Valider et envoyer », « Ouvrir dans Notion »).
+
+## [4.5] Alertes et enquêtes autonomes — 2026-10-05
+
+`bb95396` · ADR-025
+
+- Enquête sur une alerte (`agent/investigate.ts`) : le même agent, en lecture seule (les 9 outils de lecture et `submit_dossier`), rend un dossier vérifié en code (faits avec ID existants, lecture, recommandation, action proposée dans une liste fermée). Budget de 10 appels et 0,05 € par enquête ; un échec est marqué avec son coût et sa trace (CL-56). Aucun outil qui écrit (CL-57, testé).
+- Déclenchement : à l'ajout d'un retour dans le chat (en arrière-plan), par la route incrémentale, le cron et `pipeline:run` ; `pnpm investigate` pour une alerte ou toutes celles sans dossier.
+- Interface : carte d'alerte dans l'en-tête et dans le chat ; « Faire l'action proposée » passe par le chat et sa carte d'approbation, « Ignorer » est journalisé, « En parler à Signal » met le dossier dans le briefing.
+- Vérifié en réel : e-mail de Studio Bastide → alerte churn et dossier « Prévenir le CSM » ≈ 49 s après l'envoi ; retour proche de S1 → rattaché à I-27 sans alerte ; « Ignorer » → D-078.
+- Validé par le PO : checklist de l'étape.
 
 ## [Plan] Notion recentré — 2026-10-05
 
