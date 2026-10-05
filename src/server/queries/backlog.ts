@@ -172,7 +172,9 @@ export async function getBacklogScreen(
   );
 
   const counts: Record<Kind, number> = { story: 0, bug: 0, tache: 0 };
-  for (const r of rows) counts[r.kind] += 1;
+  for (const r of rows) {
+    if (!filters.insight || r.insight_id === filters.insight) counts[r.kind] += 1;
+  }
 
   const view = (r: (typeof rows)[number]): BacklogViewItem => ({
     id: r.id,
