@@ -53,13 +53,14 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## [4.2] Chat et trace en direct — 2026-10-04
 
-ADR-022
+`79261dc` · ADR-022
 
 - Panneau Signal à droite sur toutes les pages, repliable : réponses en streaming, contexte de page envoyé à `/api/agent`, 3 suggestions selon la page (sur un insight : « Pourquoi est-il classé ici ? », « Qui est concerné ? », « Prépare le backlog »), liste des conversations et « Nouvelle conversation », bouton « En parler à Signal » du Digest (champ pré-rempli).
 - Markdown sans HTML brut ; ID transformés en puces après vérification en base ; un ID inexistant apparaît « ID inconnu » et entre au journal `id_incidents` (migration 0007).
 - Onglet « Trace » : outils appelés en direct (arguments résumés, statut, durée, modèle), progression du pipeline incrémental pendant `add_feedback`, skills chargées, coût et tokens du tour, lien Langfuse.
 - Coût d'un tour : réponses courtes par défaut, cache de l'historique, briefing déplacé après l'historique ; 0,0372 → 0,0212 € par tour en moyenne sur les questions de 4.1, latence 33,9 → 28,1 s.
 - Tests : rendu d'une réponse avec HTML, script, image et ID inexistant ; vérification et journal des ID ; flux SSE ; historique ; suggestions ; progression de l'incrémental.
+- Validé par le PO : checklist de l'étape ; la progression d'`add_feedback` dans la trace reste testée en unitaire seulement.
 
 ## [4.1] Cœur de l'agent — 2026-10-04
 
