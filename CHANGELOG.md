@@ -5,14 +5,15 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 4 (agent) en cours** : 4.1 (cœur de l'agent) et 4.2 (chat et trace en direct) faites — le panneau Signal est sur toutes les pages, avec trace en direct, ID vérifiés et conversations. Prochaine étape : 4.3 (rédaction du backlog).
+- **Phase 4 (agent) en cours** : 4.1 à 4.4 faites — agent, chat et trace en direct, rédaction du backlog (stories, bugs, tâches estimés par analogie), validation humaine des décisions (carte d'approbation, challenge, revue des insights proposés). Prochaine étape : 4.5 (alertes et enquêtes).
 - **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 504 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 570 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
 - Base : migrations 0006 (`match_feedback_items`, recherche par le sens) et 0007 (`id_incidents`, journal des ID inconnus, 1 ligne d'essai : R-999). Retour d'essai R-226 (mail collé dans le chat, rattaché à C-013 / I-27) et ses 3 alertes ajoutés en 4.1.
-- Coût LLM cumulé : ~6,0 € (essais du chat en 4.2 ~0,23 €, de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
+- Données d'essai de 4.3 et 4.4 : epics E-01 à E-04 et brouillons du backlog (migration 0008), retours R-228 à R-232 (accessibilité) et insight I-52 accepté et reformulé dans le chat ; décisions D-063 à D-075. **I-26 en Must et I-30 en Confidence 50 % sont des overrides de test** (à annuler depuis l'écran Priorisation si besoin).
+- Coût LLM cumulé : ~7,3 € (validation humaine en 4.4 ~0,45 €, rédaction du backlog en 4.3 ~0,85 €, essais du chat en 4.2 ~0,23 €, de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
 
 ## Points d'attention
 
@@ -50,6 +51,31 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Coût d'un tour après 4.2** : 0,0212 € en moyenne sur les questions de 4.1 (0,0372 € avant ; 0,0225 € contre 0,0277 € sans l'écriture horaire du cache), latence 28 s. Le briefing est devenu un message système du tour, placé après l'historique, pour que l'historique reste en cache d'un tour à l'autre ; plafond de sortie à 4 000 tokens et non 1 200, car la réflexion compte dans `max_tokens` (décision du PO). → ADR-022
 - **« ID inconnu »** : un ID cité sans exister est journalisé dans `id_incidents`, y compris quand Signal dit lui-même qu'il n'existe pas (« R-999 n'existe pas »). → ADR-022
 - **Langfuse** : compte récent, la lecture des traces passe par l'API `v2/observations` (l'API `traces` historique est fermée).
+- **Rédaction du backlog** : la sortie compile en une grammaire trop grande pour le décodage contraint ; `invokeStructured` a un mode « schéma dans le prompt » (même validation zod). Latence ~34 s pour un insight déjà estimé, au-dessus des 30 s de SPEC §15. → ADR-023
+- **Validation humaine** : un refus de carte est journalisé par la route de reprise (le middleware n'exécute pas l'outil refusé) ; écrire au lieu de répondre abandonne la carte sans rien appliquer. L'ordre des middlewares compte : les hooks `afterModel` s'exécutent en ordre inverse, le HITL est placé avant le budget et la trace pour que le coût soit compté avant la pause. → ADR-024
+- **Valeurs envoyées en texte** : le modèle peut envoyer « 50 » ou « 50 % » pour une Confidence ; le contrôle les convertit avant de les vérifier sur l'échelle (`d1a95cf`).
+- **Rechargement à chaud en dev** : l'agent est gardé dans `globalThis` ; après un rechargement, une classe rechargée ne passe plus `instanceof`. Le contexte du tour est vérifié par sa forme (`1a98513`). Redémarrer `pnpm dev` après une modification de l'agent (prompt, outils) reste nécessaire pour qu'elle soit prise en compte.
+
+## [4.4] Validation humaine et challenge — 2026-10-05
+
+`1e53bce`, `d1a95cf`, `1a98513` · ADR-024
+
+- Outil `apply_decision` (override, MoSCoW final, validation d'un brouillon, revue d'un insight proposé), contrôlé en code par `lib/decisions` et `lib/scoring/overrides.ts` (CL-23), appliqué par les services de l'interface ; désaccord de Signal journalisé (`desaccord`, `actor = signal`) après un challenge confirmé.
+- Middleware human-in-the-loop : pause sur une carte d'approbation, sans carte pour une proposition invalide ; `push_to_notion` configuré pour 5.2. Reprise par `POST /api/agent/resume` et `pnpm chat --resume` ; refus journalisé ; carte sans réponse abandonnée sans blocage.
+- Carte dans le chat : contenu exact, Valider / Modifier (formulaire prérempli) / Refuser (raison) ; Accepter / Reformuler / Rejeter / Plus tard pour un insight proposé (CL-51) ; relue à la réouverture d'une conversation.
+- Challenge (skill `challenge`) : une objection avec faits, simulation et alternative, sans écrire ; puis la décision et le désaccord si Léa confirme.
+- Vérifié en réel : Gantt en Must → objection → confirmation → carte → D-070 (override) + D-071 (désaccord) ; refus de « Valide TT-002 » → D-072, rien appliqué ; retours accessibilité → I-52 proposé, Reformuler → `actif`, titre verrouillé (D-073) ; Confidence de I-30 confirmée après challenge et relue depuis l'historique → D-074 + D-075.
+- Validé par le PO : checklist de l'étape.
+
+## [4.3] Rédaction du backlog — 2026-10-05
+
+`9ab5d4e`, `b521290` · ADR-023
+
+- Choix du format en code (`lib/backlog/choose-format.ts`, SPEC §9) : epic et stories, story seule, bug ou tâche technique ; le modèle peut s'en écarter en le justifiant.
+- `draft_backlog_items` : une rédaction typée (union zod) puis une estimation par analogie pour tous les éléments ; contrôles en code (preuves de l'insight, Fibonacci dans la fourchette, composants d'`architecture.md`, tickets de référence, 2 à 5 scénarios Gherkin, epic seulement si elle regroupe) ; brouillons, effort de l'insight affiné et décision `ajustement` ; relance avec confirmation ; insight de découvrabilité → action d'aide. `update_backlog_item` : modification et changement de type (CL-54). Badge qualité provisoire par le juge, après la réponse.
+- Écran /backlog (format par type, Gherkin, estimation, preuves, badge, filtre par type, édition, changement de type) et bouton « Rédiger le backlog » sur l'insight. Migration 0008.
+- Vérifié en réel : permissions (I-31) → E-01 + TT-001 + 4 stories ; notifications (I-27) → 1 bug sans epic ; S3 (I-28) → E-02 + stories ; I-50 sans analogue proche → fourchette élargie et confiance basse affichée ; US-017 → BUG-002 journalisé (D-067) ; relance avec confirmation.
+- Validé par le PO : checklist de l'étape ; latence ~34 s au lieu de 30 s pour un insight déjà estimé.
 
 ## [4.2] Chat et trace en direct — 2026-10-04
 

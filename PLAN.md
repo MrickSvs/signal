@@ -856,13 +856,13 @@ Tests : rendu d'une réponse contenant du HTML et un ID inexistant.
 
 **Test** :
 
-- [ ] Dans le chat : « Prépare les stories des permissions » → epic + stories en moins de 30 s, visibles dans la trace (skills, architecture.md, tickets analogues).
-- [ ] L'insight des notifications (S1) donne un ou plusieurs Bug, sans epic ; l'insight S3 donne une story ou une epic.
-- [ ] Les points citent des tickets analogues et des composants d'architecture.md (vérifié en code).
-- [ ] Chaque story et chaque bug ont au moins 2 scénarios Gherkin, dont un cas limite.
-- [ ] Un insight sans analogue proche : la fourchette est élargie et la confiance basse s'affiche à l'écran.
-- [ ] Changer une story en bug → élément régénéré au format bug, décision journalisée.
-- [ ] Relancer la rédaction demande confirmation avant de remplacer les brouillons.
+- [x] Dans le chat : « Prépare les stories des permissions » → epic + stories en moins de 30 s, visibles dans la trace (skills, architecture.md, tickets analogues). _(Validé par le PO ; mesuré ~34 s pour un insight déjà estimé, la trace montre la progression.)_
+- [x] L'insight des notifications (S1) donne un ou plusieurs Bug, sans epic ; l'insight S3 donne une story ou une epic.
+- [x] Les points citent des tickets analogues et des composants d'architecture.md (vérifié en code).
+- [x] Chaque story et chaque bug ont au moins 2 scénarios Gherkin, dont un cas limite.
+- [x] Un insight sans analogue proche : la fourchette est élargie et la confiance basse s'affiche à l'écran.
+- [x] Changer une story en bug → élément régénéré au format bug, décision journalisée.
+- [x] Relancer la rédaction demande confirmation avant de remplacer les brouillons.
 
 **Commit** : `feat(agent): typed backlog drafting (stories, bugs, tasks) with estimates by analogy`
 
