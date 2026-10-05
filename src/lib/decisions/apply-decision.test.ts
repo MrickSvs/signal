@@ -121,6 +121,25 @@ describe("checkDecision (CL-23)", () => {
   });
 });
 
+describe("override values sent as text", () => {
+  it("accepts a number written as text, and still checks it on the scale", () => {
+    for (const value of ["50", "50 %", " 50% "]) {
+      expect(
+        ok({ kind: "override", target: "I-30", param: "confidence", value, reason: "r" }),
+      ).toMatchObject({ value: 50 });
+    }
+    expect(
+      ok({ kind: "override", target: "I-30", param: "impact", value: "0,5", reason: "r" }),
+    ).toMatchObject({ value: 0.5 });
+    expect(
+      error({ kind: "override", target: "I-30", param: "confidence", value: "70", reason: "r" }),
+    ).toMatch(/Confidence attendue/);
+    expect(
+      error({ kind: "override", target: "I-30", param: "impact", value: "élevé", reason: "r" }),
+    ).toMatch(/numérique/);
+  });
+});
+
 describe("describeDecision", () => {
   it("states the exact decision in plain words", () => {
     expect(describeDecision(ok({ kind: "moscow", target: "I-04", value: "wont" }))).toBe(

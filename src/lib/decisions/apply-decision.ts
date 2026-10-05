@@ -39,7 +39,7 @@ export const applyDecisionSchema = z.object({
   value: z
     .union([z.number(), z.string()])
     .describe(
-      "override : nombre (Impact sur l'échelle, Confidence en %, Reach dans l'unité du mode, Effort en semaines-personne) ; moscow : must, should, could ou wont ; validation : valide ou rejete ; insight_review : accepter, reformuler, fusionner ou rejeter.",
+      "override : nombre JSON, sans unité (Impact sur l'échelle, Confidence en % : 50 pour 50 %, Reach dans l'unité du mode, Effort en semaines-personne) ; moscow : must, should, could ou wont ; validation : valide ou rejete ; insight_review : accepter, reformuler, fusionner ou rejeter.",
     ),
   title: z.string().trim().optional().describe("insight_review reformuler : nouveau titre."),
   problem_statement: z
@@ -86,6 +86,17 @@ const ITEM_ID = /^(?:US|BUG|TT)-\d{3,}$/;
 const refuse = (error: string): DecisionCheck => ({ ok: false, error });
 const clean = (text: string | undefined) => text?.trim() || undefined;
 
+/**
+ * A number the model (or the card's form) may send as text: « 50 », « 50 % », « 0,5 ». Anything
+ * else stays invalid.
+ */
+export function toNumber(value: number | string): number | null {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  const text = value.replace(/\s|%/g, "").replace(",", ".");
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) return null;
+  return Number(text);
+}
+
 function reviewOf(args: z.infer<typeof applyDecisionSchema>, reason?: string): DecisionCheck {
   const action = String(args.value);
   if (!REVIEW_ACTIONS.includes(action as ReviewAction)) {
@@ -131,10 +142,10 @@ export function checkDecision(input: unknown, weighting: Weighting): DecisionChe
       if (!INSIGHT_ID.test(args.target)) return refuse("Override : insight attendu (I-07)");
       if (!args.param)
         return refuse("Override : param attendu (reach, impact, confidence, effort)");
-      if (typeof args.value !== "number")
-        return refuse("Override : une valeur numérique est attendue");
+      const number = toNumber(args.value);
+      if (number === null) return refuse("Override : une valeur numérique est attendue (ex. 50)");
       // Confidence is entered as a percentage (80) and checked as a ratio (0.8).
-      const value = args.param === "confidence" ? args.value / 100 : args.value;
+      const value = args.param === "confidence" ? number / 100 : number;
       const checked = validateOverride(
         { param: args.param, value, reason: common.reason },
         weighting,
@@ -147,7 +158,7 @@ export function checkDecision(input: unknown, weighting: Weighting): DecisionChe
           kind: "override",
           insight_id: args.target,
           param: args.param,
-          value: args.value,
+          value: number,
         },
       };
     }
