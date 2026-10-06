@@ -64,7 +64,7 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - Couverture à 100 % (lignes, branches, fonctions) étendue de `lib/scoring` à `lib/clustering`, `pipeline/nodes/match.ts` et `services/notion/mappers.ts` ; seuil bloquant dans `pnpm test:coverage`. 11 tests ajoutés (égalités de l'appariement par centroïdes, insights dissous sans vecteurs, ordre du survivant d'une fusion, éléments du backlog sans sections, vecteur nul).
 - Deux branches mortes retirées de `mappers.ts` (`splitText` ne laisse jamais de reste vide ; `label` n'est appelé qu'avec une référence).
 - Garde des données d'évaluation : `no-restricted-imports` sur `src/` (imports de `evals/ground-truth` et `evals/holdout`), en plus de la règle sur les chaînes et du test de chemins existants ; `scripts/` garde son accès.
-- CI : `pnpm test:coverage` remplace `pnpm test`, rapport de couverture publié en artefact ; aucune variable secrète. Vérifié en local sur une copie sans `.env` et avec un environnement vide.
+- CI : `pnpm test:coverage` remplace `pnpm test`, rapport de couverture publié en artefact ; aucune variable secrète. Vérifié en local sur une copie sans `.env` et avec un environnement vide, puis sur GitHub (run #37 vert).
 
 ## [5.1] Envoi des éléments validés vers Notion — 2026-10-05
 
