@@ -1,0 +1,625 @@
+{
+  "eval": "judge-calibration",
+  "run_id": "41e65c4a-af36-4386-af60-673ab4352a95",
+  "git_sha": "acadbe9-dirty",
+  "config": {},
+  "started_at": "2026-10-06T02:08:04.860Z",
+  "ended_at": "2026-10-06T02:09:05.479Z",
+  "cost_eur": 0.411,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuw0ie3c06lhad0cp89r9jda",
+  "dataset": "Jeu de calibration (evals/human-labels) : 15 éléments annotés par le PO, dont 5 dégradés",
+  "metrics": [
+    {
+      "key": "notes_within_1",
+      "label": "Notes à 1 point ou moins de l'humain",
+      "value": 0.8571428571428571,
+      "display": "86 % (48/56)",
+      "target": "≥ 80 %",
+      "met": true
+    },
+    {
+      "key": "verdict_kappa",
+      "label": "κ de Cohen sur le verdict",
+      "value": 0.7058823529411765,
+      "display": "0,71 (accord 87 %)",
+      "target": "≥ 0,60",
+      "met": true
+    },
+    {
+      "key": "notes_exact",
+      "label": "Notes identiques",
+      "value": 0.4642857142857143,
+      "display": "46 %"
+    },
+    {
+      "key": "mean_gap",
+      "label": "Écart moyen juge − humain (biais)",
+      "value": -0.07142857142857142,
+      "display": "-0,07"
+    },
+    {
+      "key": "degraded_caught",
+      "label": "Éléments dégradés jugés « à reprendre » (juge / humain)",
+      "value": 1,
+      "display": "5/5 / 5/5"
+    }
+  ],
+  "details": {
+    "by_criterion": {
+      "invest": {
+        "bias": 0.8,
+        "close": 8,
+        "n": 10
+      },
+      "testabilite": {
+        "bias": -1,
+        "close": 7,
+        "n": 10
+      },
+      "tracabilite": {
+        "bias": 0.4,
+        "close": 9,
+        "n": 10
+      },
+      "format": {
+        "bias": 0,
+        "close": 9,
+        "n": 10
+      },
+      "reproductibilite": {
+        "bias": -0.67,
+        "close": 3,
+        "n": 3
+      },
+      "attendu_constate": {
+        "bias": -0.33,
+        "close": 3,
+        "n": 3
+      },
+      "severite": {
+        "bias": -1.33,
+        "close": 2,
+        "n": 3
+      },
+      "critere_correction": {
+        "bias": 0,
+        "close": 3,
+        "n": 3
+      },
+      "objectif": {
+        "bias": 0.5,
+        "close": 2,
+        "n": 2
+      },
+      "definition_termine": {
+        "bias": 0,
+        "close": 2,
+        "n": 2
+      }
+    }
+  },
+  "notes": [
+    "Le juge ne voit ni les annotations ni la liste des éléments dégradés ; même grille (src/lib/judge/rubric.md) pour le juge et l'humain.",
+    "Biais par critère (juge − humain) : invest 0,80 ; testabilite -1,00 ; tracabilite 0,40 ; format 0,00 ; reproductibilite -0,67 ; attendu_constate -0,33 ; severite -1,33 ; critere_correction 0,00 ; objectif 0,50 ; definition_termine 0,00.",
+    "Cibles atteintes : le juge peut être déclaré calibré (JUDGE_CALIBRATED)."
+  ],
+  "results": [
+    {
+      "item_id": "CAL-01",
+      "expected": {
+        "item_id": "CAL-01",
+        "kind": "story",
+        "notes": {
+          "invest": 1,
+          "testabilite": 3,
+          "tracabilite": 3,
+          "format": 3
+        },
+        "verdict": "a_reprendre",
+        "comment": "le titre colle trois titres, le « je veux » enchaîne trois capacités, 10 règles  6 scénarios 21 points KPI sans cible chiffrée.",
+        "annotated_at": "2026-10-06T01:54:27.452Z",
+        "degradation": "story_trop_grosse",
+        "source": "US-010"
+      },
+      "actual": {
+        "notes": {
+          "invest": 2,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 2
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Découper en trois stories (frise, déplacement, chevauchements par assigné), chacune à 8 points au plus : 21 points et trois parcours dépassent une seule tranche de valeur.",
+          "Donner un vrai titre à l'infinitif par story et ramener chaque story à 2 à 6 règles vérifiables, sans la règle « périmètre précisé avant développement ».",
+          "Couvrir les règles sans scénario (permissions, zoom) et ajouter une cible chiffrée et un OKR au KPI (ex. X % des projets actifs à 90 jours)."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "e9838cbc4db7c698860cfe44b0d26cf6"
+    },
+    {
+      "item_id": "CAL-02",
+      "expected": {
+        "item_id": "CAL-02",
+        "kind": "story",
+        "notes": {
+          "invest": 3,
+          "testabilite": 5,
+          "tracabilite": 5,
+          "format": 5
+        },
+        "verdict": "a_reprendre",
+        "comment": "2 scénarios, 0 cas limite ; tous les « Alors » disent « l'expérience est fluide et l'utilisateur est satisfait » ; 13 points ; KPI chiffré et relié à un OKR.",
+        "annotated_at": "2026-10-06T01:55:10.944Z",
+        "degradation": "criteres_non_testables",
+        "source": "US-007"
+      },
+      "actual": {
+        "notes": {
+          "invest": 2,
+          "testabilite": 2,
+          "tracabilite": 5,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Remplacer chaque « Alors » vague par un résultat observable : tâches, statut et échéance visibles, aucun commentaire interne, message « Ce lien n'est plus actif ».",
+          "Ramener la story à 8 points au plus (13 actuellement) en la découpant, par exemple consultation du lien puis désactivation.",
+          "Ajouter un cas limite marqué comme tel (accès à un autre projet refusé) et écrire « aucune » dans les dépendances."
+        ]
+      },
+      "score": 0.75,
+      "pass": false,
+      "traceId": "0684af94a1e6111e9eeca473d1ced1dd"
+    },
+    {
+      "item_id": "CAL-03",
+      "expected": {
+        "item_id": "CAL-03",
+        "kind": "bug",
+        "notes": {
+          "reproductibilite": 1,
+          "attendu_constate": 4,
+          "severite": 4,
+          "critere_correction": 4
+        },
+        "verdict": "a_reprendre",
+        "comment": "0 étape de reproduction ; sévérité « majeur » ; 4 scénarios, 2 cas limites.",
+        "annotated_at": "2026-10-06T01:58:29.053Z",
+        "degradation": "bug_sans_reproduction",
+        "source": "BUG-001"
+      },
+      "actual": {
+        "notes": {
+          "reproductibilite": 1,
+          "attendu_constate": 3,
+          "severite": 4,
+          "critere_correction": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Remplir les étapes de reproduction (vides) : membre en digest quotidien, chef de projet qui assigne une tâche nommée, constat qu'aucun e-mail n'arrive.",
+          "Préciser le constaté : quels membres, dans quelles conditions, jamais ou intermittent. Sortir l'hypothèse technique (ancien champ de préférence) du comportement constaté.",
+          "Rendre observable le scénario du nouveau membre : remplacer « avec la préférence par défaut » par le mode attendu et le délai d'envoi de l'e-mail."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "96548e7b700856b4a9b6f09f58c12f02"
+    },
+    {
+      "item_id": "CAL-04",
+      "expected": {
+        "item_id": "CAL-04",
+        "kind": "story",
+        "notes": {
+          "invest": 1,
+          "testabilite": 5,
+          "tracabilite": 5,
+          "format": 1
+        },
+        "verdict": "a_reprendre",
+        "comment": "comparer mot à mot le « afin de » (« pouvoir restreindre un membre… ») et le « je veux » (« restreindre un membre… ») ; 3 scénarios dont 2 cas limites ; KPI relié à un OKR.",
+        "annotated_at": "2026-10-06T01:59:13.172Z",
+        "degradation": "valeur_repetee",
+        "source": "US-003"
+      },
+      "actual": {
+        "notes": {
+          "invest": 2,
+          "testabilite": 4,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Réécrire le « Afin de » en résultat concret : il recopie le « je veux ». Par exemple : faire travailler un freelance sans lui exposer les projets confidentiels des autres clients.",
+          "Couvrir la règle sur le retrait d'affectation par un scénario où le freelance perd l'accès, et vérifier aussi le droit de commenter.",
+          "Donner un horizon au KPI (par exemple « sur les renouvellements des 12 prochains mois ») et raccourcir le titre à 8 mots au plus."
+        ]
+      },
+      "score": 0.75,
+      "pass": false,
+      "traceId": "fd20e11f9c3184c553844a65f16c9c7d"
+    },
+    {
+      "item_id": "CAL-05",
+      "expected": {
+        "item_id": "CAL-05",
+        "kind": "bug",
+        "notes": {
+          "reproductibilite": 5,
+          "attendu_constate": 4,
+          "critere_correction": 4,
+          "severite": 5
+        },
+        "verdict": "a_reprendre",
+        "comment": "4 étapes, ressemble plus a une feature qu'a un bug Sévérité pas « majeur ».",
+        "annotated_at": "2026-10-06T02:00:16.630Z",
+        "degradation": null,
+        "source": "BUG-002"
+      },
+      "actual": {
+        "notes": {
+          "reproductibilite": 4,
+          "attendu_constate": 4,
+          "severite": 2,
+          "critere_correction": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Requalifier en story : le constaté dit « Jalon n'existe qu'en français », il s'agit donc d'une fonctionnalité absente (localisation des exports), pas d'un bug.",
+          "Retirer la sévérité « majeur », non étayée (aucun compte touché repris du code). Si l'élément reste un bug, la justifier par des faits.",
+          "Rendre le scénario de volume mesurable (« délai comparable » → seuil chiffré) et préciser d'où vient la « langue » de l'utilisateur, aucune préférence n'existant."
+        ]
+      },
+      "score": 0.75,
+      "pass": false,
+      "traceId": "f967485e1647928fe166aa1c6ad2ef3b"
+    },
+    {
+      "item_id": "CAL-06",
+      "expected": {
+        "item_id": "CAL-06",
+        "kind": "tache",
+        "notes": {
+          "objectif": 4,
+          "definition_termine": 4
+        },
+        "verdict": "acceptable",
+        "comment": "5 conditions, dont « Aucune régression des accès actuels des admins et des membres » ; 3 risques ; 8 points.",
+        "annotated_at": "2026-10-06T02:01:00.119Z",
+        "degradation": null,
+        "source": "TT-001"
+      },
+      "actual": {
+        "notes": {
+          "objectif": 4,
+          "definition_termine": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Ajouter au périmètre de terminé les points d'entrée cités en risque (pièces jointes, commentaires, notifications) ou les exclure explicitement.",
+          "Rendre « aucune régression » vérifiable : suite de tests nommée ou comparaison des accès avant/après migration (ni accès retiré, ni ouvert).",
+          "Expliciter dans l'objectif le risque servi (exposition d'un projet confidentiel) et, si possible, l'OKR rattaché."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "28bc8fb3553ae77bdb20dd4d26551750"
+    },
+    {
+      "item_id": "CAL-07",
+      "expected": {
+        "item_id": "CAL-07",
+        "kind": "bug",
+        "notes": {
+          "reproductibilite": 5,
+          "attendu_constate": 4,
+          "critere_correction": 4,
+          "severite": 5
+        },
+        "verdict": "acceptable",
+        "comment": "4 étapes ; même titre que CAL-03 ; sévérité « majeur » ; 4 scénarios, 2 cas limites.",
+        "annotated_at": "2026-10-06T02:01:40.368Z",
+        "degradation": null,
+        "source": "BUG-001"
+      },
+      "actual": {
+        "notes": {
+          "reproductibilite": 4,
+          "attendu_constate": 4,
+          "severite": 4,
+          "critere_correction": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Préciser la condition de départ manquante : membre ayant changé de préférence avant la migration du champ, ou tout membre en digest ? Cela lèverait le « certains / intermittent ».",
+          "Sortir l'hypothèse technique et les comptes touchés du constaté, et aligner le constaté (« jamais ou intermittent ») sur l'étape 3 (« aucun e-mail »).",
+          "Rendre testables « immédiat » et « préférence par défaut », justifier la sévérité (contournement ?) et ajouter un scénario pour un membre ayant changé de préférence."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "552b130226f937df1186acc4f4bbf987"
+    },
+    {
+      "item_id": "CAL-08",
+      "expected": {
+        "item_id": "CAL-08",
+        "kind": "story",
+        "notes": {
+          "invest": 3,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "comment": "« je veux » impose un PDF ; 2 scénarios, 1 cas limite ; KPI à 30 %, sans OKR.",
+        "annotated_at": "2026-10-06T02:02:34.710Z",
+        "degradation": null,
+        "source": "US-006"
+      },
+      "actual": {
+        "notes": {
+          "invest": 3,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Formuler le « je veux » comme un besoin (partager une synthèse d'avancement au client) sans imposer le PDF, et lever l'ambiguïté « d'un projet » / « par projet ».",
+          "Ajouter des scénarios pour la date de génération et le respect des filtres de la vue liste, et donner le texte exact du message pour un projet sans tâche.",
+          "Relier le KPI à un OKR et compléter les analogues avec les points estimés et réels."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "89826b0bf9e157d3449ec6699c74c842"
+    },
+    {
+      "item_id": "CAL-09",
+      "expected": {
+        "item_id": "CAL-09",
+        "kind": "story",
+        "notes": {
+          "tracabilite": 3,
+          "format": 3,
+          "testabilite": 4,
+          "invest": 3
+        },
+        "verdict": "a_reprendre",
+        "comment": "2 scénarios, 1 cas limite ; KPI sans cible chiffrée.",
+        "annotated_at": "2026-10-06T02:03:06.152Z",
+        "degradation": null,
+        "source": "US-009"
+      },
+      "actual": {
+        "notes": {
+          "invest": 3,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Reformuler le « afin de » en résultat concret (ex. anticiper la charge de l'équipe et repérer les chevauchements) au lieu de reformuler le « je veux ».",
+          "Ajouter des scénarios pour les règles non couvertes : tâche existante sans date de début, champ laissé vide, début égal à l'échéance.",
+          "Fixer une cible chiffrée au KPI, relier un OKR et justifier la dépendance TT-002 (ou la retirer)."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "d37f18ec3d3549e6d12c567ef861da28"
+    },
+    {
+      "item_id": "CAL-10",
+      "expected": {
+        "item_id": "CAL-10",
+        "kind": "story",
+        "notes": {
+          "tracabilite": 1,
+          "invest": 3,
+          "testabilite": 5,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "comment": "0 preuve ; KPI « Améliorer la satisfaction des utilisateurs. » ; 2 scénarios, 1 cas limite.",
+        "annotated_at": "2026-10-06T02:03:35.442Z",
+        "degradation": "preuves_absentes",
+        "source": "US-013"
+      },
+      "actual": {
+        "notes": {
+          "invest": 4,
+          "testabilite": 3,
+          "tracabilite": 1,
+          "format": 4
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Lier 1 à 5 retours R-xxx de l'insight en preuves : la liste est vide, la story n'est pas justifiée.",
+          "Remplacer « Améliorer la satisfaction » par un KPI de résultat avec cible et horizon (ex. % de projets actifs partagés à 90 jours), relié à l'OKR.",
+          "Ajouter des scénarios pour la lecture seule (modification refusée) et l'accès refusé à un autre projet, en précisant qui peut désactiver le partage."
+        ]
+      },
+      "score": 0.75,
+      "pass": false,
+      "traceId": "a1857c16e94309d8f1787b73892ff122"
+    },
+    {
+      "item_id": "CAL-11",
+      "expected": {
+        "item_id": "CAL-11",
+        "kind": "story",
+        "notes": {
+          "tracabilite": 1,
+          "invest": 3,
+          "format": 4,
+          "testabilite": 4
+        },
+        "verdict": "a_reprendre",
+        "comment": "persona « client final invité » ; 3 scénarios, 2 cas limites ; le KPI dit lui-même « mesure à confirmer avec le PO ».",
+        "annotated_at": "2026-10-06T02:04:03.606Z",
+        "degradation": null,
+        "source": "US-002"
+      },
+      "actual": {
+        "notes": {
+          "invest": 5,
+          "testabilite": 4,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Couvrir la règle 4 sur la liste et le tableau, pas seulement le sélecteur, et aligner règle 3 et scénario (modification vs suppression).",
+          "Reformuler le scénario « Tentative de modification » avec un vrai essai (Quand je tente de modifier l'échéance) et son refus.",
+          "Justifier la cible de 60 % par un OKR ou un fait fourni, et préciser les points estimés et réels d'un seul analogue."
+        ]
+      },
+      "score": 0.5,
+      "pass": false,
+      "traceId": "7087e3de0906c33d5543345988059ba8"
+    },
+    {
+      "item_id": "CAL-12",
+      "expected": {
+        "item_id": "CAL-12",
+        "kind": "story",
+        "notes": {
+          "invest": 3,
+          "format": 5,
+          "testabilite": 5,
+          "tracabilite": 5
+        },
+        "verdict": "acceptable",
+        "comment": "4 scénarios, 3 cas limites ; KPI chiffré et relié à un OKR ; 5 points.",
+        "annotated_at": "2026-10-06T02:04:55.989Z",
+        "degradation": null,
+        "source": "US-001"
+      },
+      "actual": {
+        "notes": {
+          "invest": 5,
+          "testabilite": 3,
+          "tracabilite": 5,
+          "format": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Ajouter un scénario qui couvre la lecture seule : l'invité tente de modifier une tâche de « Refonte site Kaléo » et l'action est refusée.",
+          "Remplacer « message explicite » par le texte exact attendu et vérifier dans le retrait que l'accès est coupé immédiatement, sans reconnexion.",
+          "Compléter l'estimation avec les points estimés et réels d'un analogue, et couvrir la modification d'un invité ou la retirer des règles de gestion."
+        ]
+      },
+      "score": 0.5,
+      "pass": false,
+      "traceId": "b4e866f10553bd215a4567d785bbf1b5"
+    },
+    {
+      "item_id": "CAL-13",
+      "expected": {
+        "item_id": "CAL-13",
+        "kind": "tache",
+        "notes": {
+          "objectif": 3,
+          "definition_termine": 3
+        },
+        "verdict": "a_reprendre",
+        "comment": "4 conditions, dont « affichent ou ignorent ces champs » ; 2 risques ; 8 points.",
+        "annotated_at": "2026-10-06T02:05:19.546Z",
+        "degradation": null,
+        "source": "TT-002"
+      },
+      "actual": {
+        "notes": {
+          "objectif": 4,
+          "definition_termine": 3
+        },
+        "verdict": "a_reprendre",
+        "a_ameliorer": [
+          "Trancher « affichent ou ignorent » : préciser, écran par écran (liste, tableau, export), si le champ est affiché ou ignoré, pour qu'un relecteur coche sans interpréter.",
+          "Ajouter une condition sur les permissions (risque listé mais non couvert), par exemple : seul un membre autorisé peut modifier la date ou la dépendance, export compris.",
+          "Ajouter une règle de cohérence vérifiable entre la date de début et l'échéance, et un test montrant le rejet d'un lien qui créerait un cycle."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "d2417c3614c32a9268b43d5c170f50d6"
+    },
+    {
+      "item_id": "CAL-14",
+      "expected": {
+        "item_id": "CAL-14",
+        "kind": "story",
+        "notes": {
+          "invest": 3,
+          "format": 4,
+          "testabilite": 3,
+          "tracabilite": 4
+        },
+        "verdict": "a_reprendre",
+        "comment": "le « je veux » impose un fichier Excel ; 2 scénarios, 1 cas limite ; KPI chiffré, sans OKR.",
+        "annotated_at": "2026-10-06T02:05:50.421Z",
+        "degradation": null,
+        "source": "US-005"
+      },
+      "actual": {
+        "notes": {
+          "invest": 4,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Remplacer « colonnes propres et statuts lisibles » par des résultats observables : colonnes attendues, libellé « En cours » au lieu du code interne, nom « Campagne printemps_AAAA-MM-JJ ».",
+          "Trancher le cas des 2 000 tâches : soit l'export aboutit en moins de X s, soit un message précis s'affiche, mais pas les deux en « ou ».",
+          "Couvrir par un scénario les champs personnalisés en colonnes et le nommage du fichier, puis relier le KPI à un OKR."
+        ]
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "c1c0a4965c58ce28fb2054cdcf6480d0"
+    },
+    {
+      "item_id": "CAL-15",
+      "expected": {
+        "item_id": "CAL-15",
+        "kind": "story",
+        "notes": {
+          "invest": 3,
+          "format": 5,
+          "tracabilite": 4,
+          "testabilite": 4
+        },
+        "verdict": "acceptable",
+        "comment": "2 scénarios, 1 cas limite ; le KPI dit « cible à valider » ; 2 preuves.",
+        "annotated_at": "2026-10-06T02:06:09.735Z",
+        "degradation": null,
+        "source": "US-014"
+      },
+      "actual": {
+        "notes": {
+          "invest": 4,
+          "testabilite": 3,
+          "tracabilite": 4,
+          "format": 4
+        },
+        "verdict": "acceptable",
+        "a_ameliorer": [
+          "Couvrir les règles non testées : un scénario où la langue d'un autre membre reste inchangée, et un « Alors » qui vérifie l'application immédiate sans reconnexion.",
+          "Élargir le résultat nominal au-delà des seuls libellés des paramètres (ex. : le tableau du projet « Lanzamiento Madrid » s'affiche en espagnol).",
+          "Relier le KPI à un OKR, retirer « cible à valider » en reprenant un chiffre fourni, et justifier les 3 points (analogue avec points estimés/réels, pertinence de « permissions »)."
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "c7e4491cceb4cb0c58f2dca3332f9b4a"
+    }
+  ]
+}

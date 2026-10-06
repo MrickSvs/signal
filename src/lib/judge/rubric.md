@@ -4,7 +4,7 @@ Grille commune au juge (rôle `judge`) et à l'annotation humaine de calibration
 
 Échelle commune : **5** irréprochable, prêt pour le sprint ; **4** bon, une retouche mineure ; **3** utilisable mais une faiblesse réelle à corriger ; **2** défaut qui bloque le développement ou la recette ; **1** absent ou faux.
 
-**Verdict.** `acceptable` : l'équipe peut prendre l'élément en sprint après au plus des retouches mineures (en pratique, aucune note sous 3 et la plupart à 4 ou plus). `a_reprendre` : un défaut doit être corrigé avant le sprint (une note à 1 ou 2 suffit en général).
+**Verdict.** `acceptable` : l'équipe peut prendre l'élément en sprint tel quel ou après une retouche mineure. `a_reprendre` : l'élément repasse par le PO avant le sprint. Règle du PO : **à reprendre dès qu'une note est à 2 ou moins, ou que la moitié des critères (ou plus) sont à 3** ; une seule faiblesse à 3 au milieu de 4 et 5 reste acceptable. Un défaut de fond que la grille ne couvre pas (un « bug » qui décrit en fait une fonctionnalité absente) rend aussi l'élément à reprendre.
 
 Noter ce qui est écrit, pas ce que l'élément aurait pu être. Un champ vide ou générique (« améliorer l'expérience ») est noté comme absent.
 

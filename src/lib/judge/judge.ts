@@ -17,8 +17,9 @@ export const RUBRIC_FILE = path.join(process.cwd(), "src", "lib", "judge", "rubr
 /**
  * Whether the judge passed its calibration (eval:judge-calibration, SPEC §14.3: ≤ 1 point apart
  * on ≥ 80 % of the notes, κ ≥ 0.6 on the verdict). Until then the badge says « provisoire ».
+ * Passed on 2026-10-05: 86 % and κ 0.71 (docs/EVALS.md). Set back to false if the grid changes.
  */
-export const JUDGE_CALIBRATED = false;
+export const JUDGE_CALIBRATED = true;
 
 export const JUDGE_KINDS = ["story", "bug", "tache"] as const;
 export type JudgeKind = (typeof JUDGE_KINDS)[number];

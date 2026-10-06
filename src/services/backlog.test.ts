@@ -266,7 +266,7 @@ describe("draftBacklog (in-memory database, simulated models)", () => {
     expect(tables.backlog_items[0].judge).toMatchObject({
       note: 4,
       verdict: "pret",
-      provisional: true,
+      provisional: false,
     });
     expect(invoke.mock.calls.find((c) => c[3].name === "judge-backlog-item")![0]).toBe("judge");
   });
@@ -564,7 +564,7 @@ describe("judgeBacklogItems", () => {
     expect(invoke).not.toHaveBeenCalled();
   });
 
-  it("judges each item with the grid of its kind and writes a provisional badge", async () => {
+  it("judges each item with the grid of its kind and writes its badge", async () => {
     const tables = world();
     const row = (id: string, kind: string) => ({
       id,
@@ -606,7 +606,7 @@ describe("judgeBacklogItems", () => {
       note: 4.3,
       notes: { invest: 4, testabilite: 5, tracabilite: 4, format: 4 },
       verdict: "pret",
-      provisional: true,
+      provisional: false,
     });
     expect(task.judge).toBeNull(); // a failed call leaves its item without a badge, not the others
   });

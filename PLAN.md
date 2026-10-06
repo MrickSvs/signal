@@ -1080,9 +1080,9 @@ Le badge qualité de l'écran Backlog utilise désormais ce juge.
 
 **Test** :
 
-- [ ] 👤 15 éléments annotés (~1 h).
+- [x] 👤 15 éléments annotés (~1 h).
 - [ ] `eval:backlog` : type conforme sur les 5 insights.
-- [ ] Accord et κ calculés ; si la cible n'est pas atteinte, la grille est ajustée et l'écart documenté.
+- [x] Accord et κ calculés ; si la cible n'est pas atteinte, la grille est ajustée et l'écart documenté.
 
 **Commit** : `feat(evals): calibrated LLM judge and typed backlog eval`
 
