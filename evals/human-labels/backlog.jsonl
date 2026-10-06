@@ -1,0 +1,32 @@
+{"item_id":"CAL-08","kind":"story","notes":{"invest":5,"testabilite":4,"tracabilite":5,"format":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:32:48.793Z"}
+{"item_id":"CAL-09","kind":"story","notes":{"tracabilite":5,"format":5,"testabilite":5,"invest":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:33:37.988Z"}
+{"item_id":"CAL-10","kind":"story","notes":{"tracabilite":1,"invest":4,"testabilite":5,"format":5},"verdict":"a_reprendre","comment":"pas de preuve","annotated_at":"2026-10-06T01:34:38.935Z"}
+{"item_id":"CAL-11","kind":"story","notes":{"tracabilite":5,"invest":3,"format":4,"testabilite":4},"verdict":"a_reprendre","comment":"Titre pas compréhensible","annotated_at":"2026-10-06T01:35:37.023Z"}
+{"item_id":"CAL-12","kind":"story","notes":{"invest":5,"format":5,"testabilite":5,"tracabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:35:49.167Z"}
+{"item_id":"CAL-13","kind":"tache","notes":{"objectif":5,"definition_termine":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:36:18.380Z"}
+{"item_id":"CAL-14","kind":"story","notes":{"invest":5,"format":4,"testabilite":5,"tracabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:37:16.436Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":5,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:37:50.974Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":5,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:37:53.880Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":5,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:00.248Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":5,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:04.531Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":4,"tracabilite":5,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:06.281Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"a_reprendre","comment":"","annotated_at":"2026-10-06T01:38:10.327Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:12.827Z"}
+{"item_id":"CAL-01","kind":"story","notes":{"invest":5,"testabilite":5,"tracabilite":4,"format":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:34.116Z"}
+{"item_id":"CAL-02","kind":"story","notes":{"invest":3,"testabilite":4,"tracabilite":4,"format":4},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:38.444Z"}
+{"item_id":"CAL-03","kind":"bug","notes":{"reproductibilite":4,"attendu_constate":4,"severite":4,"critere_correction":4},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:42.211Z"}
+{"item_id":"CAL-04","kind":"story","notes":{"invest":4,"testabilite":5,"tracabilite":4,"format":4},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:46.679Z"}
+{"item_id":"CAL-05","kind":"bug","notes":{"reproductibilite":5,"attendu_constate":4,"critere_correction":4,"severite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:52.092Z"}
+{"item_id":"CAL-06","kind":"tache","notes":{"objectif":5,"definition_termine":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:38:56.310Z"}
+{"item_id":"CAL-07","kind":"bug","notes":{"reproductibilite":5,"attendu_constate":4,"critere_correction":4,"severite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:01.142Z"}
+{"item_id":"CAL-08","kind":"story","notes":{"invest":5,"testabilite":4,"tracabilite":5,"format":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:04.343Z"}
+{"item_id":"CAL-09","kind":"story","notes":{"tracabilite":5,"format":5,"testabilite":5,"invest":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:04.893Z"}
+{"item_id":"CAL-10","kind":"story","notes":{"tracabilite":1,"invest":4,"testabilite":5,"format":5},"verdict":"a_reprendre","comment":"pas de preuve","annotated_at":"2026-10-06T01:39:05.343Z"}
+{"item_id":"CAL-11","kind":"story","notes":{"tracabilite":5,"invest":3,"format":4,"testabilite":4},"verdict":"a_reprendre","comment":"Titre pas compréhensible","annotated_at":"2026-10-06T01:39:05.510Z"}
+{"item_id":"CAL-12","kind":"story","notes":{"invest":5,"format":5,"testabilite":5,"tracabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:05.639Z"}
+{"item_id":"CAL-13","kind":"tache","notes":{"objectif":5,"definition_termine":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:06.878Z"}
+{"item_id":"CAL-14","kind":"story","notes":{"invest":5,"format":4,"testabilite":5,"tracabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:07.909Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:08.509Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:09.025Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:09.191Z"}
+{"item_id":"CAL-15","kind":"story","notes":{"invest":5,"format":5,"tracabilite":4,"testabilite":5},"verdict":"acceptable","comment":"","annotated_at":"2026-10-06T01:39:09.341Z"}

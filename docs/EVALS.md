@@ -2,7 +2,7 @@
 
 <!-- Fichier généré par scripts/evals (pnpm eval:*) : ne pas modifier à la main. -->
 
-Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 6 oct. 2026, 03:08.
+Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 6 oct. 2026, 03:41.
 
 Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la démo) sert à régler prompts et seuils ; le **jeu réservé** (77 retours, `evals/holdout`) ne sert qu'à mesurer le triage. La détection est réglée et mesurée sur le même jeu : son chiffre est optimiste par construction.
 
@@ -16,8 +16,8 @@ Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la d
 | Stabilité du classement | Insights classés en base (jeu de développement), top 10, mode comptes, 1 runs | Runs avec le même top 3 : 1/1 ✅ |
 | Garde-fous | Scénarios scriptés (evals/guardrails.json) sur les données de démo en base | Scénarios de garde-fous réussis : 6/6 ✅ |
 | Choix d'outil et enquête | — | pas encore mesuré |
-| Backlog (type et note du juge) | — | étape 6.3 |
-| Calibration du juge | — | étape 6.3 |
+| Calibration du juge | Jeu de calibration (evals/human-labels) : 15 éléments annotés par le PO, dont 5 dégradés | Notes à 1 point ou moins de l'humain : 71 % (40/56) ❌ |
+| Backlog : type et note du juge | — | pas encore mesuré |
 
 ## Triage
 
@@ -162,6 +162,31 @@ Commande : `pnpm eval:guardrails`
 ## Choix d'outil et enquête
 
 Commande : `pnpm eval:guardrails --tools`
+
+Pas encore mesuré.
+
+## Calibration du juge
+
+Commande : `pnpm eval:judge-calibration`
+
+- **Jeu :** Jeu de calibration (evals/human-labels) : 15 éléments annotés par le PO, dont 5 dégradés
+- **Run :** 6 oct. 2026, 03:39 · commit `d16713a-dirty` · 15 cas · 0,41 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuw0ie3c06lhad0cp89r9jda)
+
+| Mesure | Valeur | Cible | |
+| --- | --- | --- | --- |
+| Notes à 1 point ou moins de l'humain | 71 % (40/56) | ≥ 80 % | ❌ |
+| κ de Cohen sur le verdict | 0,02 (accord 53 %) | ≥ 0,60 | ❌ |
+| Notes identiques | 30 % | — | — |
+| Écart moyen juge − humain (biais) | -0,95 | — | — |
+| Éléments dégradés jugés « à reprendre » (juge / humain) | 5/5 / 1/5 | — | — |
+
+> Le juge ne voit ni les annotations ni la liste des éléments dégradés ; même grille (src/lib/judge/rubric.md) pour le juge et l'humain.
+> Biais par critère (juge − humain) : invest -0,90 ; testabilite -1,60 ; tracabilite -0,30 ; format -0,80 ; reproductibilite -2,00 ; attendu_constate -1,00 ; severite -1,33 ; critere_correction 0,00 ; objectif -0,50 ; definition_termine -1,50.
+> Cibles non atteintes : ajuster la grille sur les critères les plus biaisés, puis relancer (le badge reste provisoire).
+
+## Backlog : type et note du juge
+
+Commande : `pnpm eval:backlog`
 
 Pas encore mesuré.
 
