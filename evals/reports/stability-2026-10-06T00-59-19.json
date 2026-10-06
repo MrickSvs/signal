@@ -1,0 +1,189 @@
+{
+  "eval": "stability",
+  "run_id": "2198c9c1-6266-4af2-89c0-cebf5daa7b45",
+  "git_sha": "e33df5f-dirty",
+  "config": {
+    "runs": 1,
+    "mode": "comptes",
+    "top": 10
+  },
+  "started_at": "2026-10-06T00:59:19.789Z",
+  "ended_at": "2026-10-06T00:59:58.336Z",
+  "cost_eur": 0.3257,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvz1occ05r1ad0ccuyq9l18",
+  "dataset": "Insights classés en base (jeu de développement), top 10, mode comptes, 1 runs",
+  "metrics": [
+    {
+      "key": "same_top3",
+      "label": "Runs avec le même top 3",
+      "value": 1,
+      "display": "1/1",
+      "target": "≥ 1/1 (4/5 ramené au nombre de runs)",
+      "met": true
+    },
+    {
+      "key": "kendall_tau",
+      "label": "τ de Kendall moyen sur le top 10",
+      "value": 1,
+      "display": "1,00",
+      "target": "≥ 0,8",
+      "met": true
+    }
+  ],
+  "details": {
+    "reference": [
+      "I-27",
+      "I-29",
+      "I-26",
+      "I-34",
+      "I-28",
+      "I-33",
+      "I-30",
+      "I-31",
+      "I-32",
+      "I-41"
+    ],
+    "spread": [
+      {
+        "insight": "I-27",
+        "stored_impact": 3,
+        "impacts": [
+          3
+        ],
+        "moscow": [
+          "must"
+        ]
+      },
+      {
+        "insight": "I-29",
+        "stored_impact": 2,
+        "impacts": [
+          2
+        ],
+        "moscow": [
+          "must"
+        ]
+      },
+      {
+        "insight": "I-26",
+        "stored_impact": 1,
+        "impacts": [
+          1
+        ],
+        "moscow": [
+          "could"
+        ]
+      },
+      {
+        "insight": "I-34",
+        "stored_impact": 2,
+        "impacts": [
+          2
+        ],
+        "moscow": [
+          "could"
+        ]
+      },
+      {
+        "insight": "I-28",
+        "stored_impact": 2,
+        "impacts": [
+          2
+        ],
+        "moscow": [
+          "should"
+        ]
+      },
+      {
+        "insight": "I-33",
+        "stored_impact": 1,
+        "impacts": [
+          1
+        ],
+        "moscow": [
+          "could"
+        ]
+      },
+      {
+        "insight": "I-30",
+        "stored_impact": 1,
+        "impacts": [
+          1
+        ],
+        "moscow": [
+          "could"
+        ]
+      },
+      {
+        "insight": "I-31",
+        "stored_impact": 3,
+        "impacts": [
+          3
+        ],
+        "moscow": [
+          "must"
+        ]
+      },
+      {
+        "insight": "I-32",
+        "stored_impact": 1,
+        "impacts": [
+          1
+        ],
+        "moscow": [
+          "could"
+        ]
+      },
+      {
+        "insight": "I-41",
+        "stored_impact": 2,
+        "impacts": [
+          2
+        ],
+        "moscow": [
+          "must"
+        ]
+      }
+    ]
+  },
+  "notes": [
+    "Référence : le classement recalculé à partir des jugements enregistrés. Chaque run rejuge le top 10 (Impact, alignement, MoSCoW), garde l'effort en cache et recalcule tout le classement en code.",
+    "Impact et MoSCoW identiques à chaque run sur tout le top 10."
+  ],
+  "results": [
+    {
+      "item_id": "run-1",
+      "expected": {
+        "top": [
+          "I-27",
+          "I-29",
+          "I-26",
+          "I-34",
+          "I-28",
+          "I-33",
+          "I-30",
+          "I-31",
+          "I-32",
+          "I-41"
+        ]
+      },
+      "actual": {
+        "top": [
+          "I-27",
+          "I-29",
+          "I-26",
+          "I-34",
+          "I-28",
+          "I-33",
+          "I-30",
+          "I-31",
+          "I-32",
+          "I-41"
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "5df3c5f1de0e22af7767a9e99dc92069"
+    }
+  ]
+}

@@ -1,0 +1,350 @@
+{
+  "eval": "detection",
+  "run_id": "0a1df972-6eed-443d-9a0c-3dc6a9e70ea9",
+  "git_sha": "e33df5f-dirty",
+  "config": {},
+  "started_at": "2026-10-06T00:44:48.659Z",
+  "ended_at": "2026-10-06T00:44:58.650Z",
+  "cost_eur": 0.0066,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvyiejl05n2ad0dyvrhylgv",
+  "dataset": "Jeu de développement (en base), réglé et mesuré sur le même jeu",
+  "metrics": [
+    {
+      "key": "patterns_detected",
+      "label": "Patterns détectés",
+      "value": 7,
+      "display": "7/8",
+      "target": "8/8",
+      "met": false
+    },
+    {
+      "key": "pattern_S1",
+      "label": "S1 : rappel / pureté (I-27)",
+      "value": 0.8846153846153846,
+      "display": "100 % / 88 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S2a",
+      "label": "S2a : rappel / pureté (I-26)",
+      "value": 0.9142857142857143,
+      "display": "91 % / 100 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S2b",
+      "label": "S2b : rappel / pureté (I-31)",
+      "value": 0.9,
+      "display": "100 % / 90 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S3",
+      "label": "S3 : rappel / pureté (I-28)",
+      "value": 0.9444444444444444,
+      "display": "94 % / 100 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S4",
+      "label": "S4 : rappel / pureté (I-39)",
+      "value": 0.6666666666666666,
+      "display": "67 % / 100 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": false
+    },
+    {
+      "key": "pattern_S5a",
+      "label": "S5a : rappel / pureté (I-30)",
+      "value": 1,
+      "display": "100 % / 100 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S5b",
+      "label": "S5b : rappel / pureté (I-32)",
+      "value": 0.8,
+      "display": "80 % / 100 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "pattern_S7",
+      "label": "S7 : rappel / pureté (I-29)",
+      "value": 0.8,
+      "display": "100 % / 80 %",
+      "target": "≥ 70 % / ≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "s3_states_need",
+      "label": "Titre de S3 formulé comme un besoin (juge)",
+      "value": 1,
+      "display": "oui",
+      "target": "oui",
+      "met": true
+    },
+    {
+      "key": "s5_tension",
+      "label": "Tension S5a / S5b détectée",
+      "value": 1,
+      "display": "oui",
+      "target": "oui",
+      "met": true
+    }
+  ],
+  "details": {
+    "matches": {
+      "S1": {
+        "insight_id": "I-27",
+        "hits": 23,
+        "known": 26,
+        "recall": 1,
+        "purity": 0.8846153846153846
+      },
+      "S2a": {
+        "insight_id": "I-26",
+        "hits": 32,
+        "known": 32,
+        "recall": 0.9142857142857143,
+        "purity": 1
+      },
+      "S2b": {
+        "insight_id": "I-31",
+        "hits": 9,
+        "known": 10,
+        "recall": 1,
+        "purity": 0.9
+      },
+      "S3": {
+        "insight_id": "I-28",
+        "hits": 17,
+        "known": 17,
+        "recall": 0.9444444444444444,
+        "purity": 1
+      },
+      "S4": {
+        "insight_id": "I-39",
+        "hits": 4,
+        "known": 4,
+        "recall": 0.6666666666666666,
+        "purity": 1
+      },
+      "S5a": {
+        "insight_id": "I-30",
+        "hits": 10,
+        "known": 10,
+        "recall": 1,
+        "purity": 1
+      },
+      "S5b": {
+        "insight_id": "I-32",
+        "hits": 8,
+        "known": 8,
+        "recall": 0.8,
+        "purity": 1
+      },
+      "S7": {
+        "insight_id": "I-29",
+        "hits": 12,
+        "known": 15,
+        "recall": 1,
+        "purity": 0.8
+      }
+    },
+    "verdict": {
+      "states_need": true,
+      "solution_named": null,
+      "rationale": "Le titre « Rendre compte de l'avancement au client sans tout remettre en forme » décrit ce que l'utilisateur cherche à accomplir et la friction qu'il subit (la remise en forme manuelle). Il n'impose aucune forme de réponse : ni export, ni rapport PDF, ni lien de partage, ni tableau de bord. L'énoncé mentionne l'export CSV existant comme contexte du problème, pas comme solution proposée dans le titre."
+    }
+  },
+  "notes": [
+    "Le pipeline a été réglé sur ce jeu : ces chiffres sont optimistes par construction (le jeu réservé ne sert qu'au triage).",
+    "Un item d'un retour multi-sujets (E1) compte pour le pattern dont il porte le domaine.",
+    "23 item(s) de retours ajoutés après la génération (sans vérité terrain) ignorés dans la pureté.",
+    "Juge sur le titre de S3 : Le titre « Rendre compte de l'avancement au client sans tout remettre en forme » décrit ce que l'utilisateur cherche à accomplir et la friction qu'il subit (la remise en forme manuelle). Il n'impose aucune forme de réponse : ni export, ni rapport PDF, ni lien de partage, ni tableau de bord. L'énoncé mentionne l'export CSV existant comme contexte du problème, pas comme solution proposée dans le titre."
+  ],
+  "results": [
+    {
+      "item_id": "S1",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-27",
+        "hits": 23,
+        "known": 26,
+        "recall": 1,
+        "purity": 0.8846153846153846,
+        "title": "Être prévenu quand une tâche m'est assignée"
+      },
+      "score": 0.8846153846153846,
+      "pass": true
+    },
+    {
+      "item_id": "S2a",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-26",
+        "hits": 32,
+        "known": 32,
+        "recall": 0.9142857142857143,
+        "purity": 1,
+        "title": "Visualiser et présenter le planning des projets dans le temps"
+      },
+      "score": 0.9142857142857143,
+      "pass": true
+    },
+    {
+      "item_id": "S2b",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-31",
+        "hits": 9,
+        "known": 10,
+        "recall": 1,
+        "purity": 0.9,
+        "title": "Donner accès à un projet sans exposer les autres projets"
+      },
+      "score": 0.9,
+      "pass": true
+    },
+    {
+      "item_id": "S3",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-28",
+        "hits": 17,
+        "known": 17,
+        "recall": 0.9444444444444444,
+        "purity": 1,
+        "title": "Rendre compte de l'avancement au client sans tout remettre en forme"
+      },
+      "score": 0.9444444444444444,
+      "pass": true
+    },
+    {
+      "item_id": "S4",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-39",
+        "hits": 4,
+        "known": 4,
+        "recall": 0.6666666666666666,
+        "purity": 1,
+        "title": "Facturer les clients sur le temps passé sans outil dédié"
+      },
+      "score": 0.6666666666666666,
+      "pass": false
+    },
+    {
+      "item_id": "S5a",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-30",
+        "hits": 10,
+        "known": 10,
+        "recall": 1,
+        "purity": 1,
+        "title": "Trouver et utiliser l'essentiel dans une interface trop chargée"
+      },
+      "score": 1,
+      "pass": true
+    },
+    {
+      "item_id": "S5b",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-32",
+        "hits": 8,
+        "known": 8,
+        "recall": 0.8,
+        "purity": 1,
+        "title": "Saisir des données cohérentes et normalisées dans les champs personnalisés"
+      },
+      "score": 0.8,
+      "pass": true
+    },
+    {
+      "item_id": "S7",
+      "expected": {
+        "min_recall": 0.7,
+        "min_purity": 0.7
+      },
+      "actual": {
+        "insight_id": "I-29",
+        "hits": 12,
+        "known": 15,
+        "recall": 1,
+        "purity": 0.8,
+        "title": "Travailler sur un tableau kanban devenu lent avec beaucoup de cartes"
+      },
+      "score": 0.8,
+      "pass": true
+    },
+    {
+      "item_id": "tension-S5",
+      "expected": {
+        "kind": "tension",
+        "between": [
+          "S5a",
+          "S5b"
+        ]
+      },
+      "actual": [
+        {
+          "insight_a": "I-30",
+          "insight_b": "I-32",
+          "kind": "tension"
+        },
+        {
+          "insight_a": "I-30",
+          "insight_b": "I-46",
+          "kind": "tension"
+        }
+      ],
+      "score": 1,
+      "pass": true
+    },
+    {
+      "item_id": "S3-title",
+      "expected": {
+        "states_need": true
+      },
+      "actual": {
+        "insight": "I-28",
+        "title": "Rendre compte de l'avancement au client sans tout remettre en forme",
+        "states_need": true,
+        "solution_named": null,
+        "rationale": "Le titre « Rendre compte de l'avancement au client sans tout remettre en forme » décrit ce que l'utilisateur cherche à accomplir et la friction qu'il subit (la remise en forme manuelle). Il n'impose aucune forme de réponse : ni export, ni rapport PDF, ni lien de partage, ni tableau de bord. L'énoncé mentionne l'export CSV existant comme contexte du problème, pas comme solution proposée dans le titre."
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "0183581948963f045e7bd22e5f865092"
+    }
+  ]
+}

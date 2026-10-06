@@ -1,0 +1,291 @@
+{
+  "eval": "estimation",
+  "run_id": "fbfa2bd4-538a-4de7-8e55-8d4a4533bbe5",
+  "git_sha": "e33df5f-dirty",
+  "config": {
+    "sample": 10
+  },
+  "started_at": "2026-10-06T00:58:36.587Z",
+  "ended_at": "2026-10-06T00:59:12.961Z",
+  "cost_eur": 0.2585,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvz0o6006bdad0cbm1qeadl",
+  "dataset": "Tickets de référence (data/reference_tickets.json), leave-one-out, 10/40 tickets",
+  "metrics": [
+    {
+      "key": "in_range",
+      "label": "Points réels dans la fourchette",
+      "value": 0.7,
+      "display": "70 % (7/10)",
+      "target": "≥ 70 %",
+      "met": true
+    },
+    {
+      "key": "mean_steps",
+      "label": "Erreur moyenne du milieu de la fourchette (crans Fibonacci)",
+      "value": 0.9,
+      "display": "0,90",
+      "target": "≤ 1 cran",
+      "met": true
+    },
+    {
+      "key": "vs_team",
+      "label": "Erreur moyenne de l'équipe (estimated_points), mêmes tickets",
+      "value": 0.3,
+      "display": "0,30 (Signal : 0,90)",
+      "target": "Signal au moins aussi bien",
+      "met": false
+    },
+    {
+      "key": "mean_width",
+      "label": "Largeur moyenne de la fourchette (crans)",
+      "value": 1.4,
+      "display": "1,40"
+    }
+  ],
+  "details": {
+    "failed": [],
+    "team_exact_share": 0.7
+  },
+  "notes": [
+    "Chaque ticket est retiré des analogues et du calcul de biais ; l'estimateur ne voit que son titre et sa description.",
+    "Erreur en crans : distance, sur l'échelle de Fibonacci, entre le milieu de la fourchette (moyenne des deux bornes en crans) et les points réels.",
+    "L'équipe tombe juste (estimé = réel) sur 70 % des tickets."
+  ],
+  "results": [
+    {
+      "item_id": "T-101",
+      "expected": {
+        "actual_points": 8,
+        "team": 8,
+        "components": [
+          "taches"
+        ]
+      },
+      "actual": {
+        "points_min": 8,
+        "points_max": 13,
+        "confidence": "moyenne",
+        "components": [
+          "taches",
+          "liste",
+          "tableau",
+          "notifications",
+          "export"
+        ]
+      },
+      "score": 0.5,
+      "pass": true,
+      "traceId": "e520de5e94cb58fd3690ae8e3aa38331"
+    },
+    {
+      "item_id": "T-105",
+      "expected": {
+        "actual_points": 5,
+        "team": 5,
+        "components": [
+          "champs_personnalises"
+        ]
+      },
+      "actual": {
+        "points_min": 5,
+        "points_max": 8,
+        "confidence": "moyenne",
+        "components": [
+          "champs_personnalises",
+          "taches",
+          "liste",
+          "export",
+          "parametres"
+        ]
+      },
+      "score": 0.5,
+      "pass": true,
+      "traceId": "f344f8f20cec9dac0f96dbe01d7b7c3c"
+    },
+    {
+      "item_id": "T-109",
+      "expected": {
+        "actual_points": 5,
+        "team": 5,
+        "components": [
+          "taches"
+        ]
+      },
+      "actual": {
+        "points_min": 8,
+        "points_max": 13,
+        "confidence": "moyenne",
+        "components": [
+          "taches",
+          "permissions"
+        ]
+      },
+      "score": 1.5,
+      "pass": false,
+      "traceId": "bb946eb882b519689e63b14ecb0909af"
+    },
+    {
+      "item_id": "T-113",
+      "expected": {
+        "actual_points": 1,
+        "team": 1,
+        "components": [
+          "notifications"
+        ]
+      },
+      "actual": {
+        "points_min": 2,
+        "points_max": 3,
+        "confidence": "moyenne",
+        "components": [
+          "notifications",
+          "taches"
+        ]
+      },
+      "score": 1.5,
+      "pass": false,
+      "traceId": "113e1c88516fdf94fb6377768a804841"
+    },
+    {
+      "item_id": "T-117",
+      "expected": {
+        "actual_points": 8,
+        "team": 5,
+        "components": [
+          "permissions",
+          "parametres"
+        ]
+      },
+      "actual": {
+        "points_min": 5,
+        "points_max": 13,
+        "confidence": "moyenne",
+        "components": [
+          "permissions",
+          "parametres",
+          "taches",
+          "liste",
+          "export"
+        ]
+      },
+      "score": 0,
+      "pass": true,
+      "traceId": "a42c970aa078fd38606d46c81ed3f9bd"
+    },
+    {
+      "item_id": "T-121",
+      "expected": {
+        "actual_points": 5,
+        "team": 3,
+        "components": [
+          "tableau"
+        ]
+      },
+      "actual": {
+        "points_min": 3,
+        "points_max": 5,
+        "confidence": "moyenne",
+        "components": [
+          "tableau",
+          "taches"
+        ]
+      },
+      "score": 0.5,
+      "pass": true,
+      "traceId": "71d21a4760821d4cc131fda0ff38b8bd"
+    },
+    {
+      "item_id": "T-125",
+      "expected": {
+        "actual_points": 2,
+        "team": 2,
+        "components": [
+          "champs_personnalises"
+        ]
+      },
+      "actual": {
+        "points_min": 1,
+        "points_max": 8,
+        "confidence": "basse",
+        "components": [
+          "champs_personnalises",
+          "taches"
+        ]
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "6860cc85951e299453f1dd359c63c619"
+    },
+    {
+      "item_id": "T-129",
+      "expected": {
+        "actual_points": 1,
+        "team": 1,
+        "components": [
+          "parametres"
+        ]
+      },
+      "actual": {
+        "points_min": 3,
+        "points_max": 5,
+        "confidence": "moyenne",
+        "components": [
+          "parametres",
+          "taches",
+          "liste",
+          "permissions"
+        ]
+      },
+      "score": 2.5,
+      "pass": false,
+      "traceId": "0df02d2a03ef6c0d6b17b4ca6ac26c04"
+    },
+    {
+      "item_id": "T-133",
+      "expected": {
+        "actual_points": 3,
+        "team": 3,
+        "components": [
+          "champs_personnalises",
+          "taches"
+        ]
+      },
+      "actual": {
+        "points_min": 3,
+        "points_max": 5,
+        "confidence": "moyenne",
+        "components": [
+          "champs_personnalises",
+          "parametres",
+          "taches"
+        ]
+      },
+      "score": 0.5,
+      "pass": true,
+      "traceId": "236bd90e1237d89d4d9728f98621a5b3"
+    },
+    {
+      "item_id": "T-137",
+      "expected": {
+        "actual_points": 8,
+        "team": 5,
+        "components": [
+          "permissions",
+          "taches"
+        ]
+      },
+      "actual": {
+        "points_min": 5,
+        "points_max": 8,
+        "confidence": "moyenne",
+        "components": [
+          "permissions",
+          "taches"
+        ]
+      },
+      "score": 0.5,
+      "pass": true,
+      "traceId": "f1aa8d3ed7ebdf3c1363226af8d4bc78"
+    }
+  ]
+}

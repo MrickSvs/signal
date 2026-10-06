@@ -193,6 +193,7 @@ describe("investigate (simulated model)", () => {
     const model = new ScriptedModel(() => submitCall(dossier()));
     const result = await investigate(ALERT_ID, depsFor(tables), { skills, model });
     expect(result.status).toBe("pret");
+    expect(result.toolCalls).toEqual(["submit_dossier"]);
     expect(model.received).toHaveLength(1); // the run stops once the dossier is accepted
     const alert = tables.alerts[0];
     expect(alert.dossier_status).toBe("pret");
@@ -246,6 +247,8 @@ describe("investigate (simulated model)", () => {
     );
     expect(model.received).toHaveLength(3);
     expect(result).toMatchObject({ status: "echec", error: expect.stringContaining("2 appels") });
+    // Every call the model asked for, the last one included (stopped before it ran).
+    expect(result.toolCalls).toEqual(["load_skill", "load_skill", "load_skill"]);
   });
 
   it("stops beyond the cost budget and records the cost (CL-56)", async () => {

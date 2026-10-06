@@ -317,6 +317,8 @@ export type InvestigationResult = {
   costEur: number;
   langfuseUrl: string | null;
   durationMs: number;
+  /** Tools the investigation called, in order (eval:guardrails --tools: none may write). */
+  toolCalls: string[];
 };
 
 export type InvestigateOptions = {
@@ -376,6 +378,7 @@ export async function investigate(
   const outcome: BudgetOutcome = { exceeded: null };
   let accepted: Dossier | null = null;
   let traceId: string | undefined;
+  let toolCalls: string[] = [];
   type Stored = Pick<InvestigationResult, "status" | "error" | "costEur" | "langfuseUrl">;
   let stored: Stored | null = null;
 
@@ -439,9 +442,12 @@ export async function investigate(
           ],
         });
         const context: TurnContext = { threadId: `alerte-${alertId}`, runCost, page: null };
-        await agent.invoke(
+        const state = await agent.invoke(
           { messages: [new HumanMessage(investigationBrief(alert, deps.now()))] },
           { context, recursionLimit: RECURSION_LIMIT, callbacks: langfuseCallbacks() },
+        );
+        toolCalls = state.messages.flatMap((m) =>
+          AIMessage.isInstance(m) ? (m.tool_calls ?? []).map((c) => c.name) : [],
         );
         await store(accepted ? null : (outcome.exceeded ?? "aucun dossier valide rendu"));
       },
@@ -466,6 +472,7 @@ export async function investigate(
     costEur,
     langfuseUrl,
     durationMs: Date.now() - started,
+    toolCalls,
   };
 }
 
