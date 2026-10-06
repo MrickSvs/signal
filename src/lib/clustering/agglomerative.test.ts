@@ -31,6 +31,10 @@ describe("cosine helpers", () => {
     expect(c[1]).toBeCloseTo(Math.SQRT1_2);
     expect(() => centroid([])).toThrow();
   });
+
+  it("centroid of zero vectors stays the zero vector instead of dividing by zero", () => {
+    expect(centroid([[0, 0]])).toEqual([0, 0]);
+  });
 });
 
 describe("agglomerativeCluster", () => {

@@ -335,3 +335,81 @@ describe("applyMerges (consolidation pass)", () => {
     expect(insights[2]).toMatchObject({ status: "fusionne", mergedInto: "I-01" });
   });
 });
+
+describe("matchClusters edge cases", () => {
+  it("resolveMergeTarget: unknown id, or a chain to a missing insight, gives null", () => {
+    const byId = new Map([["I-08", { status: "fusionne" as const, mergedInto: "I-99" }]]);
+    expect(resolveMergeTarget("I-00", byId)).toBeNull();
+    expect(resolveMergeTarget("I-08", byId)).toBeNull();
+  });
+
+  it("centroid ties are broken by insight id, then by cluster order", () => {
+    const flat = new Map<string, Vector>(
+      ["x1", "x2", "y1", "y2", "z1", "z2", "w1", "w2"].map((id) => [id, [1, 0, 0]]),
+    );
+    const result = matchClusters(
+      [prev({ id: "I-02", itemIds: ["y1", "y2"] }), prev({ id: "I-01", itemIds: ["x1", "x2"] })],
+      [cluster(["z1", "z2"]), cluster(["w1", "w2"])],
+      { ...options, vectors: flat },
+    );
+    expect(result.matchedBy).toEqual({ "I-01": "centroide", "I-02": "centroide" });
+    expect(byKey(result)["I-01"].itemIds).toEqual(["z1", "z2"]);
+    expect(byKey(result)["I-02"].itemIds).toEqual(["w1", "w2"]);
+  });
+
+  it("insights whose items vanished, without vectors, dissolve in size then id order", () => {
+    const result = matchClusters(
+      [
+        prev({ id: "I-03", itemIds: ["gone1"] }),
+        prev({ id: "I-02", itemIds: ["gone2"] }),
+        prev({ id: "I-01", itemIds: ["gone3", "gone4"] }),
+      ],
+      [cluster(["new1"])],
+      options,
+    );
+    expect(result.events).toEqual([
+      { kind: "dissous", id: "I-01" },
+      { kind: "dissous", id: "I-02" },
+      { kind: "dissous", id: "I-03" },
+    ]);
+    expect(byKey(result).N1.isNew).toBe(true);
+  });
+
+  it("a new topic next to a kept insight is not reported as a split", () => {
+    const result = matchClusters(
+      [prev({ id: "I-01", itemIds: items("a", 1, 6) })],
+      [cluster(items("a", 1, 6)), cluster(items("b", 1, 4))],
+      options,
+    );
+    expect(result.events).toEqual([]);
+    expect(byKey(result).N1.isNew).toBe(true);
+  });
+});
+
+describe("applyMerges survivor order", () => {
+  const planned = (key: string, itemIds: string[]): PlannedInsight => ({
+    key,
+    itemIds,
+    isNew: key.startsWith("N"),
+    status: key.startsWith("N") ? "propose" : "actif",
+    mergedInto: null,
+    titleLocked: false,
+    previousItemIds: key.startsWith("N") ? null : itemIds,
+    needsLabel: key.startsWith("N"),
+  });
+
+  it("the existing insight survives whichever side it is on", () => {
+    const insights = [planned("I-01", ["a1"]), planned("N1", ["a2", "a3"])];
+    applyMerges(insights, [{ a: "I-01", b: "N1", reason: "x" }]);
+    expect(insights[1]).toMatchObject({ status: "fusionne", mergedInto: "I-01" });
+  });
+
+  it("between new insights, the bigger or lower key survives whichever side it is on", () => {
+    const bigger = [planned("N1", ["a1", "a2"]), planned("N2", ["a3"])];
+    applyMerges(bigger, [{ a: "N1", b: "N2", reason: "x" }]);
+    expect(bigger[1]).toMatchObject({ status: "fusionne", mergedInto: "N1" });
+    const tie = [planned("N2", ["a1"]), planned("N10", ["a2"])];
+    applyMerges(tie, [{ a: "N2", b: "N10", reason: "x" }]);
+    expect(tie[1]).toMatchObject({ status: "fusionne", mergedInto: "N2" });
+  });
+});

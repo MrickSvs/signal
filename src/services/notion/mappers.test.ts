@@ -216,3 +216,59 @@ describe("approval preview (SPEC §10.6)", () => {
     expect(backlogPagePreview(task)).toContain("2 critères de terminé");
   });
 });
+
+describe("sparse items", () => {
+  const bare: NotionBacklogItem = {
+    ...task,
+    id: "BUG-009",
+    kind: "bug",
+    points: null,
+    objective: null,
+    definition_of_done: [],
+    risks: [],
+    evidence: [],
+    insight: null,
+    moscow: null,
+  };
+
+  it("bug without behaviors, severity, steps or criteria: empty sections, no evidence", () => {
+    const blocks = text(backlogPageBlocks(bare, BASE));
+    expect(statement(bare)).toBe("");
+    expect(blocks).toContain("—");
+    expect(blocks).not.toContain("Étapes de reproduction");
+    expect(blocks).not.toContain("Critères d'acceptation");
+    expect(blocks).not.toContain("Preuves");
+    const properties = backlogPageProperties(bare, { baseUrl: BASE, validatedAt: new Date() });
+    expect(properties.Insight).toEqual({ rich_text: [] });
+    expect(backlogPagePreview(bare)).toBe(
+      "BUG-009 · Bug · Centraliser les permissions\nStatut Prêt · non estimé\n",
+    );
+  });
+
+  it("bug preview counts its scenarios and reproduction steps", () => {
+    expect(
+      backlogPagePreview({ ...bare, repro_steps: ["a"], acceptance_criteria: [scenario("x")] }),
+    ).toContain("Corps : 1 scénarios, 1 étapes de reproduction.");
+  });
+
+  it("story without rules or KPI, task without objective, definition of done or risks", () => {
+    const plainStory = text(
+      backlogPageBlocks({ ...story, business_rules: [], success_kpi: null }, BASE),
+    );
+    expect(plainStory).not.toContain("Règles de gestion");
+    expect(plainStory).not.toContain("KPI de succès");
+    const plainTask = { ...bare, kind: "tache" as const };
+    expect(statement(plainTask)).toBe("");
+    const blocks = text(backlogPageBlocks(plainTask, BASE));
+    expect(blocks).toContain("Objectif");
+    expect(blocks).not.toContain("Définition de terminé");
+    expect(blocks).not.toContain("Risques");
+  });
+
+  it("a text of exactly twice the limit gives two full pieces and no empty one", () => {
+    expect(splitText("a".repeat(2 * RICH_TEXT_MAX))).toEqual([
+      "a".repeat(RICH_TEXT_MAX),
+      "a".repeat(RICH_TEXT_MAX),
+    ]);
+  });
+});

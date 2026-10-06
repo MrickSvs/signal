@@ -105,7 +105,7 @@ export function splitText(text: string, max = RICH_TEXT_MAX): string[] {
     pieces.push(rest.slice(0, cut));
     rest = rest.slice(cut);
   }
-  if (rest.length > 0 || pieces.length === 0) pieces.push(rest);
+  pieces.push(rest); // never empty, unless the text itself is
   return pieces;
 }
 
@@ -149,8 +149,7 @@ export function statement(item: NotionBacklogItem): string {
   }
 }
 
-const label = (ref: { id: string; title: string } | null) =>
-  ref ? `${ref.id} · ${ref.title}` : "";
+const label = (ref: { id: string; title: string }) => `${ref.id} · ${ref.title}`;
 
 /** Properties of the page in the Backlog data source; it is born « Prêt » (SPEC §11.2). */
 export function backlogPageProperties(

@@ -1,5 +1,7 @@
 # Signal
 
+[![CI](https://github.com/MrickSvs/signal/actions/workflows/ci.yml/badge.svg)](https://github.com/MrickSvs/signal/actions/workflows/ci.yml)
+
 L'agent IA du Product Owner de Jalon. Le quoi et le pourquoi sont dans [SPEC.md](SPEC.md), l'ordre de construction dans [PLAN.md](PLAN.md), l'avancement dans [CHANGELOG.md](CHANGELOG.md). Ce README sera complété à l'étape 8.2.
 
 ## Notion

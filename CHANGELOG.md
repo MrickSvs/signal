@@ -5,14 +5,15 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 
 ## État actuel
 
-- **Phase 5 (Notion) faite** : 5.1 faite — envoi des éléments validés dans le kanban Notion, depuis le chat (carte d'approbation) ou l'écran Backlog, dans un seul sens (ADR-026, ADR-027). Le bonus 5.2 (retour du statut) attend la fin de 8.1. Prochaine étape : 6.1 (tests unitaires et CI).
+- **Phase 5 (Notion) faite** : 5.1 faite — envoi des éléments validés dans le kanban Notion, depuis le chat (carte d'approbation) ou l'écran Backlog, dans un seul sens (ADR-026, ADR-027). Le bonus 5.2 (retour du statut) attend la fin de 8.1.
+- **Phase 6 (qualité) commencée** : 6.1 faite — cœur déterministe couvert à 100 %, garde des données d'évaluation par `no-restricted-imports`, rapport de couverture en artefact de CI. Prochaine étape : 6.2 (harnais d'evals).
 - Notion : page « Jalon — Produit (Signal) », base Backlog et vue Kanban créées ; US-015 et BUG-002 (insight I-50) envoyés pendant les essais.
 - **Phase 4 (agent) terminée** : 4.1 à 4.5 faites — agent, chat et trace en direct, rédaction du backlog (stories, bugs, tâches estimés par analogie), validation humaine des décisions (carte d'approbation, challenge, revue des insights proposés), alertes et enquêtes en lecture seule.
 - **Phase 3 (cockpit) terminée** : 3.1 à 3.6 faites (shell, Digest, Retours, Insights, priorisation interactive, Contexte).
 - **Phase 2 (pipeline) terminée** : 2.1 à 2.7 faites. Le pipeline tourne de bout en bout en graphe LangGraph (`pnpm pipeline:run`, reprise avec `--resume`) jusqu'au digest ; mode incrémental (`POST /api/pipeline/incremental`), alertes, digest à la demande (`pnpm digest`) et cron quotidien (`GET /api/cron/digest`). Checklists 2.6 et 2.7 validées, sauf la latence de l'incrémental (voir ci-dessous).
 - Base Supabase : 90 clients + 5 prospects, 40 tickets de référence, 214 retours de développement + 10 retours d'essai (R-215 à R-224). 25 insights au statut « propose » (I-26 à I-50), 11 classés et scorés ; S1 à S7 présents (S4 en signal faible). 3 alertes d'essai ouvertes (dossiers vides jusqu'à 4.5). 5 digests (le premier sans historique). Le jeu réservé (77 retours) reste hors base.
 - App déployée sur Vercel (production, protégée par Basic Auth) : https://signal-coral-two.vercel.app — shell du cockpit, sections encore vides ; routes `/api/pipeline/*` et `/api/cron/digest`, région `dub1`, cron quotidien à 4 h UTC.
-- CI GitHub Actions (lint, typecheck, tests, sans aucune clé) : 570 tests. `lib/scoring` couvert à 100 % (`pnpm test:coverage`).
+- CI GitHub Actions (lint, typecheck, tests avec couverture, sans aucune clé ; badge dans le README) : 636 tests. `lib/scoring`, `lib/clustering`, `pipeline/nodes/match.ts` et `services/notion/mappers.ts` couverts à 100 % (`pnpm test:coverage`, seuil bloquant).
 - Base : migrations 0006 (`match_feedback_items`, recherche par le sens) et 0007 (`id_incidents`, journal des ID inconnus, 1 ligne d'essai : R-999). Retour d'essai R-226 (mail collé dans le chat, rattaché à C-013 / I-27) et ses 3 alertes ajoutés en 4.1.
 - Données d'essai de 4.3 et 4.4 : epics E-01 à E-04 et brouillons du backlog (migration 0008), retours R-228 à R-232 (accessibilité) et insight I-52 accepté et reformulé dans le chat ; décisions D-063 à D-075. **I-26 en Must et I-30 en Confidence 50 % sont des overrides de test** (à annuler depuis l'écran Priorisation si besoin).
 - Coût LLM cumulé : ~7,3 € (validation humaine en 4.4 ~0,45 €, rédaction du backlog en 4.3 ~0,85 €, essais du chat en 4.2 ~0,23 €, de l'agent en 4.1 ~0,30 €, génération des tickets ~0,21 €, des retours ~2,1 €, triage ~0,34 €, regroupement ~0,31 €, estimation ~0,13 €, scoring ~0,81 €, run complet sur base vide ~1,3 €, essais incrémentaux ~0,18 €, digests ~0,09 €).
@@ -57,6 +58,13 @@ Pour le détail : le **pourquoi** des choix est dans [docs/DECISIONS.md](docs/DE
 - **Validation humaine** : un refus de carte est journalisé par la route de reprise (le middleware n'exécute pas l'outil refusé) ; écrire au lieu de répondre abandonne la carte sans rien appliquer. L'ordre des middlewares compte : les hooks `afterModel` s'exécutent en ordre inverse, le HITL est placé avant le budget et la trace pour que le coût soit compté avant la pause. → ADR-024
 - **Valeurs envoyées en texte** : le modèle peut envoyer « 50 » ou « 50 % » pour une Confidence ; le contrôle les convertit avant de les vérifier sur l'échelle (`d1a95cf`).
 - **Rechargement à chaud en dev** : l'agent est gardé dans `globalThis` ; après un rechargement, une classe rechargée ne passe plus `instanceof`. Le contexte du tour est vérifié par sa forme (`1a98513`). Redémarrer `pnpm dev` après une modification de l'agent (prompt, outils) reste nécessaire pour qu'elle soit prise en compte.
+
+## [6.1] Tests unitaires et CI — 2026-10-05
+
+- Couverture à 100 % (lignes, branches, fonctions) étendue de `lib/scoring` à `lib/clustering`, `pipeline/nodes/match.ts` et `services/notion/mappers.ts` ; seuil bloquant dans `pnpm test:coverage`. 11 tests ajoutés (égalités de l'appariement par centroïdes, insights dissous sans vecteurs, ordre du survivant d'une fusion, éléments du backlog sans sections, vecteur nul).
+- Deux branches mortes retirées de `mappers.ts` (`splitText` ne laisse jamais de reste vide ; `label` n'est appelé qu'avec une référence).
+- Garde des données d'évaluation : `no-restricted-imports` sur `src/` (imports de `evals/ground-truth` et `evals/holdout`), en plus de la règle sur les chaînes et du test de chemins existants ; `scripts/` garde son accès.
+- CI : `pnpm test:coverage` remplace `pnpm test`, rapport de couverture publié en artefact ; aucune variable secrète. Vérifié en local sur une copie sans `.env` et avec un environnement vide.
 
 ## [5.1] Envoi des éléments validés vers Notion — 2026-10-05
 
