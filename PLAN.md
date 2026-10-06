@@ -1018,8 +1018,8 @@ Consulte la doc actuelle de l'API Notion (version 2025-09-03 : data sources) et 
 
 **Test** :
 
-- [ ] CI verte sans secrets, couverture conforme.
-- [ ] Un import volontaire de `evals/ground-truth` dans `src` fait échouer le lint.
+- [x] CI verte sans secrets, couverture conforme.
+- [x] Un import volontaire de `evals/ground-truth` dans `src` fait échouer le lint.
 
 **Commit** : `test: coverage for deterministic core and evaluation data guard`
 
@@ -1051,8 +1051,8 @@ Par défaut --sample 60 pour le triage (plafond Langfuse) ; --full pour tout le 
 
 **Test** :
 
-- [ ] Les commandes tournent et écrivent leurs résultats.
-- [ ] `docs/EVALS.md` est généré et indique sur quel jeu chaque chiffre est mesuré ; les écarts aux cibles sont analysés dans BUILD_LOG (cause, correction tentée), sans jamais toucher à la vérité terrain pour les faire disparaître.
+- [x] Les commandes tournent et écrivent leurs résultats. Écart accepté par le PO : `eval:guardrails --tools` non lancé (~1,5 €) ; estimation (10/40 tickets) et stabilité (1 run) en échantillon.
+- [x] `docs/EVALS.md` est généré et indique sur quel jeu chaque chiffre est mesuré ; les écarts aux cibles sont analysés dans BUILD_LOG (cause, correction tentée), sans jamais toucher à la vérité terrain pour les faire disparaître.
 
 **Commit** : `feat(evals): triage, edge cases, detection, estimation, stability and guardrail evals`
 
