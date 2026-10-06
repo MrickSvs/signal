@@ -45,7 +45,8 @@ export const DEFAULT_SAMPLE = 60; // Langfuse Hobby cap (CL-48)
 const COST_PER_FEEDBACK_EUR: Record<TriageModel, number> = { haiku: 0.002, sonnet: 0.01 };
 const CONCURRENCY = 8;
 
-const pct = (r: number) => `${Math.round(r * 100)} %`;
+// One decimal and three for the F1: a value just under its target must not round up to it.
+const pct = (r: number) => `${(r * 100).toFixed(1).replace(".", ",").replace(",0", "")} %`;
 const dec = (n: number, digits = 2) => n.toFixed(digits).replace(".", ",");
 
 // ---------------------------------------------------------------------------
@@ -207,7 +208,7 @@ export function holdoutMetrics(score: HoldoutScore, suffix = ""): Metric[] {
       key: `area_macro_f1${key}`,
       label: `Macro-F1 du domaine${tag}`,
       value: score.areaMacroF1,
-      display: dec(score.areaMacroF1),
+      display: dec(score.areaMacroF1, 3),
       target: "≥ 0,85",
       met: score.areaMacroF1 >= 0.85,
     },

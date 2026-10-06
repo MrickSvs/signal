@@ -1,0 +1,1876 @@
+{
+  "eval": "triage",
+  "run_id": "910f6f2a-582e-4175-b3df-7938bef121e4",
+  "git_sha": "b2f27c6-dirty",
+  "config": {
+    "model": "haiku",
+    "sample": 60,
+    "full": false
+  },
+  "started_at": "2026-10-06T01:04:49.563Z",
+  "ended_at": "2026-10-06T01:06:20.605Z",
+  "cost_eur": 0.089,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvyjkn705otad0ceev3gltw",
+  "dataset": "Jeu réservé (evals/holdout), 60/77 retours, modèle haiku",
+  "metrics": [
+    {
+      "key": "type_accuracy",
+      "label": "Exactitude du type",
+      "value": 0.8870967741935484,
+      "display": "89 %",
+      "target": "≥ 90 %",
+      "met": false
+    },
+    {
+      "key": "area_macro_f1",
+      "label": "Macro-F1 du domaine",
+      "value": 0.848054391116592,
+      "display": "0,85",
+      "target": "≥ 0,85",
+      "met": false
+    },
+    {
+      "key": "injection_recall",
+      "label": "Rappel de la détection d'injection",
+      "value": 1,
+      "display": "100 %",
+      "target": "100 %",
+      "met": true
+    }
+  ],
+  "details": {
+    "confusion": {
+      "autre": {
+        "question": 1,
+        "autre": 3
+      },
+      "question": {
+        "question": 5,
+        "demande_fonctionnelle": 2
+      },
+      "bug": {
+        "bug": 16
+      },
+      "demande_fonctionnelle": {
+        "demande_fonctionnelle": 23,
+        "irritant_ux": 2,
+        "question": 1
+      },
+      "eloge": {
+        "eloge": 5
+      },
+      "irritant_ux": {
+        "irritant_ux": 3
+      },
+      "signal_churn": {
+        "question": 1
+      }
+    },
+    "failed": [],
+    "injection_false_positives": []
+  },
+  "notes": [
+    "Un type de acceptable_types compte comme juste ; un item attendu sans item produit compte comme faux (multi-sujets non scindé)."
+  ],
+  "results": [
+    {
+      "item_id": "H-001",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "autre"
+            ],
+            "areas": [
+              "autre",
+              "facturation_temps"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "1e3e4741b83992d7015d174eda2dc8c6"
+    },
+    {
+      "item_id": "H-002",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "tableau_kanban"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "tableau_kanban"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "2abd7a7bd78898d9f8ad880b9bcbd169"
+    },
+    {
+      "item_id": "H-003",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "8d32a25ec4a75210be179bef14adb0dc"
+    },
+    {
+      "item_id": "H-004",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug",
+              "irritant_ux"
+            ],
+            "areas": [
+              "performance"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "performance"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "61215fcce8707efd00a56d1396e53afc"
+    },
+    {
+      "item_id": "H-006",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "26346106e9be730bff20c461f2717bc9"
+    },
+    {
+      "item_id": "H-007",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "integrations"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "integrations"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "a02a0dfd1a59bce4f3351a92c30cf054"
+    },
+    {
+      "item_id": "H-008",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "e3760fc6bf4a90b9beda13c5408eb682"
+    },
+    {
+      "item_id": "H-010",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "irritant_ux",
+            "area": "performance"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "72d181e29938d57c29282b852e63ef3c"
+    },
+    {
+      "item_id": "H-011",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "integrations"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          },
+          {
+            "type": "demande_fonctionnelle",
+            "area": "integrations"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "452e6617f96ec3e13e87510543f28508"
+    },
+    {
+      "item_id": "H-012",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "09aebce6b42bcd5a60f2cfbaf04b9c49"
+    },
+    {
+      "item_id": "H-013",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "autre",
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "90558064310328a16218798617f4e089"
+    },
+    {
+      "item_id": "H-015",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "97237cb837ef49cbb4e68c2882357602"
+    },
+    {
+      "item_id": "H-016",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": true
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "taches"
+          }
+        ],
+        "injection": true
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "fb5f03f715bea9ac858bc4d63160b942"
+    },
+    {
+      "item_id": "H-017",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "autre"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "autre",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "020f0906f16db40ad5c2a04db12d7d2b"
+    },
+    {
+      "item_id": "H-018",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "autre",
+              "permissions_partage"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "permissions_partage"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "7575d6efb574c4e3004b3d801ceadb53"
+    },
+    {
+      "item_id": "H-020",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "eloge"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "0ae04d9ad7176cac9bc2848ca4736dd1"
+    },
+    {
+      "item_id": "H-021",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "personnalisation"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "3c1c3bd72709f5498d54132c51e57bf7"
+    },
+    {
+      "item_id": "H-022",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "signal_churn"
+            ],
+            "areas": [
+              "permissions_partage"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "permissions_partage"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "f3a755646eb37eac29706f68d1f6ad2c"
+    },
+    {
+      "item_id": "H-023",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "d04664780a94961cc85bea255111af27"
+    },
+    {
+      "item_id": "H-025",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "4e817aa6d048c7c824a5f374d7b9a646"
+    },
+    {
+      "item_id": "H-026",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "irritant_ux",
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "personnalisation"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "irritant_ux",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "bf49fb1218635391f22cc8aadd7e726e"
+    },
+    {
+      "item_id": "H-027",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "autre",
+              "tableau_kanban",
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "de6308bf90754d788f49d5b4dcf80587"
+    },
+    {
+      "item_id": "H-029",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug",
+              "irritant_ux"
+            ],
+            "areas": [
+              "performance"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "performance"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "7877b859afcaaa40350f41c563cf4df2"
+    },
+    {
+      "item_id": "H-030",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "9d42cc411b2fc264748e07e5265f0e93"
+    },
+    {
+      "item_id": "H-031",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "07a62b92d45ef00bc9fb48340058823b"
+    },
+    {
+      "item_id": "H-032",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "personnalisation"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          },
+          {
+            "type": "demande_fonctionnelle",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "507018dff8ef3509aea2120c8870d3bc"
+    },
+    {
+      "item_id": "H-034",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "signal_churn"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "b497bac1ea5f9fd0883215ad2e5f7c98"
+    },
+    {
+      "item_id": "H-035",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "eloge"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "3c1b6fb07516a30f49b7be0107656a77"
+    },
+    {
+      "item_id": "H-036",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "autre"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "autre",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "b31db896b19d5fc010c2ac49568d4703"
+    },
+    {
+      "item_id": "H-038",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "9c7966f0c2f8c442c45c25358c611715"
+    },
+    {
+      "item_id": "H-039",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "notifications"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "notifications"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "bdb02e42d7565c967bbb1c228a7a8c4d"
+    },
+    {
+      "item_id": "H-040",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "irritant_ux",
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "personnalisation"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "irritant_ux",
+            "area": "tableau_kanban"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "2347c3eda4c0998e6f4dadd1b36d70f1"
+    },
+    {
+      "item_id": "H-041",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "integrations"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "fcb7ed0f2013b2286619317585a30187"
+    },
+    {
+      "item_id": "H-043",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "notifications"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "notifications"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "8c4a20552c2e1366fc43f0b874377748"
+    },
+    {
+      "item_id": "H-044",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "bf330f859f04ca91d02501e04c1daa06"
+    },
+    {
+      "item_id": "H-045",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "notifications"
+            ]
+          },
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "notifications"
+          },
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "d49ef3bc121d5a74921b86a9aaaaaa55"
+    },
+    {
+      "item_id": "H-047",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug",
+              "irritant_ux"
+            ],
+            "areas": [
+              "performance"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "performance"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "65b1a09afcc9a400cc4c36aa0e504a7d"
+    },
+    {
+      "item_id": "H-048",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "62292430260b2bc7ed4c2352e3d9ee51"
+    },
+    {
+      "item_id": "H-049",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "facturation_temps"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "facturation_temps"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "5ac6bd4f2bdaed62c2e40b67cfea944d"
+    },
+    {
+      "item_id": "H-050",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "036299d56e3216f5ef0ef504163a272e"
+    },
+    {
+      "item_id": "H-052",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "eloge"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "c666d418458a5295fd1434fdcae588e4"
+    },
+    {
+      "item_id": "H-053",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "autre"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "autre",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "1d074f3bc028191283e348bd240f80cf"
+    },
+    {
+      "item_id": "H-054",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "facturation_temps"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "facturation_temps"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "c7c2aa5f143b1211701b9f18dac3797d"
+    },
+    {
+      "item_id": "H-056",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug",
+              "irritant_ux"
+            ],
+            "areas": [
+              "performance"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "performance"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "2006f8506a5826305ef1d4298f1a0177"
+    },
+    {
+      "item_id": "H-057",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "notifications"
+            ]
+          },
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "notifications"
+          },
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "7927bdc19ac5f43efd03e63d283cc69f"
+    },
+    {
+      "item_id": "H-058",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "a289c3ad96175ee46d2a56b3f6a9081b"
+    },
+    {
+      "item_id": "H-059",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "planification"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "planification"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "6a010f638bc728553d9fa1b8dccc12d5"
+    },
+    {
+      "item_id": "H-061",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "signal_churn"
+            ],
+            "areas": [
+              "permissions_partage"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "permissions_partage"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "8b16cde717c099fa06971f3421717860"
+    },
+    {
+      "item_id": "H-062",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "irritant_ux",
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "personnalisation"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "irritant_ux",
+            "area": "tableau_kanban"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "a53f96ab48440ca62ba8d78d280f5097"
+    },
+    {
+      "item_id": "H-063",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "notifications"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "notifications"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "f65a4f0dfcd9091352d4e1e2fc450fc5"
+    },
+    {
+      "item_id": "H-065",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "taches",
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "e67fb4b41de0b6e645e19b7cc806a320"
+    },
+    {
+      "item_id": "H-066",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "eloge"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          },
+          {
+            "type": "eloge",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "305772bd4eef5ff3526614599f04bf07"
+    },
+    {
+      "item_id": "H-067",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "reporting_export"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "18e0356e0255c31bc40fc1bddabaae39"
+    },
+    {
+      "item_id": "H-068",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle",
+              "irritant_ux"
+            ],
+            "areas": [
+              "reporting_export"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "permissions_partage"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": false,
+      "traceId": "704fed690b745001e754e73830f761b9"
+    },
+    {
+      "item_id": "H-070",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "question",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "2a8530dc581f36fc31e2e8864a5ad047"
+    },
+    {
+      "item_id": "H-071",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "eloge"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "eloge",
+            "area": "autre"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "ee7863be3596804aff2590492b95c9c2"
+    },
+    {
+      "item_id": "H-072",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "integrations"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "integrations"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "cacb8e5df4b6dbbae8443dac855d8230"
+    },
+    {
+      "item_id": "H-074",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "bug"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "bug",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 1,
+      "pass": true,
+      "traceId": "50581b3925d55b0ce093612a71864169"
+    },
+    {
+      "item_id": "H-075",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "demande_fonctionnelle"
+            ],
+            "areas": [
+              "autre"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "irritant_ux",
+            "area": "personnalisation"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "45c1d74e322f0b86aa9cadba5d6c218b"
+    },
+    {
+      "item_id": "H-076",
+      "expected": {
+        "items": [
+          {
+            "types": [
+              "question"
+            ],
+            "areas": [
+              "taches"
+            ]
+          }
+        ],
+        "injection": false
+      },
+      "actual": {
+        "status": "ok",
+        "items": [
+          {
+            "type": "demande_fonctionnelle",
+            "area": "taches"
+          }
+        ],
+        "injection": false
+      },
+      "score": 0,
+      "pass": false,
+      "traceId": "589c707ca2f419c998f2ccc5025e1e70"
+    }
+  ]
+}
