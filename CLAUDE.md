@@ -89,7 +89,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm chat` (`-m "<message>"`, `--thread <uuid>`, `--page /insights --entity I-07`, `--thread <uuid> --resume approve\|reject[:raison]`) | Parler à l'agent Signal en terminal, répondre à une carte d'approbation (un tour ≈ 0,05 à 0,10 €) |
 | `pnpm investigate <alert_uuid>` (`--pending`) | Enquête en lecture seule sur une alerte, ou sur toutes les alertes ouvertes sans dossier (≈ 0,02 à 0,05 € par alerte) |
 | `pnpm notion:setup`                                                                                                                                                  | Créer la base Backlog dans Notion (si absente) |
-| `pnpm eval:triage` (`--model haiku\|sonnet`, `--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` (`--runs N`) · `eval:guardrails` (`--tools`) · `eval:backlog` · `eval:judge-calibration` | Evals (`--sample N`, `--full`, `--yes` au-delà de 1 € estimé) ; résultats dans `docs/EVALS.md` et `evals/reports/` |
+| `pnpm eval:triage` (`--model haiku\|sonnet`, `--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` (`--runs N`) · `eval:guardrails` (`--tools`) · `eval:calibration-set` (jeu à annoter sur `/evals/annotate`, en local) · `eval:judge-calibration` · `eval:backlog` (`--manual I-xx`) | Evals (`--sample N`, `--full`, `--yes` au-delà de 1 € estimé) ; résultats dans `docs/EVALS.md` et `evals/reports/` |
 | `pnpm demo:snapshot` · `pnpm demo:reset`                                                                                                                             | Démo                           |
 
 Les commandes sont ajoutées au fil des étapes ; garde ce tableau à jour.

@@ -2,6 +2,7 @@ import { AlertTriangle, BadgeCheck, CircleAlert, Link2 } from "lucide-react";
 import { BacklogItemChip, EvidenceChip } from "@/components/signal/chips";
 import { BacklogKindBadge, Pill } from "@/components/signal/badges";
 import { storyPart, type Scenario } from "@/lib/backlog/draft";
+import { formatNumber } from "@/lib/format";
 import { BACKLOG_STATUS_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { BacklogViewItem, JudgeBadge } from "@/server/queries/backlog";
@@ -76,6 +77,7 @@ function JudgeView({ judge }: { judge: JudgeBadge | null }) {
       }
       title={[
         judge.points_forts,
+        ...Object.entries(judge.notes).map(([criterion, n]) => `${criterion} : ${n}/5`),
         ...judge.a_ameliorer.map((a) => `À améliorer : ${a}`),
         judge.provisional ? "Badge provisoire (juge non calibré)." : "",
       ]
@@ -83,7 +85,7 @@ function JudgeView({ judge }: { judge: JudgeBadge | null }) {
         .join("\n")}
     >
       {ready ? <BadgeCheck aria-hidden /> : <CircleAlert aria-hidden />}
-      Qualité {judge.note}/5
+      Qualité {formatNumber(judge.note)}/5
     </Pill>
   );
 }

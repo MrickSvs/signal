@@ -418,3 +418,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Échantillons et coûts** : triage 60 retours par défaut, l'injection toujours gardée (CL-49) ; `--full` pour tout le jeu. Chaque runner annonce son coût estimé et exige `--yes` au-delà de 1 € (règle 13, CL-48).
   - **Persistance** : `eval_runs` (git_sha, avec « -dirty » si l'arbre a des modifications ; coût ; métriques avec le jeu de mesure), `eval_results`, rapport JSON dans `evals/reports/`, dataset `signal-eval-<nom>` dans Langfuse (un élément par cas, un run par exécution, un score par trace et les métriques sur le run). `docs/EVALS.md` est régénéré à chaque run depuis le dernier run de chaque éval.
 - **Conséquences** : TC-16 (`generate_prototype`) échoue jusqu'à l'étape 7.1. Le texte `trigger_text` de l'enquête n'est pas inséré, pour ne pas consommer d'ID de retour. La détection reste mesurée sur le jeu de réglage, et le dit.
+
+## ADR-029 — Juge calibré : une grille par type, un appel par élément, calibration à l'aveugle
+
+- **Date** : 2026-10-05
+- **Statut** : acceptée
+- **Contexte** : étape 6.3 (SPEC §14.2, §14.3). Le badge de 4.3 jugeait tous les éléments d'une rédaction en un appel, avec une note globale et une grille provisoire.
+- **Décision** :
+  - **Grille** `src/lib/judge/rubric.md`, commune au juge et à l'annotation humaine : story (invest, testabilite, tracabilite, format), bug (reproductibilite, attendu_constate, severite, critere_correction), tâche (objectif, definition_termine), notes de 1 à 5 définies niveau par niveau, verdict `acceptable` / `a_reprendre`. Le juge reçoit la partie commune et la section de son type seulement.
+  - **Juge** `src/lib/judge/judge.ts` : rôle judge (Opus), **un appel par élément** (préfixe système identique par type, donc en cache), sortie zod (une note par critère du type, verdict, points forts, trois retouches au plus). La note globale est la moyenne des critères, calculée en code (P5). Le badge du backlog l'utilise ; il reste « provisoire » tant que `JUDGE_CALIBRATED` est faux, constante passée à vrai seulement quand `eval:judge-calibration` atteint ses cibles.
+  - **Jeu de calibration sans appel au modèle** (`pnpm eval:calibration-set`) : 15 éléments tirés du backlog rédigé par Signal (5 insights) ; 10 réels, 5 copies dégradées en code (valeur qui répète le « quoi », critères non testables, story trop grosse, preuves absentes, bug sans reproduction). Mélangés et numérotés CAL-01… ; la clé des dégradations est dans un fichier à part que la page d'annotation ne lit pas. Le jeu refuse d'être régénéré une fois annoté.
+  - **Annotation** `/evals/annotate` et `POST /api/evals/annotations`, absentes en production : une ligne par annotation dans `evals/human-labels/backlog.jsonl`, la dernière ligne d'un élément fait foi.
+  - **eval:backlog** : la rédaction est extraite de `draftBacklog` (`composeDraft`, aucune écriture sauf le cache d'estimation) et jouée comme si l'insight n'avait pas de backlog ; type attendu par pattern (SPEC §14.2), puis note du juge sur chaque élément (non estimé un à un, donc sans points).
+- **Conséquences** : un badge coûte un appel Opus par élément au lieu d'un par rédaction (~0,04 € l'élément). Le sujet manuel technique d'`eval:backlog` n'existe pas encore en base : le cas est signalé non mesuré (ou `--manual I-xx`). La calibration attend l'annotation du PO (~1 h).

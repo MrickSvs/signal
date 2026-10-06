@@ -8,7 +8,9 @@ export type EvalName =
   | "estimation"
   | "stability"
   | "guardrails"
-  | "guardrails-tools";
+  | "guardrails-tools"
+  | "judge-calibration"
+  | "backlog";
 
 /** One headline number of an eval, next to its target (SPEC §14.2). */
 export type Metric = {

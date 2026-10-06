@@ -287,3 +287,23 @@ export function numbersIn(text: string): number[] {
   const matches = text.match(/\d{1,3}(?:[   ]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?/g) ?? [];
   return matches.map((m) => Number(m.replace(/[   ]/g, "").replace(",", ".")));
 }
+
+// ---------------------------------------------------------------------------
+// Judge calibration
+// ---------------------------------------------------------------------------
+
+/**
+ * Cohen's kappa between two raters on the same items (agreement beyond chance). 1 when both
+ * agree perfectly with a single class used by both (chance agreement = 1 then).
+ */
+export function cohenKappa(a: readonly string[], b: readonly string[]): number {
+  const n = a.length;
+  if (n === 0 || n !== b.length) return 0;
+  const observed = a.filter((x, i) => x === b[i]).length / n;
+  const labels = new Set([...a, ...b]);
+  let expected = 0;
+  for (const label of labels)
+    expected +=
+      (a.filter((x) => x === label).length / n) * (b.filter((x) => x === label).length / n);
+  return expected === 1 ? 1 : (observed - expected) / (1 - expected);
+}

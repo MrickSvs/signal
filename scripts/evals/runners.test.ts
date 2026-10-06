@@ -398,7 +398,7 @@ describe("renderEvalsDoc", () => {
     expect(doc).toContain("[Langfuse](https://lf/datasets/1)");
     expect(doc).toContain("> Une note.");
     expect(doc).toContain("| Détection des patterns | — | pas encore mesuré |");
-    expect(doc).toContain("| Calibration du juge | — | étape 6.3 |");
+    expect(doc).toContain("| Calibration du juge | — | pas encore mesuré |");
     expect(doc).not.toContain("❌");
   });
 });

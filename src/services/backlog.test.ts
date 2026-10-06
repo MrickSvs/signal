@@ -2,6 +2,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { describe, expect, it, vi } from "vitest";
 import type { DraftItem, Scenario } from "@/lib/backlog/draft";
 import { loadContextPack } from "@/lib/context";
+import { RUBRIC_CRITERIA } from "@/lib/judge/judge";
 import { EMPTY_USAGE } from "@/lib/llm/cost";
 import type { invokeStructured } from "@/lib/llm/structured";
 import {
@@ -114,17 +115,14 @@ function backlogInvoke(draft: (evidence: string[]) => Draft, points = 3) {
           usage: EMPTY_USAGE,
         };
       }
-      case "judge-backlog-items": {
-        const ids = [...body.matchAll(/^((?:US|BUG|TT)-\d{3}) \[/gm)].map((m) => m[1]);
+      case "judge-backlog-item": {
+        const kind = /\[(story|bug|tache)\]/.exec(body)![1] as keyof typeof RUBRIC_CRITERIA;
         return {
           data: {
-            items: ids.map((id) => ({
-              id,
-              note: 4,
-              verdict: "pret",
-              points_forts: "Clair.",
-              a_ameliorer: [],
-            })),
+            notes: Object.fromEntries(RUBRIC_CRITERIA[kind].map((c) => [c, 4])),
+            verdict: "acceptable",
+            points_forts: "Clair.",
+            a_ameliorer: [],
           },
           usage: EMPTY_USAGE,
         };
@@ -270,7 +268,7 @@ describe("draftBacklog (in-memory database, simulated models)", () => {
       verdict: "pret",
       provisional: true,
     });
-    expect(invoke.mock.calls.find((c) => c[3].name === "judge-backlog-items")![0]).toBe("judge");
+    expect(invoke.mock.calls.find((c) => c[3].name === "judge-backlog-item")![0]).toBe("judge");
   });
 
   it("a functional insight beyond 8 points gives an epic with stories and their dependencies", async () => {
@@ -564,6 +562,53 @@ describe("judgeBacklogItems", () => {
     const invoke = vi.fn();
     await judgeBacklogItems(memoryDb(world()), [], { invoke: invoke as never, now: NOW });
     expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it("judges each item with the grid of its kind and writes a provisional badge", async () => {
+    const tables = world();
+    const row = (id: string, kind: string) => ({
+      id,
+      kind,
+      insight_id: "I-01",
+      title: `Titre ${id}`,
+      status: "brouillon",
+      evidence: ["R-001"],
+      dependencies: [],
+      points: 3,
+      complexity_estimate_id: null,
+      judge: null,
+    });
+    tables.backlog_items = [row("US-001", "story"), row("TT-001", "tache")] as never;
+    const invoke = vi.fn(
+      async (_role: string, _schema: unknown, messages: { content: unknown }[]) => {
+        if (JSON.stringify(messages[1].content).includes("TT-001")) throw new Error("API en panne");
+        return {
+          data: {
+            notes: { invest: 4, testabilite: 5, tracabilite: 4, format: 4 },
+            verdict: "acceptable",
+            points_forts: "Valeur nette.",
+            a_ameliorer: [],
+          },
+          usage: EMPTY_USAGE,
+          costEur: 0,
+          attempts: 1,
+        };
+      },
+    );
+    await judgeBacklogItems(memoryDb(tables), ["US-001", "TT-001"], {
+      invoke: invoke as never,
+      now: NOW,
+      draftSkills: { backlogFormat: "f", userStory: "s" },
+    });
+    expect(invoke).toHaveBeenCalledTimes(2);
+    const [story, task] = tables.backlog_items as unknown as { judge: unknown }[];
+    expect(story.judge).toMatchObject({
+      note: 4.3,
+      notes: { invest: 4, testabilite: 5, tracabilite: 4, format: 4 },
+      verdict: "pret",
+      provisional: true,
+    });
+    expect(task.judge).toBeNull(); // a failed call leaves its item without a badge, not the others
   });
 });
 

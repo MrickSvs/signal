@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   areaLabels,
   bestInsightFor,
+  cohenKappa,
   confusionMatrix,
   fibonacciIndex,
   itemInPattern,
@@ -274,5 +275,28 @@ describe("text checks", () => {
 
   it("extracts numbers with French separators", () => {
     expect(numbersIn("MRR exposé : 12 450 € sur 3 comptes, Impact 0,5")).toEqual([12450, 3, 0.5]);
+  });
+});
+
+describe("cohenKappa", () => {
+  it("is 1 on full agreement, 0 at chance level, negative below", () => {
+    expect(cohenKappa(["a", "b", "a"], ["a", "b", "a"])).toBe(1);
+    expect(cohenKappa(["a", "a"], ["a", "a"])).toBe(1);
+    // observed 0.5, expected 0.5 → 0
+    expect(cohenKappa(["a", "a", "b", "b"], ["a", "b", "a", "b"])).toBe(0);
+    expect(cohenKappa(["a", "b"], ["b", "a"])).toBe(-1);
+    expect(cohenKappa([], [])).toBe(0);
+  });
+
+  it("matches a textbook case", () => {
+    // 20 yes/yes, 5 yes/no, 10 no/yes, 15 no/no → κ = 0.4
+    const a = [...Array(25).fill("y"), ...Array(25).fill("n")];
+    const b = [
+      ...Array(20).fill("y"),
+      ...Array(5).fill("n"),
+      ...Array(10).fill("y"),
+      ...Array(15).fill("n"),
+    ];
+    expect(cohenKappa(a, b)).toBeCloseTo(0.4);
   });
 });

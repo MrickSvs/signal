@@ -24,6 +24,8 @@ export type JudgeBadge = {
   verdict: "pret" | "a_revoir";
   points_forts: string;
   a_ameliorer: string[];
+  /** Note per criterion of the grid (calibrated judge, PLAN 6.3); {} for an older badge. */
+  notes: Record<string, number>;
   provisional: boolean;
 };
 
@@ -91,6 +93,15 @@ function asJudge(value: Json | null): JudgeBadge | null {
         verdict: v.verdict === "pret" ? "pret" : "a_revoir",
         points_forts: typeof v.points_forts === "string" ? v.points_forts : "",
         a_ameliorer: Array.isArray(v.a_ameliorer) ? v.a_ameliorer.map(String) : [],
+        notes:
+          v.notes && typeof v.notes === "object" && !Array.isArray(v.notes)
+            ? Object.fromEntries(
+                Object.entries(v.notes).filter(([, n]) => typeof n === "number") as [
+                  string,
+                  number,
+                ][],
+              )
+            : {},
         provisional: v.provisional !== false,
       }
     : null;

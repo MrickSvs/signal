@@ -1,0 +1,1384 @@
+[
+  {
+    "id": "CAL-01",
+    "kind": "story",
+    "content": {
+      "title": "Titre reformulé, Déplacer une tâche dans le temps sur la frise, Repérer les chevauchements et surcharges par assigné",
+      "evidence": [
+        "R-033",
+        "R-048",
+        "R-083",
+        "R-114",
+        "R-207"
+      ],
+      "kind": "story",
+      "value": "visualiser l'enchaînement des tâches sans tenir un tableur à côté",
+      "persona": "chef de projet en agence",
+      "want": "voir les tâches d'un projet étalées sur une frise dans le temps, et déplacer ou redimensionner une tâche directement sur la frise, et voir par assigné les tâches qui se chevauchent sur une période",
+      "business_rules": [
+        "Chaque tâche datée apparaît comme une barre de son début à son échéance",
+        "Les tâches sans date sont listées à part",
+        "La vue respecte les permissions du projet",
+        "Zoom disponible par semaine et par mois",
+        "Le déplacement met à jour les dates de début et d'échéance",
+        "Seuls les membres autorisés à modifier la tâche peuvent la déplacer",
+        "Une tâche dépendante bloquée ne peut pas commencer avant la fin de sa prédécesseure",
+        "Le planning peut être filtré par assigné",
+        "Deux tâches d'un même assigné sur les mêmes jours sont signalées comme chevauchement",
+        "Le périmètre de la charge (nombre de tâches, pas d'heures) est précisé avant développement"
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "affichage de la frise",
+          "steps": [
+            {
+              "text": "un projet « Refonte site Kaléo » avec 12 tâches datées",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre la vue planning",
+              "keyword": "Quand"
+            },
+            {
+              "text": "les 12 tâches apparaissent en barres sur l'axe du temps",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "tâches sans date",
+          "steps": [
+            {
+              "text": "un projet comportant 3 tâches sans date",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre la vue planning",
+              "keyword": "Quand"
+            },
+            {
+              "text": "ces 3 tâches sont listées dans une zone « Non planifiées »",
+              "keyword": "Alors"
+            },
+            {
+              "text": "elles ne sont pas dessinées sur la frise",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "déplacement d'une barre",
+          "steps": [
+            {
+              "text": "la tâche « Rédaction » du 5 au 10",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je la glisse de deux jours vers la droite",
+              "keyword": "Quand"
+            },
+            {
+              "text": "ses dates deviennent le 7 et le 12",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "déplacement avant une dépendance",
+          "steps": [
+            {
+              "text": "une tâche qui attend la fin de « Validation client » le 10",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je la déplace pour démarrer le 8",
+              "keyword": "Quand"
+            },
+            {
+              "text": "le déplacement est refusé avec un message explicatif",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "chevauchement signalé",
+          "steps": [
+            {
+              "text": "deux tâches assignées au même membre du 10 au 15",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'affiche le planning filtré sur ce membre",
+              "keyword": "Quand"
+            },
+            {
+              "text": "les deux tâches sont marquées en chevauchement",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "assigné sans tâche datée",
+          "steps": [
+            {
+              "text": "un membre dont aucune tâche n'a de date",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je filtre le planning sur lui",
+              "keyword": "Quand"
+            },
+            {
+              "text": "un message indique qu'aucune tâche planifiée n'existe",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Part des projets actifs consultant la vue planning chaque semaine, à 90 jours",
+      "estimation": {
+        "points": 21,
+        "composants": [
+          "taches",
+          "liste",
+          "permissions"
+        ],
+        "analogues": [
+          "T-127",
+          "T-126",
+          "T-102"
+        ]
+      },
+      "dependances": [
+        "US-009"
+      ]
+    }
+  },
+  {
+    "id": "CAL-02",
+    "kind": "story",
+    "content": {
+      "title": "Partager l'avancement via un lien en lecture seule",
+      "evidence": [
+        "R-151",
+        "R-188",
+        "R-193",
+        "R-199",
+        "R-212"
+      ],
+      "kind": "story",
+      "value": "Afin de rassurer mon client sans lui créer de compte ni lui envoyer de rapport à chaque fois,",
+      "persona": "chef de projet en agence",
+      "want": "envoyer au client un lien en lecture seule vers l'avancement d'un projet.",
+      "business_rules": [
+        "Le lien ne montre que le projet concerné, en lecture seule.",
+        "Le lien n'expose ni les commentaires internes ni les autres projets.",
+        "Un admin du projet peut désactiver le lien à tout moment.",
+        "Un lien désactivé affiche « Ce lien n'est plus actif »."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "consultation par le client",
+          "steps": [
+            {
+              "text": "que j'ai généré un lien pour le projet « Campagne printemps »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "mon client ouvre le lien sans compte",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'expérience est fluide et l'utilisateur est satisfait",
+              "keyword": "Alors"
+            },
+            {
+              "text": "l'expérience est fluide et l'utilisateur est satisfait",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "lien désactivé",
+          "steps": [
+            {
+              "text": "que j'ai désactivé le lien du projet « Campagne printemps »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "mon client ouvre l'ancien lien",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'expérience est fluide et l'utilisateur est satisfait",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        }
+      ],
+      "success_kpi": "25 % des projets actifs avec un accès client à 90 jours (O2-KR1)",
+      "estimation": {
+        "points": 13,
+        "composants": [
+          "permissions",
+          "export",
+          "taches",
+          "liste"
+        ],
+        "analogues": [
+          "T-120",
+          "T-132",
+          "T-110"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-03",
+    "kind": "bug",
+    "content": {
+      "title": "Les e-mails d'assignation ne sont pas reçus par certains membres",
+      "evidence": [
+        "R-119",
+        "R-139",
+        "R-195",
+        "R-147",
+        "R-040"
+      ],
+      "kind": "bug",
+      "expected_behavior": "Toute assignation de tâche déclenche un e-mail d'assignation vers le membre assigné, quel que soit son mode de notification (immédiat ou digest quotidien).",
+      "actual_behavior": "Certains membres ne reçoivent jamais ou de façon intermittente les e-mails d'assignation, alors que leurs autres notifications fonctionnent. Plusieurs retours évoquent un lien avec le digest quotidien. Le chemin des assignations semble lire l'ancien champ de préférence. Comptes touchés : 22 dont 6 Enterprise.",
+      "repro_steps": [],
+      "severity": "majeur",
+      "acceptance_criteria": [
+        {
+          "name": "Assignation à un membre en digest quotidien",
+          "steps": [
+            {
+              "text": "qu'un membre a activé le digest quotidien",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "un chef de projet lui assigne la tâche « Maquettes page d'accueil »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation",
+              "keyword": "Alors"
+            },
+            {
+              "text": "l'assignation figure aussi dans son prochain digest, sans doublon",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Assignation à un membre en envoi immédiat",
+          "steps": [
+            {
+              "text": "qu'un membre a choisi l'envoi immédiat des notifications",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on lui assigne la tâche « Recette client »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Nouveau membre sans préférence enregistrée",
+          "steps": [
+            {
+              "text": "qu'un nouveau membre vient de rejoindre l'équipe et n'a jamais modifié ses préférences",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on lui assigne la tâche « Rédaction du brief »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation avec la préférence par défaut",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Assignation à plusieurs membres aux préférences différentes",
+          "steps": [
+            {
+              "text": "deux membres, l'un en digest quotidien et l'autre en envoi immédiat",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on leur assigne la même tâche",
+              "keyword": "Quand"
+            },
+            {
+              "text": "chacun reçoit un e-mail d'assignation, sans oubli ni doublon",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "notifications",
+          "parametres",
+          "taches"
+        ],
+        "analogues": [
+          "T-128",
+          "T-108",
+          "T-119"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-04",
+    "kind": "story",
+    "content": {
+      "title": "Limiter un freelance aux projets qui lui sont affectés",
+      "evidence": [
+        "R-141",
+        "R-162",
+        "R-110"
+      ],
+      "kind": "story",
+      "value": "pouvoir restreindre un membre (freelance, sous-traitant) aux seuls projets auxquels je l'affecte",
+      "persona": "directeur d'agence",
+      "want": "restreindre un membre (freelance, sous-traitant) aux seuls projets auxquels je l'affecte",
+      "business_rules": [
+        "Un membre restreint ne voit que les projets auxquels il est affecté.",
+        "Un membre restreint peut travailler (modifier, commenter) sur ses projets, contrairement à un invité en lecture.",
+        "L'affectation ou le retrait se gère depuis les paramètres du projet.",
+        "Les membres existants conservent leur accès actuel après la migration."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "Affectation d'un freelance à un projet",
+          "steps": [
+            {
+              "text": "que je suis admin et que Julie, freelance, est membre restreint",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je l'affecte au projet « Campagne Orion »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "elle voit « Campagne Orion » et peut y modifier ses tâches",
+              "keyword": "Alors"
+            },
+            {
+              "text": "elle ne voit aucun autre projet de l'espace",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Projet non affecté inaccessible",
+          "steps": [
+            {
+              "text": "que Julie est affectée uniquement à « Campagne Orion »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "elle ouvre le lien du projet « Refonte site Kaléo »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'accès est refusé",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Membres existants non impactés",
+          "steps": [
+            {
+              "text": "que Marie est membre standard avant la mise en service",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "la migration des rôles est terminée",
+              "keyword": "Quand"
+            },
+            {
+              "text": "Marie voit les mêmes projets qu'avant",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Zéro compte Enterprise perdu au renouvellement pour absence de permissions par projet (O1-KR2)",
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "permissions",
+          "parametres"
+        ],
+        "analogues": [
+          "T-103",
+          "T-137",
+          "T-107"
+        ]
+      },
+      "dependances": [
+        "TT-001"
+      ]
+    }
+  },
+  {
+    "id": "CAL-05",
+    "kind": "bug",
+    "content": {
+      "title": "Les exports restent en français pour les équipes hispanophones",
+      "evidence": [
+        "R-220",
+        "R-221"
+      ],
+      "kind": "bug",
+      "expected_behavior": "Un export de projet utilise la langue de la personne qui exporte : libellés de colonnes et formats de dates en espagnol si sa langue est l'espagnol. Les valeurs saisies dans les champs personnalisés ne sont pas traduites.",
+      "actual_behavior": "Jalon n'existe qu'en français. Les exports sortent toujours avec des libellés de colonnes et des dates en français, même pour une équipe basée en Espagne, ce qui les rend difficiles à partager avec des collègues ou clients hispanophones.",
+      "repro_steps": [
+        "Se connecter avec un compte rattaché à une équipe basée en Espagne (filiale de Barcelone, par exemple)",
+        "Ouvrir le projet « Apertura Barcelona » qui contient des champs personnalisés",
+        "Lancer l'export du projet",
+        "Ouvrir le fichier exporté : les colonnes et les dates sont en français"
+      ],
+      "severity": "majeur",
+      "acceptance_criteria": [
+        {
+          "name": "Export d'un projet en espagnol",
+          "steps": [
+            {
+              "text": "que ma langue est l'espagnol et que le projet « Apertura Barcelona » a des champs personnalisés",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'exporte le projet",
+              "keyword": "Quand"
+            },
+            {
+              "text": "les libellés de colonnes et les dates du fichier sont en espagnol",
+              "keyword": "Alors"
+            },
+            {
+              "text": "les valeurs saisies dans les champs personnalisés restent telles que saisies",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Export d'un gros projet en espagnol",
+          "steps": [
+            {
+              "text": "qu'un projet contient plusieurs milliers de tâches et que ma langue est l'espagnol",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je lance l'export",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'export aboutit avec les libellés et les dates en espagnol",
+              "keyword": "Alors"
+            },
+            {
+              "text": "le délai reste comparable à celui d'un export en français",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Export en français inchangé",
+          "steps": [
+            {
+              "text": "que ma langue est le français",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'exporte le projet « Apertura Barcelona »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "les libellés de colonnes et les dates restent en français",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "export",
+          "liste",
+          "champs_personnalises"
+        ],
+        "analogues": [
+          "T-118",
+          "T-120"
+        ]
+      },
+      "dependances": [
+        "TT-003",
+        "US-014"
+      ]
+    }
+  },
+  {
+    "id": "CAL-06",
+    "kind": "tache",
+    "content": {
+      "title": "Centraliser les contrôles d'accès par projet",
+      "evidence": [
+        "R-013",
+        "R-134",
+        "R-110",
+        "R-078"
+      ],
+      "kind": "tache",
+      "objective": "Disposer d'une couche d'autorisation unique qui décide de l'accès à un projet, à la place des contrôles dispersés (page projet, paramètres, liste, tableau, export). Elle débloque les rôles par projet et l'invité externe.",
+      "definition_of_done": [
+        "Toutes les lectures de projet (page projet, paramètres, liste, tableau, export) passent par la couche d'autorisation unique.",
+        "Le modèle de données porte un rôle par projet ; les membres existants sont migrés sans perte d'accès.",
+        "Un utilisateur externe à l'espace, sans rôle sur aucun projet, ne voit aucun projet.",
+        "Tests automatisés : un utilisateur sans rôle sur un projet est refusé sur chaque point d'entrée recensé.",
+        "Aucune régression des accès actuels des admins et des membres."
+      ],
+      "risks": [
+        "Un point d'entrée oublié, découvert tard comme en recette de T-103 et T-137, exposerait un projet confidentiel.",
+        "Migration des membres existants vers un rôle par projet : risque de retirer ou d'ouvrir des accès par erreur.",
+        "Ricochet sur le modèle des tâches (pièces jointes, commentaires, notifications)."
+      ],
+      "estimation": {
+        "points": 8,
+        "composants": [
+          "permissions",
+          "taches",
+          "tableau",
+          "liste",
+          "export",
+          "parametres"
+        ],
+        "analogues": [
+          "T-103",
+          "T-137",
+          "T-107"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-07",
+    "kind": "bug",
+    "content": {
+      "title": "Les e-mails d'assignation ne sont pas reçus par certains membres",
+      "evidence": [
+        "R-119",
+        "R-139",
+        "R-195",
+        "R-147",
+        "R-040"
+      ],
+      "kind": "bug",
+      "expected_behavior": "Toute assignation de tâche déclenche un e-mail d'assignation vers le membre assigné, quel que soit son mode de notification (immédiat ou digest quotidien).",
+      "actual_behavior": "Certains membres ne reçoivent jamais ou de façon intermittente les e-mails d'assignation, alors que leurs autres notifications fonctionnent. Plusieurs retours évoquent un lien avec le digest quotidien. Le chemin des assignations semble lire l'ancien champ de préférence. Comptes touchés : 22 dont 6 Enterprise.",
+      "repro_steps": [
+        "Activer le mode « digest quotidien » pour un membre de l'équipe.",
+        "Assigner une tâche à ce membre depuis un projet.",
+        "Constater qu'aucun e-mail d'assignation n'est reçu, ni immédiatement ni dans le digest.",
+        "Répéter avec un membre en envoi immédiat : constater l'écart de comportement."
+      ],
+      "severity": "majeur",
+      "acceptance_criteria": [
+        {
+          "name": "Assignation à un membre en digest quotidien",
+          "steps": [
+            {
+              "text": "qu'un membre a activé le digest quotidien",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "un chef de projet lui assigne la tâche « Maquettes page d'accueil »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation",
+              "keyword": "Alors"
+            },
+            {
+              "text": "l'assignation figure aussi dans son prochain digest, sans doublon",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Assignation à un membre en envoi immédiat",
+          "steps": [
+            {
+              "text": "qu'un membre a choisi l'envoi immédiat des notifications",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on lui assigne la tâche « Recette client »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Nouveau membre sans préférence enregistrée",
+          "steps": [
+            {
+              "text": "qu'un nouveau membre vient de rejoindre l'équipe et n'a jamais modifié ses préférences",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on lui assigne la tâche « Rédaction du brief »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il reçoit un e-mail d'assignation avec la préférence par défaut",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Assignation à plusieurs membres aux préférences différentes",
+          "steps": [
+            {
+              "text": "deux membres, l'un en digest quotidien et l'autre en envoi immédiat",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "on leur assigne la même tâche",
+              "keyword": "Quand"
+            },
+            {
+              "text": "chacun reçoit un e-mail d'assignation, sans oubli ni doublon",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "notifications",
+          "parametres",
+          "taches"
+        ],
+        "analogues": [
+          "T-128",
+          "T-108",
+          "T-119"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-08",
+    "kind": "story",
+    "content": {
+      "title": "Générer un rapport d'avancement PDF d'un projet",
+      "evidence": [
+        "R-077",
+        "R-104",
+        "R-201",
+        "R-169"
+      ],
+      "kind": "story",
+      "value": "Afin de présenter l'avancement au client lors des points mensuels et comités de pilotage sans retravailler les données,",
+      "persona": "chef de projet en agence",
+      "want": "générer un rapport PDF de synthèse montrant les tâches par statut et par projet.",
+      "business_rules": [
+        "Le rapport affiche les tâches par statut avec leurs échéances.",
+        "Le rapport indique la date de génération.",
+        "Les commentaires internes n'apparaissent jamais dans le rapport.",
+        "Le rapport reflète les filtres de la vue liste."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "génération du rapport",
+          "steps": [
+            {
+              "text": "que le projet « Campagne printemps » compte des tâches à faire, en cours et terminées",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je génère le rapport PDF",
+              "keyword": "Quand"
+            },
+            {
+              "text": "je télécharge un PDF présentant les tâches par statut avec leur échéance",
+              "keyword": "Alors"
+            },
+            {
+              "text": "aucun commentaire interne n'y figure",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "projet sans tâche",
+          "steps": [
+            {
+              "text": "qu'un projet « Nouveau site » ne contient aucune tâche",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je génère le rapport PDF",
+              "keyword": "Quand"
+            },
+            {
+              "text": "un message m'indique qu'il n'y a rien à présenter",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "30 % des agences Business actives génèrent au moins un rapport par mois à 90 jours",
+      "estimation": {
+        "points": 8,
+        "composants": [
+          "export",
+          "liste",
+          "champs_personnalises",
+          "taches"
+        ],
+        "analogues": [
+          "T-120",
+          "T-132",
+          "T-110"
+        ]
+      },
+      "dependances": [
+        "US-005"
+      ]
+    }
+  },
+  {
+    "id": "CAL-09",
+    "kind": "story",
+    "content": {
+      "title": "Renseigner une date de début sur une tâche",
+      "evidence": [
+        "R-071",
+        "R-118",
+        "R-161"
+      ],
+      "kind": "story",
+      "value": "planifier chaque tâche sur une durée réelle plutôt que sur une seule échéance",
+      "persona": "chef de projet en agence",
+      "want": "indiquer une date de début et une date de fin sur mes tâches",
+      "business_rules": [
+        "La date de début est optionnelle",
+        "La date de début ne peut pas être postérieure à l'échéance",
+        "Les tâches existantes sans date de début restent valides",
+        "La date est modifiable depuis la liste et le détail de la tâche"
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "ajout d'une date de début",
+          "steps": [
+            {
+              "text": "une tâche « Maquettes page d'accueil » avec une échéance au 30 du mois",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je renseigne une date de début au 15 du mois",
+              "keyword": "Quand"
+            },
+            {
+              "text": "la tâche affiche la période du 15 au 30",
+              "keyword": "Alors"
+            },
+            {
+              "text": "la date de début apparaît dans la vue liste",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "date de début après l'échéance",
+          "steps": [
+            {
+              "text": "une tâche avec une échéance au 30 du mois",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je saisis une date de début au 2 du mois suivant",
+              "keyword": "Quand"
+            },
+            {
+              "text": "un message d'erreur m'indique que le début doit précéder l'échéance",
+              "keyword": "Alors"
+            },
+            {
+              "text": "la date n'est pas enregistrée",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Part des tâches avec date de début parmi les projets actifs, à 90 jours",
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "taches",
+          "liste",
+          "champs_personnalises"
+        ],
+        "analogues": [
+          "T-127",
+          "T-126",
+          "T-102"
+        ]
+      },
+      "dependances": [
+        "TT-002"
+      ]
+    }
+  },
+  {
+    "id": "CAL-10",
+    "kind": "story",
+    "content": {
+      "title": "Partager le planning avec mon client",
+      "evidence": [],
+      "kind": "story",
+      "value": "rassurer mon client sans refaire le planning à la main",
+      "persona": "chef de projet en agence",
+      "want": "partager le planning d'un projet avec mon client en lecture seule",
+      "business_rules": [
+        "Le partage est en lecture seule",
+        "Il ne montre que le projet partagé",
+        "Il peut être désactivé à tout moment",
+        "Les commentaires internes ne sont pas visibles"
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "consultation par le client",
+          "steps": [
+            {
+              "text": "un planning partagé du projet « Campagne printemps »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "le client ouvre le lien",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il voit la frise sans commentaires internes",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "partage désactivé",
+          "steps": [
+            {
+              "text": "un partage désactivé",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "le client ouvre l'ancien lien",
+              "keyword": "Quand"
+            },
+            {
+              "text": "il voit le message « Ce lien n'est plus actif »",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Améliorer la satisfaction des utilisateurs.",
+      "estimation": {
+        "points": 8,
+        "composants": [
+          "permissions",
+          "export",
+          "parametres",
+          "taches"
+        ],
+        "analogues": [
+          "T-127",
+          "T-126",
+          "T-102"
+        ]
+      },
+      "dependances": [
+        "US-010"
+      ]
+    }
+  },
+  {
+    "id": "CAL-11",
+    "kind": "story",
+    "content": {
+      "title": "Suivre l'avancement de mon projet en lecture",
+      "evidence": [
+        "R-007",
+        "R-146",
+        "R-111"
+      ],
+      "kind": "story",
+      "value": "savoir où en est mon projet sans avoir à relancer l'agence",
+      "persona": "client final invité",
+      "want": "consulter les tâches de mon projet avec leur statut et leur échéance, sans pouvoir rien modifier",
+      "business_rules": [
+        "L'invité voit les tâches, leur statut et leur échéance du projet auquel il est invité.",
+        "Les commentaires internes ne sont pas visibles par l'invité.",
+        "Les boutons de création et de modification ne sont pas proposés à l'invité.",
+        "Les listes et le tableau n'affichent que le projet de l'invité."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "Consultation de l'avancement",
+          "steps": [
+            {
+              "text": "que je suis invité en lecture sur « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre la vue liste du projet",
+              "keyword": "Quand"
+            },
+            {
+              "text": "je vois les tâches avec leur statut et leur échéance",
+              "keyword": "Alors"
+            },
+            {
+              "text": "je ne vois aucun commentaire interne",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Tentative de modification",
+          "steps": [
+            {
+              "text": "que je suis invité en lecture sur « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre une tâche du projet",
+              "keyword": "Quand"
+            },
+            {
+              "text": "aucun champ n'est modifiable",
+              "keyword": "Alors"
+            },
+            {
+              "text": "aucun bouton de création ou de suppression n'est affiché",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Navigation sans autre projet",
+          "steps": [
+            {
+              "text": "que je suis invité uniquement sur « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre le sélecteur de projets",
+              "keyword": "Quand"
+            },
+            {
+              "text": "seul « Refonte site Kaléo » est listé",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Au moins 60 % des invités clients se connectent une fois par mois à 90 jours, mesure à confirmer avec le PO (O2-KR1)",
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "taches",
+          "tableau",
+          "liste",
+          "permissions"
+        ],
+        "analogues": [
+          "T-103",
+          "T-137",
+          "T-107"
+        ]
+      },
+      "dependances": [
+        "US-001"
+      ]
+    }
+  },
+  {
+    "id": "CAL-12",
+    "kind": "story",
+    "content": {
+      "title": "Inviter un client sur un seul projet",
+      "evidence": [
+        "R-013",
+        "R-134",
+        "R-146",
+        "R-111"
+      ],
+      "kind": "story",
+      "value": "partager l'avancement avec mon client sans exposer les projets de mes autres clients",
+      "persona": "chef de projet en agence",
+      "want": "inviter un client externe sur un projet précis avec un accès en lecture seule",
+      "business_rules": [
+        "Un invité ne voit que les projets auxquels il est explicitement invité.",
+        "Un invité ne peut ni modifier ni créer de contenu : l'accès est en lecture seule.",
+        "Seul un admin du projet peut inviter, modifier ou retirer un invité.",
+        "Retirer un invité supprime immédiatement son accès au projet."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "Invitation d'un client sur un projet",
+          "steps": [
+            {
+              "text": "que je suis admin du projet « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'invite client@kaleo.fr avec le rôle « Invité lecture »",
+              "keyword": "Quand"
+            },
+            {
+              "text": "client@kaleo.fr reçoit une invitation",
+              "keyword": "Alors"
+            },
+            {
+              "text": "une fois l'invitation acceptée, il ne voit que le projet « Refonte site Kaléo »",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Accès refusé à un autre projet",
+          "steps": [
+            {
+              "text": "que client@kaleo.fr est invité uniquement sur « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "il ouvre le lien du projet « Campagne Orion » de la même agence",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'accès est refusé",
+              "keyword": "Alors"
+            },
+            {
+              "text": "le nom du projet « Campagne Orion » n'est pas affiché",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Retrait d'un invité",
+          "steps": [
+            {
+              "text": "que client@kaleo.fr est invité sur « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je retire client@kaleo.fr des membres du projet",
+              "keyword": "Quand"
+            },
+            {
+              "text": "client@kaleo.fr n'a plus accès à « Refonte site Kaléo »",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        },
+        {
+          "name": "Invitation par un non-admin",
+          "steps": [
+            {
+              "text": "que je suis membre simple du projet « Refonte site Kaléo »",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je tente d'inviter un client externe",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'action est refusée avec un message explicite",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "25 % des projets actifs avec au moins un invité client à 90 jours (O2-KR1)",
+      "estimation": {
+        "points": 5,
+        "composants": [
+          "permissions",
+          "parametres",
+          "taches"
+        ],
+        "analogues": [
+          "T-103",
+          "T-137",
+          "T-107"
+        ]
+      },
+      "dependances": [
+        "TT-001"
+      ]
+    }
+  },
+  {
+    "id": "CAL-13",
+    "kind": "tache",
+    "content": {
+      "title": "Ajouter date de début et dépendances aux tâches",
+      "evidence": [
+        "R-071",
+        "R-118",
+        "R-056"
+      ],
+      "kind": "tache",
+      "objective": "Faire évoluer le modèle de données des tâches pour porter une date de début et des liens de dépendance, prérequis de toute vue dans le temps, en gardant liste, tableau, export, notifications et champs personnalisés cohérents.",
+      "definition_of_done": [
+        "Une date de début optionnelle est stockée sur chaque tâche, avec migration des tâches existantes sans perte",
+        "Un lien « attend la fin de » entre deux tâches est stocké, sans cycle possible",
+        "Liste, tableau et export affichent ou ignorent ces champs sans régression",
+        "Tests de non-régression passés sur les notifications et les champs personnalisés"
+      ],
+      "risks": [
+        "Migration du modèle avec répercussion sur le tableau, la liste, l'export, les notifications et les champs personnalisés",
+        "Contrôles de permissions dispersés sur plusieurs écrans et sur l'export"
+      ],
+      "estimation": {
+        "points": 8,
+        "composants": [
+          "taches",
+          "liste",
+          "tableau",
+          "export",
+          "notifications",
+          "champs_personnalises",
+          "permissions"
+        ],
+        "analogues": [
+          "T-127",
+          "T-126",
+          "T-102"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-14",
+    "kind": "story",
+    "content": {
+      "title": "Exporter l'avancement d'un projet en Excel formaté",
+      "evidence": [
+        "R-013",
+        "R-034",
+        "R-087",
+        "R-168",
+        "R-209"
+      ],
+      "kind": "story",
+      "value": "Afin de ne plus passer une à deux heures par client à reformater un export CSV brut,",
+      "persona": "chef de projet en agence",
+      "want": "exporter l'avancement d'un projet dans un fichier Excel lisible, avec colonnes propres et statuts compréhensibles, prêt à envoyer au client.",
+      "business_rules": [
+        "L'export Excel reprend les filtres appliqués dans la vue liste.",
+        "Les statuts sont affichés avec leur libellé lisible, pas leur code interne.",
+        "Les champs personnalisés du projet figurent en colonnes.",
+        "Le fichier est nommé avec le nom du projet et la date."
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "export formaté d'un projet",
+          "steps": [
+            {
+              "text": "que je consulte la liste du projet « Campagne printemps » filtrée sur les tâches en cours",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je demande l'export Excel",
+              "keyword": "Quand"
+            },
+            {
+              "text": "je télécharge un fichier avec colonnes propres et statuts lisibles",
+              "keyword": "Alors"
+            },
+            {
+              "text": "il ne contient que les tâches en cours",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "projet très volumineux",
+          "steps": [
+            {
+              "text": "que le projet « Refonte site Kaléo » contient plus de 2 000 tâches",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je demande l'export Excel",
+              "keyword": "Quand"
+            },
+            {
+              "text": "l'export aboutit sans erreur d'expiration ou un message clair m'explique comment réduire le périmètre",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Baisse du temps de préparation d'un rapport client de 1 à 2 h à moins de 15 min, mesurée par sondage à 90 jours",
+      "estimation": {
+        "points": 5,
+        "composants": [
+          "export",
+          "liste",
+          "champs_personnalises"
+        ],
+        "analogues": [
+          "T-120",
+          "T-132",
+          "T-110"
+        ]
+      },
+      "dependances": []
+    }
+  },
+  {
+    "id": "CAL-15",
+    "kind": "story",
+    "content": {
+      "title": "Choisir sa langue d'interface dans les paramètres",
+      "evidence": [
+        "R-218",
+        "R-220"
+      ],
+      "kind": "story",
+      "value": "travailler dans ma langue dès la première connexion sans dépendre d'un collègue francophone",
+      "persona": "membre d'équipe",
+      "want": "choisir l'espagnol ou le français comme langue de mon interface depuis mes paramètres",
+      "business_rules": [
+        "La préférence de langue est propre à chaque membre",
+        "Le français reste la langue par défaut",
+        "Le changement s'applique immédiatement, sans reconnexion",
+        "La préférence est conservée d'une session à l'autre"
+      ],
+      "acceptance_criteria": [
+        {
+          "name": "Passage de l'interface en espagnol",
+          "steps": [
+            {
+              "text": "que je suis membre de l'équipe Madrid et que mon interface est en français",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "je choisis « Español » dans mes paramètres de langue",
+              "keyword": "Quand"
+            },
+            {
+              "text": "les menus et libellés des paramètres s'affichent en espagnol",
+              "keyword": "Alors"
+            },
+            {
+              "text": "ma préférence est conservée à ma prochaine connexion",
+              "keyword": "Et"
+            }
+          ],
+          "edge_case": false
+        },
+        {
+          "name": "Texte sans traduction disponible",
+          "steps": [
+            {
+              "text": "que mon interface est en espagnol et qu'un libellé n'a pas encore de traduction",
+              "keyword": "Étant donné"
+            },
+            {
+              "text": "j'ouvre l'écran concerné",
+              "keyword": "Quand"
+            },
+            {
+              "text": "le libellé s'affiche en français plutôt que vide ou en clé technique",
+              "keyword": "Alors"
+            }
+          ],
+          "edge_case": true
+        }
+      ],
+      "success_kpi": "Au moins 60 % des membres des comptes hispanophones ont choisi l'espagnol dans les 30 jours suivant leur invitation (cible à valider)",
+      "estimation": {
+        "points": 3,
+        "composants": [
+          "parametres",
+          "permissions"
+        ],
+        "analogues": [
+          "T-118",
+          "T-120"
+        ]
+      },
+      "dependances": [
+        "TT-003"
+      ]
+    }
+  }
+]

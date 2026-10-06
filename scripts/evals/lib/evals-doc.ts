@@ -37,12 +37,12 @@ export const EVALS: { name: EvalName; title: string; command: string }[] = [
     title: "Choix d'outil et enquête",
     command: "pnpm eval:guardrails --tools",
   },
-];
-
-/** Evals of later steps, listed so the page shows what is still missing. */
-const LATER = [
-  { title: "Backlog (type et note du juge)", command: "pnpm eval:backlog", step: "6.3" },
-  { title: "Calibration du juge", command: "pnpm eval:judge-calibration", step: "6.3" },
+  {
+    name: "judge-calibration",
+    title: "Calibration du juge",
+    command: "pnpm eval:judge-calibration",
+  },
+  { name: "backlog", title: "Backlog : type et note du juge", command: "pnpm eval:backlog" },
 ];
 
 const cell = (text: string) => text.replace(/\|/g, "\\|").replace(/\n/g, " ");
@@ -109,7 +109,6 @@ export function renderEvalsDoc(runs: readonly StoredEvalRun[], generatedAt: Date
       const dataset = run && "metrics" in run.metrics ? run.metrics.dataset : "—";
       return `| ${e.title} | ${cell(dataset)} | ${headline(run)} |`;
     }),
-    ...LATER.map((l) => `| ${l.title} | — | étape ${l.step} |`),
     "",
     ...EVALS.flatMap((e) => section(e, latest.get(e.name))),
   ].join("\n");

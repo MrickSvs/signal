@@ -1,0 +1,92 @@
+[
+  {
+    "id": "CAL-01",
+    "source_id": "US-010",
+    "insight_id": "I-26",
+    "degradation": "story_trop_grosse"
+  },
+  {
+    "id": "CAL-02",
+    "source_id": "US-007",
+    "insight_id": "I-28",
+    "degradation": "criteres_non_testables"
+  },
+  {
+    "id": "CAL-03",
+    "source_id": "BUG-001",
+    "insight_id": "I-27",
+    "degradation": "bug_sans_reproduction"
+  },
+  {
+    "id": "CAL-04",
+    "source_id": "US-003",
+    "insight_id": "I-31",
+    "degradation": "valeur_repetee"
+  },
+  {
+    "id": "CAL-05",
+    "source_id": "BUG-002",
+    "insight_id": "I-50",
+    "degradation": null
+  },
+  {
+    "id": "CAL-06",
+    "source_id": "TT-001",
+    "insight_id": "I-31",
+    "degradation": null
+  },
+  {
+    "id": "CAL-07",
+    "source_id": "BUG-001",
+    "insight_id": "I-27",
+    "degradation": null
+  },
+  {
+    "id": "CAL-08",
+    "source_id": "US-006",
+    "insight_id": "I-28",
+    "degradation": null
+  },
+  {
+    "id": "CAL-09",
+    "source_id": "US-009",
+    "insight_id": "I-26",
+    "degradation": null
+  },
+  {
+    "id": "CAL-10",
+    "source_id": "US-013",
+    "insight_id": "I-26",
+    "degradation": "preuves_absentes"
+  },
+  {
+    "id": "CAL-11",
+    "source_id": "US-002",
+    "insight_id": "I-31",
+    "degradation": null
+  },
+  {
+    "id": "CAL-12",
+    "source_id": "US-001",
+    "insight_id": "I-31",
+    "degradation": null
+  },
+  {
+    "id": "CAL-13",
+    "source_id": "TT-002",
+    "insight_id": "I-26",
+    "degradation": null
+  },
+  {
+    "id": "CAL-14",
+    "source_id": "US-005",
+    "insight_id": "I-28",
+    "degradation": null
+  },
+  {
+    "id": "CAL-15",
+    "source_id": "US-014",
+    "insight_id": "I-50",
+    "degradation": null
+  }
+]

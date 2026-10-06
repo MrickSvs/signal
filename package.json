@@ -29,7 +29,10 @@
     "eval:detection": "tsx --conditions=react-server scripts/evals/detection.ts",
     "eval:estimation": "tsx --conditions=react-server scripts/evals/estimation.ts",
     "eval:stability": "tsx --conditions=react-server scripts/evals/stability.ts",
-    "eval:guardrails": "tsx --conditions=react-server scripts/evals/guardrails.ts"
+    "eval:guardrails": "tsx --conditions=react-server scripts/evals/guardrails.ts",
+    "eval:calibration-set": "tsx --conditions=react-server scripts/evals/calibration-set.ts",
+    "eval:judge-calibration": "tsx --conditions=react-server scripts/evals/judge-calibration.ts",
+    "eval:backlog": "tsx --conditions=react-server scripts/evals/backlog.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.122.0",
