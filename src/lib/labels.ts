@@ -160,6 +160,20 @@ export const RUN_STATUS_LABELS: Record<Enums["run_status"], string> = {
   echec: "en échec",
 };
 
+/** Criteria of the judge's grids (src/lib/judge/rubric.md). */
+export const JUDGE_CRITERION_LABELS: Record<string, string> = {
+  invest: "INVEST",
+  testabilite: "Testabilité",
+  tracabilite: "Traçabilité",
+  format: "Format",
+  reproductibilite: "Reproductibilité",
+  attendu_constate: "Attendu / constaté",
+  severite: "Sévérité",
+  critere_correction: "Critère de correction",
+  objectif: "Objectif",
+  definition_termine: "Définition de terminé",
+};
+
 export type ModelFamily = "Haiku" | "Sonnet" | "Opus";
 
 /** Model family from a model id (claude-sonnet-5-5 → Sonnet), null if unknown. */

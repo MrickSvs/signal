@@ -1,9 +1,9 @@
-import { AlertTriangle, BadgeCheck, CircleAlert, Link2 } from "lucide-react";
+import { BadgeCheck, CircleAlert, Link2, Scale, ThumbsUp } from "lucide-react";
 import { BacklogItemChip, EvidenceChip } from "@/components/signal/chips";
 import { BacklogKindBadge, Pill } from "@/components/signal/badges";
 import { storyPart, type Scenario } from "@/lib/backlog/draft";
 import { formatNumber } from "@/lib/format";
-import { BACKLOG_STATUS_LABELS } from "@/lib/labels";
+import { BACKLOG_STATUS_LABELS, JUDGE_CRITERION_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { BacklogViewItem, JudgeBadge } from "@/server/queries/backlog";
 import { BacklogItemActions } from "./item-actions";
@@ -75,18 +75,73 @@ function JudgeView({ judge }: { judge: JudgeBadge | null }) {
           ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
           : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
       }
-      title={[
-        judge.points_forts,
-        ...Object.entries(judge.notes).map(([criterion, n]) => `${criterion} : ${n}/5`),
-        ...judge.a_ameliorer.map((a) => `À améliorer : ${a}`),
-        judge.provisional ? "Badge provisoire (juge non calibré)." : "",
-      ]
-        .filter(Boolean)
-        .join("\n")}
+      title={judge.provisional ? "Badge provisoire : juge non calibré" : "Note du juge qualité"}
     >
       {ready ? <BadgeCheck aria-hidden /> : <CircleAlert aria-hidden />}
       Qualité {formatNumber(judge.note)}/5
     </Pill>
+  );
+}
+
+/** The quality judge's review (SPEC §14.3): advice for the PO before validating, never applied
+ * automatically. Verdict and overall note, one chip per criterion, the strength, what to check. */
+function JudgePanel({ judge }: { judge: JudgeBadge }) {
+  const ready = judge.verdict === "pret";
+  const notes = Object.entries(judge.notes);
+  return (
+    <section
+      aria-label="Avis du juge qualité"
+      className="flex flex-col gap-2.5 rounded-lg border bg-muted/40 px-3 py-2.5 text-[13px]"
+    >
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <Scale aria-hidden className="size-3.5 text-muted-foreground" />
+        <span className="font-medium">Avis du juge</span>
+        <span
+          className={cn(
+            "font-medium",
+            ready ? "text-emerald-700 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300",
+          )}
+        >
+          {ready ? "Prêt" : "À revoir"} · {formatNumber(judge.note)}/5
+        </span>
+        <span className="text-muted-foreground">
+          relecture par un second modèle{judge.provisional ? " (provisoire)" : ""}
+        </span>
+      </div>
+      {notes.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5" aria-label="Notes par critère">
+          {notes.map(([criterion, note]) => (
+            <li
+              key={criterion}
+              className={cn(
+                "rounded-md border bg-background px-2 py-0.5",
+                note <= 2 &&
+                  "border-amber-300 text-amber-800 dark:border-amber-800 dark:text-amber-200",
+              )}
+            >
+              {JUDGE_CRITERION_LABELS[criterion] ?? criterion}{" "}
+              <span className="font-medium tabular-nums">{note}/5</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {judge.points_forts && (
+        <p className="flex items-start gap-1.5 text-muted-foreground">
+          <ThumbsUp aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+          {judge.points_forts}
+        </p>
+      )}
+      {judge.a_ameliorer.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <p className="font-medium">À vérifier avant de valider</p>
+          <ul className="flex list-disc flex-col gap-1 pl-5 leading-relaxed">
+            {judge.a_ameliorer.map((advice, i) => (
+              <li key={i}>{advice}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -226,13 +281,9 @@ export function BacklogItemCard({
             <EvidenceChip key={id} id={id} />
           ))}
         </p>
-        {item.judge && item.judge.a_ameliorer.length > 0 && (
-          <p className="flex items-start gap-1.5 text-amber-800 dark:text-amber-200">
-            <AlertTriangle aria-hidden className="mt-0.5 size-3.5 shrink-0" />
-            {item.judge.a_ameliorer.join(" · ")}
-          </p>
-        )}
       </div>
+
+      {item.judge && <JudgePanel judge={item.judge} />}
 
       {item.status === "valide" && item.push_error && (
         <p role="alert" className="flex items-start gap-1.5 text-[13px] text-destructive">
