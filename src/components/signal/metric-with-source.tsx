@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { Pill } from "./badges";
 import { EvidenceChip } from "./chips";
+import { PILL_TONES, TEXT_TONES } from "./tones";
 
 export type MetricSource = "calcule" | "estime" | "ecrase";
 
@@ -14,11 +15,9 @@ const SOURCE_LABELS: Record<MetricSource, string> = {
 };
 
 const SOURCE_STYLES: Record<MetricSource, string> = {
-  calcule: "border-border text-muted-foreground",
-  estime:
-    "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200",
-  ecrase:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
+  calcule: PILL_TONES.neutral,
+  estime: PILL_TONES.signal,
+  ecrase: PILL_TONES.po,
 };
 
 export type MetricBreakdownLine = { label: string; value: string };
@@ -52,7 +51,7 @@ export function MetricWithSource({
         aria-label={`${label} : ${value}${unit ? ` ${unit}` : ""}, voir le détail`}
         className={cn(
           "inline-flex cursor-pointer items-baseline gap-1 rounded-sm font-medium tabular-nums underline decoration-muted-foreground/40 decoration-dotted underline-offset-4 hover:decoration-signal focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
-          source === "ecrase" && "text-amber-700 dark:text-amber-300",
+          source === "ecrase" && TEXT_TONES.po,
           className,
         )}
       >

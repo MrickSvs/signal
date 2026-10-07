@@ -24,7 +24,10 @@ const MODES: { mode: ReachMode; label: string; hint: string }[] = [
   { mode: "mrr", label: "MRR", hint: "MRR concerné estimé, en euros" },
 ];
 
-/** Priorisation (SPEC §12.5): the RICE ranking the PO toggles, overrides and completes. */
+/**
+ * Priorisation (SPEC §12.5, ADR-039): « in which order, and why? ». Signal's challenges first, then
+ * the RICE ranking the PO toggles, overrides and completes.
+ */
 export default async function PrioritizationPage({ searchParams }: PageProps<"/priorisation">) {
   const pack = await loadContextPack();
   const { mode, focus } = parsePrioritizationParams(
@@ -58,7 +61,7 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
   }
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-6">
+    <div className="@container mx-auto flex max-w-7xl flex-col gap-5 px-6 py-6">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-medium text-muted-foreground">Reach</span>
@@ -86,12 +89,7 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
         {toolbar}
       </div>
 
-      <p className="text-muted-foreground">
-        RICE = Reach × Impact × Confidence ÷ Effort. Signal estime l&apos;Impact, le reste est
-        calculé ; clique sur une valeur pour voir sa source et l&apos;écraser. Les scores ne se
-        comparent qu&apos;à l&apos;intérieur d&apos;un même mode de Reach (
-        {mode === "mrr" ? "euros de MRR concerné" : "comptes concernés"}).
-      </p>
+      <RecommendationsPanel recommendations={screen.recommendations} />
 
       <RankingTable rows={screen.rows} mode={mode} focus={focus} />
 
@@ -107,8 +105,6 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
           ))}
         </div>
       )}
-
-      <RecommendationsPanel recommendations={screen.recommendations} />
     </div>
   );
 }

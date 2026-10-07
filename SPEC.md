@@ -742,14 +742,9 @@ L'écran répond à « de quoi parlent les clients, et est-ce que ça monte ? »
 
 ### 12.5 Priorisation
 
-Tableau classé : RICE décomposé (R, I, C, E cliquables), badge de robustesse, MoSCoW recommandé vs final, alignement, tendance.
+L'écran répond à « dans quel ordre, et pourquoi ? » (ADR-039). En tête : bascule **Reach : comptes / MRR**, jauge de capacité des Must (alerte au-delà de 60 %), bouton **« Ajouter un sujet »** (insight manuel, §8.9) et journal des décisions en tiroir. Puis les **Recommandations de Signal** (challenges : hors stratégie, contradictions, règles en tension, rang fragile, contexte modifié), une ligne chacune, détail et piste dépliables. Puis le tableau classé : une ligne par insight avec son rang, son titre en entier, les quatre paramètres R, I, C, E dessous (chacun cliquable vers sa source et l'**override**, raison obligatoire → re-classement animé), alignement, tendance, RICE et badge de robustesse, MoSCoW recommandé ou final.
 
-- Bascule **Reach : comptes / MRR**.
-- **Override** de n'importe quel paramètre (raison obligatoire) → re-classement animé.
-- Jauge de capacité des Must (alerte au-delà de 60 %).
-- Bouton **« Ajouter un sujet »** : insight manuel (§8.9).
-- Panneau « Recommandations de Signal » (dont les challenges : hors stratégie, contradictions, règles en tension).
-- Journal des décisions en tiroir.
+Couleurs communes à tous les écrans : bleu pour ce que le PO décide ou a décidé (à valider, override, MoSCoW choisi), vert Signal pour ce que Signal estime ou voit monter, ambre pour un risque (rang fragile, contexte modifié, capacité), le reste neutre.
 
 ### 12.6 Backlog
 

@@ -1,7 +1,8 @@
-import { CheckCircle2 } from "lucide-react";
-import { Pill } from "@/components/signal/badges";
+import { CheckCircle2, ChevronDown } from "lucide-react";
 import { InsightChip } from "@/components/signal/chips";
+import { TEXT_TONES } from "@/components/signal/tones";
 import type { Recommendation, RecommendationKind } from "@/lib/prioritization/recommendations";
+import { cn } from "@/lib/utils";
 
 const KIND_LABELS: Record<RecommendationKind, string> = {
   capacite: "Capacité",
@@ -13,43 +14,66 @@ const KIND_LABELS: Record<RecommendationKind, string> = {
   contexte_modifie: "Contexte modifié",
 };
 
+/** Kinds that put the ranking at risk (amber); the others are Signal's reading (neutral). */
+const RISKS = new Set<RecommendationKind>(["capacite", "fragile", "contexte_modifie"]);
+
 /**
- * « Recommandations de Signal » (SPEC §12.5): gaps between the recommendation and the PO's
- * choice, off-strategy insights, segment tensions, MoSCoW rules in tension, fragile ranks and
- * overrides whose context changed. Derived in code; Signal recommends, the PO decides.
+ * « Recommandations de Signal » (SPEC §12.5, ADR-039), above the ranking: one line per challenge,
+ * the detail and the lead unfold on click. Derived in code; Signal recommends, the PO decides.
  */
 export function RecommendationsPanel({ recommendations }: { recommendations: Recommendation[] }) {
+  if (recommendations.length === 0) {
+    return (
+      <p className="flex items-center gap-2 text-muted-foreground">
+        <CheckCircle2 aria-hidden className="size-4 text-signal" />
+        Tes choix suivent les recommandations de Signal et le classement est stable.
+      </p>
+    );
+  }
   return (
-    <section aria-labelledby="recos-title" className="flex flex-col gap-3">
-      <h2 id="recos-title" className="text-base font-semibold">
+    <section aria-labelledby="recos-title" className="flex flex-col gap-2">
+      <h2 id="recos-title" className="flex items-baseline gap-2 text-base font-semibold">
         Recommandations de Signal
+        <span className="font-normal text-muted-foreground tabular-nums">
+          {recommendations.length}
+        </span>
       </h2>
-      {recommendations.length === 0 ? (
-        <p className="flex items-center gap-2 text-muted-foreground">
-          <CheckCircle2 aria-hidden className="size-4 text-signal" />
-          Rien à signaler : tes choix suivent les recommandations et le classement est stable.
-        </p>
-      ) : (
-        <ul className="grid gap-2.5 md:grid-cols-2">
-          {recommendations.map((r, i) => (
-            <li key={`${r.kind}-${i}`} className="flex flex-col gap-1.5 rounded-lg border p-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <Pill className="border-border text-muted-foreground">{KIND_LABELS[r.kind]}</Pill>
-                {r.insight_ids.map((id) => (
-                  <InsightChip key={id} id={id} />
-                ))}
+      <ul className="flex flex-col divide-y rounded-lg border">
+        {recommendations.map((r, i) => (
+          <li key={`${r.kind}-${i}`}>
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-start gap-3 px-3 py-2.5 hover:bg-muted/40 [&::-webkit-details-marker]:hidden">
+                <span
+                  className={cn(
+                    "w-40 shrink-0 pt-px text-[13px] font-medium",
+                    RISKS.has(r.kind) ? TEXT_TONES.risk : "text-muted-foreground",
+                  )}
+                >
+                  {KIND_LABELS[r.kind]}
+                </span>
+                <span className="min-w-0 flex-1 leading-snug font-medium">{r.title}</span>
+                <span className="flex shrink-0 items-center gap-1">
+                  {r.insight_ids.map((id) => (
+                    <InsightChip key={id} id={id} />
+                  ))}
+                  <ChevronDown
+                    aria-hidden
+                    className="size-4 text-muted-foreground transition-transform group-open:rotate-180 motion-reduce:transition-none"
+                  />
+                </span>
+              </summary>
+              <div className="flex flex-col gap-1.5 px-3 pb-3 pl-[13.25rem] leading-relaxed">
+                <p className="text-muted-foreground">{r.detail}</p>
+                {r.piste && (
+                  <p>
+                    <span className="font-medium">Piste :</span> {r.piste}
+                  </p>
+                )}
               </div>
-              <p className="font-medium">{r.title}</p>
-              <p className="leading-relaxed text-muted-foreground">{r.detail}</p>
-              {r.piste && (
-                <p className="leading-relaxed">
-                  <span className="font-medium">Piste :</span> {r.piste}
-                </p>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+            </details>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

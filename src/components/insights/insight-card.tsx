@@ -2,6 +2,7 @@ import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { Sparkline } from "@/components/digest/sparkline";
 import { Pill } from "@/components/signal/badges";
+import { PILL_TONES } from "@/components/signal/tones";
 import { MetricWithSource } from "@/components/signal/metric-with-source";
 import { formatEur, formatNumber } from "@/lib/format";
 import { cardBadges, type InsightCard } from "@/lib/insights/list";
@@ -15,14 +16,13 @@ import { cn } from "@/lib/utils";
 
 // Same meaning, same color as the Digest (ADR-033): blue for what awaits Léa's decision, Signal
 // green for a rising trend; everything else stays neutral.
-export const TO_REVIEW_STYLE =
-  "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200";
+export const TO_REVIEW_STYLE = PILL_TONES.po;
 
 const BADGES = {
   a_valider: { label: "À valider", className: TO_REVIEW_STYLE, icon: null },
   emergent: {
     label: "Émergent",
-    className: "border-signal/30 bg-signal-soft text-signal",
+    className: PILL_TONES.signal,
     icon: TrendingUp,
   },
   nouveau: { label: "Nouveau", className: "border-border text-muted-foreground", icon: null },

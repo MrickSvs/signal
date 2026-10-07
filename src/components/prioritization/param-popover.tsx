@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2, RotateCcw } from "lucide-react";
 import { Pill } from "@/components/signal/badges";
+import { PILL_TONES, TEXT_TONES } from "@/components/signal/tones";
 import { EvidenceChip } from "@/components/signal/chips";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,12 +22,10 @@ const SOURCE_LABELS: Record<CellSource, string> = {
 };
 
 const SOURCE_STYLES: Record<CellSource, string> = {
-  calcule: "border-border text-muted-foreground",
-  estime:
-    "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200",
-  ecrase:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
-  saisi: "border-border bg-muted text-foreground",
+  calcule: PILL_TONES.neutral,
+  estime: PILL_TONES.signal,
+  ecrase: PILL_TONES.po,
+  saisi: PILL_TONES.po,
 };
 
 /**
@@ -65,7 +64,7 @@ export function ParamPopover({
         aria-label={`${cell.label} : ${cell.display}${cell.unit ? ` ${cell.unit}` : ""}, détail et override`}
         className={cn(
           "inline-flex cursor-pointer items-center gap-1 rounded-sm font-medium tabular-nums underline decoration-muted-foreground/40 decoration-dotted underline-offset-4 hover:decoration-signal focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
-          cell.source === "ecrase" && "text-amber-700 dark:text-amber-300",
+          cell.source === "ecrase" && TEXT_TONES.po,
         )}
       >
         {cell.display}

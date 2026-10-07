@@ -546,3 +546,15 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Couleurs** du Digest (ADR-033) : bleu pour « À valider », vert Signal pour « Émergent », le reste neutre. Le plan passe en texte.
   - **Détail** : bande de huit chiffres clés sous le problème, « Qui est concerné » et « Canaux » sur deux colonnes, retours en deux lignes qui ouvrent l'écran Retours filtré sur l'insight (navigation d'ADR-037).
 - **Conséquences** : SPEC §12.4 ne prévoit plus de section « Signaux faibles » à part. Un ancien lien `tri=rang` retombe sur le tri par volume.
+
+## ADR-039 — Écran Priorisation : les challenges d'abord, des titres lisibles, une couleur par sens
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : à 1 280 × 800 avec le chat ouvert, le tableau à huit colonnes fixes coupait les titres à une quinzaine de caractères et faisait déborder la colonne MoSCoW. Une phrase sur la formule du RICE occupait le haut de l'écran, et les recommandations de Signal (les challenges) étaient en grosses cartes au troisième écran. L'ambre portait cinq sens (fragile, écrasé, à valider, hors stratégie, contexte modifié), le bleu ciel deux (sensible, estimé).
+- **Décision** :
+  - **Une question** (ADR-038) : « dans quel ordre, et pourquoi ? ».
+  - **Recommandations de Signal au-dessus du classement**, une ligne par challenge (type, titre, insights), détail et piste dépliables.
+  - **Tableau** sur quatre colonnes : rang, insight (titre entier, puis R, I, C, E cliquables, puis alignement, tendance, badges), RICE et robustesse, MoSCoW. La formule passe en info-bulle de l'en-tête. Le MoSCoW n'affiche plus « Should → Should » : la valeur seule, suivie de « reco » tant que le PO n'a pas tranché, barrée puis remplacée quand il a choisi autre chose.
+  - **Couleurs communes** (`components/signal/tones.ts`) : bleu pour le PO (à valider, override, MoSCoW choisi), vert Signal pour ce que Signal estime (paramètre estimé, émergent), ambre pour un risque (rang fragile, contexte modifié, capacité), le reste neutre. « Hors stratégie » passe en texte appuyé ; « sensible » devient neutre. S'applique aussi aux popovers de valeurs de tous les écrans (`MetricWithSource`).
+- **Conséquences** : un override se lit désormais en bleu partout (il était en ambre). La re-classification animée est inchangée.

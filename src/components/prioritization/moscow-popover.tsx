@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import { Pill } from "@/components/signal/badges";
+import { PILL_TONES, TEXT_TONES } from "@/components/signal/tones";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -67,18 +68,23 @@ export function MoscowPopover({
         aria-label={`MoSCoW recommandé ${MOSCOW_LABELS[moscow.reco]}, final ${MOSCOW_LABELS[moscow.final]} : choisir`}
         className="inline-flex cursor-pointer items-center gap-1 rounded-sm whitespace-nowrap underline decoration-muted-foreground/40 decoration-dotted underline-offset-4 hover:decoration-signal focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
       >
-        <span className="text-muted-foreground">{MOSCOW_LABELS[moscow.reco]}</span>
-        <ArrowRight aria-hidden className="size-3.5 text-muted-foreground" />
-        <span className={cn("font-semibold", differs && "text-amber-700 dark:text-amber-300")}>
+        {differs && (
+          <>
+            <span className="text-muted-foreground line-through decoration-muted-foreground/60">
+              {MOSCOW_LABELS[moscow.reco]}
+            </span>
+            <ArrowRight aria-hidden className="size-3.5 text-muted-foreground" />
+          </>
+        )}
+        <span className={cn("font-semibold", moscow.override && TEXT_TONES.po)}>
           {MOSCOW_LABELS[moscow.final]}
         </span>
+        {!moscow.override && <span className="text-[13px] text-muted-foreground">reco</span>}
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[26rem] gap-3 p-3.5 text-sm">
         <div className="flex items-center justify-between gap-2">
           <p className="font-medium">MoSCoW</p>
-          <Pill className="border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200">
-            Recommandé : {MOSCOW_LABELS[moscow.reco]}
-          </Pill>
+          <Pill className={PILL_TONES.signal}>Recommandé : {MOSCOW_LABELS[moscow.reco]}</Pill>
         </div>
         <p className="leading-relaxed">{moscow.rationale}</p>
         {moscow.flags.length > 0 && (
