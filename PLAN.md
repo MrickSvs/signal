@@ -1120,6 +1120,8 @@ Le badge qualité de l'écran Backlog utilise désormais ce juge.
 
 ### Étape 7.1 — Visualiser une story
 
+> **Reportée après 8.1 et allégée** (ADR-031) : sans `components.html`, sans outil agent, sans « Régénérer », sans propriété Notion.
+
 `[Signature]` · ~3 h
 
 **Objectif** : la story devient un écran Jalon cliquable en moins d'une minute — et jamais une iframe vide.
@@ -1157,6 +1159,8 @@ Le badge qualité de l'écran Backlog utilise désormais ce juge.
 
 ### Étape 7.2 — Signal en MCP
 
+> **Coupée** (ADR-031, 2026-10-06). Nouvel ordre : 8.1 → 7.1 allégée → 8.2 → 8.3.
+
 `[Bonus]` · ~1 h 30
 
 **Objectif** : Signal utilisable depuis n'importe quel client MCP.
@@ -1185,6 +1189,8 @@ Consulte la doc actuelle du SDK MCP TypeScript et de l'adaptateur MCP pour Next.
 # Phase 8 — Démo et livrables
 
 ### Étape 8.1 — Mode démo
+
+> **Réalisée avec écarts** (ADR-031, ADR-032) : backlog de secours sur S2b (permissions), pas S3 ; `/status` coupée ; `demo:reset --empty` ajouté ; digest généré en direct après le reset ; dix retours à coller dans `data/demo/retours-a-coller.md` au lieu de deux fichiers.
 
 `[Cœur]` · ~1 h 45
 

@@ -1,0 +1,16 @@
+[
+ {
+  "id": "E-01",
+  "insight_id": "I-31",
+  "title": "Permettre aux agences d'ouvrir un seul projet à un client ou un intervenant externe",
+  "goal": "Remplacer l'accès « tout l'espace » par un accès limité par projet (invité en lecture, membre restreint), pour sécuriser la relation client et lever le frein au renouvellement des comptes Enterprise.",
+  "okr_refs": [
+   "O2-KR1",
+   "O1-KR2"
+  ],
+  "kpis": [
+   "25 % des projets actifs avec au moins un invité client (O2-KR1) ; zéro compte Enterprise perdu au renouvellement pour absence d'accès restreint (O1-KR2)"
+  ],
+  "created_at": "2026-10-05T02:00:45.238+00:00"
+ }
+]

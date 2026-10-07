@@ -21,6 +21,8 @@
     "pipeline:cluster": "tsx scripts/pipeline-cluster.ts",
     "pipeline:score": "tsx scripts/pipeline-score.ts",
     "digest": "tsx scripts/digest.ts",
+    "demo:snapshot": "tsx scripts/demo-snapshot.ts",
+    "demo:reset": "tsx --conditions=react-server scripts/demo-reset.ts",
     "estimate": "tsx scripts/estimate.ts",
     "chat": "tsx --conditions=react-server scripts/chat.ts",
     "investigate": "tsx --conditions=react-server scripts/investigate.ts",

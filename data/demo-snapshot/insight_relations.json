@@ -1,0 +1,38 @@
+[
+ {
+  "id": "3be41a70-a3f3-482f-b310-7510d3f17c31",
+  "insight_a": "I-30",
+  "insight_b": "I-32",
+  "kind": "tension",
+  "segments": [
+   {
+    "segment": "Free / Pro",
+    "position": "Veulent une interface allégée, avec moins de menus, d'options et de champs, et une version simplifiée centrée sur leurs tâches."
+   },
+   {
+    "segment": "Business",
+    "position": "Demandent davantage de types de champs personnalisés (liste déroulante, case à cocher, personne, montant) pour normaliser leurs données."
+   }
+  ],
+  "rationale": "Les comptes Free et Pro trouvent déjà l'interface trop chargée, alors que les comptes Business veulent y ajouter des types de champs, ce qui accroît la complexité.",
+  "run_id": "1e8af357-ba78-464b-b75c-1802bf499a18"
+ },
+ {
+  "id": "3ddf46c4-40b8-4b12-9770-2b30f23134bf",
+  "insight_a": "I-30",
+  "insight_b": "I-46",
+  "kind": "tension",
+  "segments": [
+   {
+    "segment": "Free / Pro",
+    "position": "Veulent réduire le nombre d'options et de champs affichés pour retrouver l'essentiel."
+   },
+   {
+    "segment": "Business",
+    "position": "Veulent des champs financiers supplémentaires (formule, montant en euros) pour suivre devis, marges et reste à faire dans les tâches."
+   }
+  ],
+  "rationale": "Simplifier l'interface pour les petites équipes s'oppose à l'ajout de champs spécialisés demandés par les comptes Business.",
+  "run_id": "1e8af357-ba78-464b-b75c-1802bf499a18"
+ }
+]

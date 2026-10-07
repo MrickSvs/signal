@@ -1,0 +1,1220 @@
+[
+ {
+  "insight_id": "I-29",
+  "item_id": "R-001.1",
+  "feedback_id": "R-001",
+  "similarity": 0.961417,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-003.1",
+  "feedback_id": "R-003",
+  "similarity": 0.882969,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-004.1",
+  "feedback_id": "R-004",
+  "similarity": 0.914524,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-006.1",
+  "feedback_id": "R-006",
+  "similarity": 0.950789,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-007.1",
+  "feedback_id": "R-007",
+  "similarity": 0.915671,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-008.1",
+  "feedback_id": "R-008",
+  "similarity": 0.907335,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-34",
+  "item_id": "R-010.1",
+  "feedback_id": "R-010",
+  "similarity": 0.957693,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-011.1",
+  "feedback_id": "R-011",
+  "similarity": 0.915004,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-011.2",
+  "feedback_id": "R-011",
+  "similarity": 0.907954,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-012.1",
+  "feedback_id": "R-012",
+  "similarity": 0.914018,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-013.1",
+  "feedback_id": "R-013",
+  "similarity": 0.947955,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-013.2",
+  "feedback_id": "R-013",
+  "similarity": 0.911511,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-43",
+  "item_id": "R-014.1",
+  "feedback_id": "R-014",
+  "similarity": 0.976556,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-017.1",
+  "feedback_id": "R-017",
+  "similarity": 0.867068,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-44",
+  "item_id": "R-018.1",
+  "feedback_id": "R-018",
+  "similarity": 0.977997,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-020.1",
+  "feedback_id": "R-020",
+  "similarity": 0.896607,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-35",
+  "item_id": "R-021.1",
+  "feedback_id": "R-021",
+  "similarity": 0.894707,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-45",
+  "item_id": "R-023.1",
+  "feedback_id": "R-023",
+  "similarity": 0.986501,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-024.1",
+  "feedback_id": "R-024",
+  "similarity": 0.909343,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-025.1",
+  "feedback_id": "R-025",
+  "similarity": 0.916864,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-025.2",
+  "feedback_id": "R-025",
+  "similarity": 0.916161,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-026.1",
+  "feedback_id": "R-026",
+  "similarity": 0.917,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-36",
+  "item_id": "R-027.1",
+  "feedback_id": "R-027",
+  "similarity": 0.930767,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-028.1",
+  "feedback_id": "R-028",
+  "similarity": 0.865462,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-030.1",
+  "feedback_id": "R-030",
+  "similarity": 0.887474,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-033.1",
+  "feedback_id": "R-033",
+  "similarity": 0.920303,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-034.2",
+  "feedback_id": "R-034",
+  "similarity": 0.906249,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-035.1",
+  "feedback_id": "R-035",
+  "similarity": 0.932805,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-36",
+  "item_id": "R-036.1",
+  "feedback_id": "R-036",
+  "similarity": 0.93541,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-037.1",
+  "feedback_id": "R-037",
+  "similarity": 0.924869,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-038.1",
+  "feedback_id": "R-038",
+  "similarity": 0.955888,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-040.1",
+  "feedback_id": "R-040",
+  "similarity": 0.943881,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-041.1",
+  "feedback_id": "R-041",
+  "similarity": 0.967713,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-042.1",
+  "feedback_id": "R-042",
+  "similarity": 0.928942,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-043.1",
+  "feedback_id": "R-043",
+  "similarity": 0.897989,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-044.1",
+  "feedback_id": "R-044",
+  "similarity": 0.914319,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-45",
+  "item_id": "R-046.1",
+  "feedback_id": "R-046",
+  "similarity": 0.986501,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-047.1",
+  "feedback_id": "R-047",
+  "similarity": 0.919992,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-048.1",
+  "feedback_id": "R-048",
+  "similarity": 0.937058,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-37",
+  "item_id": "R-049.1",
+  "feedback_id": "R-049",
+  "similarity": 0.942904,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-050.1",
+  "feedback_id": "R-050",
+  "similarity": 0.930281,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-051.1",
+  "feedback_id": "R-051",
+  "similarity": 0.929041,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-052.1",
+  "feedback_id": "R-052",
+  "similarity": 0.953903,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-052.2",
+  "feedback_id": "R-052",
+  "similarity": 0.955255,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-46",
+  "item_id": "R-053.2",
+  "feedback_id": "R-053",
+  "similarity": 0.938035,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-055.1",
+  "feedback_id": "R-055",
+  "similarity": 0.813263,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-056.1",
+  "feedback_id": "R-056",
+  "similarity": 0.876508,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-057.1",
+  "feedback_id": "R-057",
+  "similarity": 0.946324,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-058.1",
+  "feedback_id": "R-058",
+  "similarity": 0.899592,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-40",
+  "item_id": "R-059.1",
+  "feedback_id": "R-059",
+  "similarity": 0.956137,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-060.1",
+  "feedback_id": "R-060",
+  "similarity": 0.885057,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-061.1",
+  "feedback_id": "R-061",
+  "similarity": 0.945622,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-062.1",
+  "feedback_id": "R-062",
+  "similarity": 0.922034,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-35",
+  "item_id": "R-063.1",
+  "feedback_id": "R-063",
+  "similarity": 0.959749,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-46",
+  "item_id": "R-064.1",
+  "feedback_id": "R-064",
+  "similarity": 0.938035,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-066.1",
+  "feedback_id": "R-066",
+  "similarity": 0.961796,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-068.1",
+  "feedback_id": "R-068",
+  "similarity": 0.914177,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-069.1",
+  "feedback_id": "R-069",
+  "similarity": 0.924167,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-41",
+  "item_id": "R-070.1",
+  "feedback_id": "R-070",
+  "similarity": 0.900099,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-071.1",
+  "feedback_id": "R-071",
+  "similarity": 0.892745,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-072.1",
+  "feedback_id": "R-072",
+  "similarity": 0.893344,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-073.1",
+  "feedback_id": "R-073",
+  "similarity": 0.913417,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-075.2",
+  "feedback_id": "R-075",
+  "similarity": 0.893569,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-41",
+  "item_id": "R-076.1",
+  "feedback_id": "R-076",
+  "similarity": 0.970823,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-077.1",
+  "feedback_id": "R-077",
+  "similarity": 0.918494,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-078.1",
+  "feedback_id": "R-078",
+  "similarity": 0.920056,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-079.1",
+  "feedback_id": "R-079",
+  "similarity": 0.969831,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-38",
+  "item_id": "R-080.1",
+  "feedback_id": "R-080",
+  "similarity": 0.864213,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-41",
+  "item_id": "R-081.1",
+  "feedback_id": "R-081",
+  "similarity": 0.962842,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-083.1",
+  "feedback_id": "R-083",
+  "similarity": 0.923945,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-084.1",
+  "feedback_id": "R-084",
+  "similarity": 0.962761,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-086.1",
+  "feedback_id": "R-086",
+  "similarity": 0.963631,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-087.1",
+  "feedback_id": "R-087",
+  "similarity": 0.949333,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-37",
+  "item_id": "R-088.1",
+  "feedback_id": "R-088",
+  "similarity": 0.977148,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-090.1",
+  "feedback_id": "R-090",
+  "similarity": 0.928022,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-091.1",
+  "feedback_id": "R-091",
+  "similarity": 0.921552,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-34",
+  "item_id": "R-092.1",
+  "feedback_id": "R-092",
+  "similarity": 0.933744,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-095.1",
+  "feedback_id": "R-095",
+  "similarity": 0.913794,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-098.1",
+  "feedback_id": "R-098",
+  "similarity": 0.955062,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-099.1",
+  "feedback_id": "R-099",
+  "similarity": 0.9109,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-42",
+  "item_id": "R-101.1",
+  "feedback_id": "R-101",
+  "similarity": 0.971259,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-47",
+  "item_id": "R-102.1",
+  "feedback_id": "R-102",
+  "similarity": 0.992323,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-104.1",
+  "feedback_id": "R-104",
+  "similarity": 0.907801,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-40",
+  "item_id": "R-105.1",
+  "feedback_id": "R-105",
+  "similarity": 0.941668,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-42",
+  "item_id": "R-107.1",
+  "feedback_id": "R-107",
+  "similarity": 0.974876,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-108.1",
+  "feedback_id": "R-108",
+  "similarity": 0.964038,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-110.1",
+  "feedback_id": "R-110",
+  "similarity": 0.925446,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-110.2",
+  "feedback_id": "R-110",
+  "similarity": 0.817661,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-111.1",
+  "feedback_id": "R-111",
+  "similarity": 0.911795,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-114.2",
+  "feedback_id": "R-114",
+  "similarity": 0.960876,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-115.1",
+  "feedback_id": "R-115",
+  "similarity": 0.970433,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-116.1",
+  "feedback_id": "R-116",
+  "similarity": 0.97427,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-117.1",
+  "feedback_id": "R-117",
+  "similarity": 0.953841,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-118.1",
+  "feedback_id": "R-118",
+  "similarity": 0.864971,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-119.1",
+  "feedback_id": "R-119",
+  "similarity": 0.950458,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-37",
+  "item_id": "R-120.1",
+  "feedback_id": "R-120",
+  "similarity": 0.968138,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-121.1",
+  "feedback_id": "R-121",
+  "similarity": 0.858775,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-124.1",
+  "feedback_id": "R-124",
+  "similarity": 0.902415,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-39",
+  "item_id": "R-125.1",
+  "feedback_id": "R-125",
+  "similarity": 0.934788,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-48",
+  "item_id": "R-126.1",
+  "feedback_id": "R-126",
+  "similarity": 0.975319,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-37",
+  "item_id": "R-129.1",
+  "feedback_id": "R-129",
+  "similarity": 0.961437,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-39",
+  "item_id": "R-130.1",
+  "feedback_id": "R-130",
+  "similarity": 0.963968,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-49",
+  "item_id": "R-131.2",
+  "feedback_id": "R-131",
+  "similarity": 0.962555,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-133.1",
+  "feedback_id": "R-133",
+  "similarity": 0.93835,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-134.1",
+  "feedback_id": "R-134",
+  "similarity": 0.928749,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-135.1",
+  "feedback_id": "R-135",
+  "similarity": 0.959729,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-35",
+  "item_id": "R-137.1",
+  "feedback_id": "R-137",
+  "similarity": 0.893434,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-139.1",
+  "feedback_id": "R-139",
+  "similarity": 0.956957,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-139.2",
+  "feedback_id": "R-139",
+  "similarity": 0.871415,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-140.1",
+  "feedback_id": "R-140",
+  "similarity": 0.859281,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-141.1",
+  "feedback_id": "R-141",
+  "similarity": 0.939307,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-35",
+  "item_id": "R-142.1",
+  "feedback_id": "R-142",
+  "similarity": 0.947442,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-35",
+  "item_id": "R-143.1",
+  "feedback_id": "R-143",
+  "similarity": 0.952092,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-34",
+  "item_id": "R-144.1",
+  "feedback_id": "R-144",
+  "similarity": 0.870528,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-38",
+  "item_id": "R-145.1",
+  "feedback_id": "R-145",
+  "similarity": 0.968394,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-146.1",
+  "feedback_id": "R-146",
+  "similarity": 0.948732,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-147.1",
+  "feedback_id": "R-147",
+  "similarity": 0.955415,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-148.1",
+  "feedback_id": "R-148",
+  "similarity": 0.930667,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-149.1",
+  "feedback_id": "R-149",
+  "similarity": 0.950487,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-150.1",
+  "feedback_id": "R-150",
+  "similarity": 0.847341,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-151.1",
+  "feedback_id": "R-151",
+  "similarity": 0.90838,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-34",
+  "item_id": "R-152.1",
+  "feedback_id": "R-152",
+  "similarity": 0.956057,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-153.1",
+  "feedback_id": "R-153",
+  "similarity": 0.96404,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-39",
+  "item_id": "R-154.1",
+  "feedback_id": "R-154",
+  "similarity": 0.877317,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-155.1",
+  "feedback_id": "R-155",
+  "similarity": 0.952245,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-40",
+  "item_id": "R-157.1",
+  "feedback_id": "R-157",
+  "similarity": 0.937057,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-158.1",
+  "feedback_id": "R-158",
+  "similarity": 0.961556,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-159.1",
+  "feedback_id": "R-159",
+  "similarity": 0.884905,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-36",
+  "item_id": "R-160.1",
+  "feedback_id": "R-160",
+  "similarity": 0.928138,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-161.1",
+  "feedback_id": "R-161",
+  "similarity": 0.935006,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-31",
+  "item_id": "R-162.1",
+  "feedback_id": "R-162",
+  "similarity": 0.922166,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-38",
+  "item_id": "R-163.1",
+  "feedback_id": "R-163",
+  "similarity": 0.965894,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-164.1",
+  "feedback_id": "R-164",
+  "similarity": 0.947489,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-165.1",
+  "feedback_id": "R-165",
+  "similarity": 0.925589,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-167.1",
+  "feedback_id": "R-167",
+  "similarity": 0.856314,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-168.1",
+  "feedback_id": "R-168",
+  "similarity": 0.949089,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-168.2",
+  "feedback_id": "R-168",
+  "similarity": 0.918081,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-169.1",
+  "feedback_id": "R-169",
+  "similarity": 0.86616,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-170.1",
+  "feedback_id": "R-170",
+  "similarity": 0.902177,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-171.1",
+  "feedback_id": "R-171",
+  "similarity": 0.961236,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-44",
+  "item_id": "R-174.1",
+  "feedback_id": "R-174",
+  "similarity": 0.977997,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-175.1",
+  "feedback_id": "R-175",
+  "similarity": 0.960125,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-177.1",
+  "feedback_id": "R-177",
+  "similarity": 0.956697,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-30",
+  "item_id": "R-178.1",
+  "feedback_id": "R-178",
+  "similarity": 0.926311,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-43",
+  "item_id": "R-179.1",
+  "feedback_id": "R-179",
+  "similarity": 0.976556,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-180.1",
+  "feedback_id": "R-180",
+  "similarity": 0.900359,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-181.1",
+  "feedback_id": "R-181",
+  "similarity": 0.888145,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-182.1",
+  "feedback_id": "R-182",
+  "similarity": 0.955584,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-182.2",
+  "feedback_id": "R-182",
+  "similarity": 0.795796,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-184.1",
+  "feedback_id": "R-184",
+  "similarity": 0.921109,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-36",
+  "item_id": "R-185.1",
+  "feedback_id": "R-185",
+  "similarity": 0.94643,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-187.2",
+  "feedback_id": "R-187",
+  "similarity": 0.896047,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-188.1",
+  "feedback_id": "R-188",
+  "similarity": 0.912835,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-32",
+  "item_id": "R-190.2",
+  "feedback_id": "R-190",
+  "similarity": 0.934822,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-39",
+  "item_id": "R-191.1",
+  "feedback_id": "R-191",
+  "similarity": 0.966649,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-192.1",
+  "feedback_id": "R-192",
+  "similarity": 0.930807,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-193.1",
+  "feedback_id": "R-193",
+  "similarity": 0.893296,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-29",
+  "item_id": "R-194.1",
+  "feedback_id": "R-194",
+  "similarity": 0.869507,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-195.1",
+  "feedback_id": "R-195",
+  "similarity": 0.912242,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-42",
+  "item_id": "R-196.2",
+  "feedback_id": "R-196",
+  "similarity": 0.979315,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-197.1",
+  "feedback_id": "R-197",
+  "similarity": 0.90461,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-34",
+  "item_id": "R-198.1",
+  "feedback_id": "R-198",
+  "similarity": 0.953159,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-199.1",
+  "feedback_id": "R-199",
+  "similarity": 0.915626,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-33",
+  "item_id": "R-200.1",
+  "feedback_id": "R-200",
+  "similarity": 0.916657,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-201.1",
+  "feedback_id": "R-201",
+  "similarity": 0.946629,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-47",
+  "item_id": "R-204.1",
+  "feedback_id": "R-204",
+  "similarity": 0.992323,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-205.1",
+  "feedback_id": "R-205",
+  "similarity": 0.887517,
+  "is_representative": false
+ },
+ {
+  "insight_id": "I-48",
+  "item_id": "R-206.1",
+  "feedback_id": "R-206",
+  "similarity": 0.975319,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-26",
+  "item_id": "R-207.1",
+  "feedback_id": "R-207",
+  "similarity": 0.951212,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-27",
+  "item_id": "R-209.1",
+  "feedback_id": "R-209",
+  "similarity": 0.94996,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-209.2",
+  "feedback_id": "R-209",
+  "similarity": 0.906871,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-38",
+  "item_id": "R-211.1",
+  "feedback_id": "R-211",
+  "similarity": 0.959821,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-28",
+  "item_id": "R-212.1",
+  "feedback_id": "R-212",
+  "similarity": 0.927346,
+  "is_representative": true
+ },
+ {
+  "insight_id": "I-49",
+  "item_id": "R-214.1",
+  "feedback_id": "R-214",
+  "similarity": 0.962555,
+  "is_representative": true
+ }
+]

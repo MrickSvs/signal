@@ -444,3 +444,32 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Coût par nœud** : le canal `cost` du graphe porte `byNode` (€ par nœud, additionnés par le reducer `addCostTotals`, tolérant aux checkpoints antérieurs) ; `pipeline:run` l'écrit dans `pipeline_runs.stats.cost_by_node`. Pas de migration : `stats` est en jsonb.
   - **Comparatif Haiku / Sonnet** : coût mesuré pour 100 retours × nombre de retours du jeu de démo, calculé en code.
 - **Conséquences** : un run complet enregistré avant cette étape affiche son total seul, avec un renvoi vers sa trace Langfuse ; la répartition apparaît au prochain `pnpm pipeline:run`.
+
+## ADR-031 — Coupe de 7.2 (MCP), 7.1 allégée et reportée après 8.1
+
+- **Date** : 2026-10-06
+- **Statut** : acceptée
+- **Contexte** : budget de tokens largement consommé après la phase 6. La phase 7 compte une étape `[Bonus]` (7.2, MCP) et une étape `[Signature]` (7.1, prototype) ; le parcours de démo (digest → insight → priorisation → backlog → Notion) fonctionne déjà sans l'une ni l'autre.
+- **Décision** :
+  - **7.2 coupée** (deuxième de la ligne de coupe). Elle réexpose des services existants sans rien ajouter au parcours de démo ; mentionnée dans le README comme évolution possible.
+  - **Nouvel ordre** : 8.1 → 7.1 allégée (si le budget le permet) → 8.2 → 8.3.
+  - **7.1 allégée** : `shell.html` + `tokens.css`, `services/prototype.ts` (validation, nouvelle tentative, message d'échec CL-42), route `/proto/[id]` avec CSP, bouton « Visualiser » et iframe sandbox, prototype pré-généré de la story de démo. Retirés : `components.html` et `DESIGN.md` détaillé, outil agent `generate_prototype`, « Régénérer » avec consigne, propriété Prototype dans Notion.
+  - **Page `/status` coupée** (8.1) : elle ne sert qu'à vérifier les services juste avant la démo ; remplacée par une ligne de la checklist de 8.3. CL-43 (projet Supabase en pause) reste couvert par le cron quotidien.
+  - **Backlog de secours sur S2b** (permissions, insight I-31), pas S3 : PLAN 8.1 citait S3 par erreur, la démo rédige « les stories des permissions ».
+- **Alternatives écartées** : suivre l'ordre de PLAN (7.1 complète puis 7.2 avant 8.1), qui risquait de laisser la démo sans reset ni plan B.
+- **Conséquences** : 8.1 ne recharge le prototype pré-généré que si 7.1 est faite ; si 7.1 est sautée, le README la documente comme limite connue et la trame de démo perd ce moment. L'agent garde ses outils actuels.
+
+## ADR-032 — Mode démo : snapshot en JSON, deux décalages de dates, digest en direct
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : étape 8.1 (SPEC §18, CL-46). Revenir à un état connu en moins de 2 minutes, montrer l'app vide puis remplie, coller des retours choisis par l'évaluateur, sans que les répétitions salissent la base ni Notion.
+- **Décision** :
+  - **Snapshot** (`pnpm demo:snapshot --keep-backlog I-31`) : une copie JSON par table métier dans `data/demo-snapshot/` (16 tables, ~3,6 Mo, embeddings compris), plus `meta.json`. Seul le backlog des insights listés est gardé (le backlog de secours, en brouillon pour être validé en direct) ; les autres éléments, leurs décisions et leurs liens Notion sont écartés. Ni digests, ni fils de chat, ni prototypes.
+  - **Reset** (`pnpm demo:reset`, ~17 s, aucun appel de modèle) : pages Notion créées depuis le snapshot mises à la corbeille (celles du snapshot en sont ressorties), suppression de ce que le pipeline, le PO et l'agent ont produit (clients, tickets de référence, evals et état de synchronisation Notion conservés), restauration (clients en upsert, références circulaires recollées à la fin), séquence des retours réalignée. `--empty` s'arrête avant la restauration : l'app vide montre ses états vides.
+  - **Dates** : deux décalages. Les dates du scénario (`feedbacks.received_at`, `feedbacks.created_at`, `customers.renewal_date`) avancent d'un nombre entier de jours, arrondi vers le bas (« reçu il y a 2 jours », renouvellement à J+38 restent exacts) ; toutes les autres (runs, revues, décisions, backlog) avancent du temps écoulé depuis le snapshot, donc la préparation reste juste avant la démo, dans son ordre. Aucune date ne dépasse « maintenant ». La date du scénario d'un snapshot est la première insertion de retour.
+  - **Digest** : jamais restauré, généré en direct après le reset (`pnpm digest`) ; sans digest précédent, il couvre tout ce que Signal a traité.
+  - **Retours à coller** : `data/demo/retours-a-coller.md`, dix retours écrits pour la démo (aucun ne vient du jeu réservé), un par comportement : sujet connu, churn Enterprise, anglais, multi-sujets, fonctionnalité existante, injection, sujet inédit, prospect, ironie, réponse automatique. Collés par l'écran Retours (mode incrémental) ; le reset les efface.
+  - **Préparation de la base** (`scripts/demo-purge.ts --from R-215`) : retire les retours ajoutés pendant les tests et ce qu'ils ont seuls produit (insights, alertes, décisions, runs), recalcule en code les agrégats des insights touchés et les re-score avec leur jugement stocké.
+- **Alternatives écartées** : régénérer le digest dans le reset (on veut le montrer en direct) ; reconstruire la base par un run complet (~1,60 € et une nouvelle revue du PO) ; dump SQL (exige un accès Postgres direct, le JSON passe par le client de service) ; un seul décalage de dates (soit la préparation passe dans le futur, soit le scénario vieillit et S7 sort de la fenêtre de 7 jours).
+- **Conséquences** : le dossier d'une alerte déclenchée en direct n'a pas de secours précalculé ; plan B : `pnpm investigate --pending`. Les traces Langfuse des répétitions restent (service externe, rétention 30 jours). Les messages des fils supprimés restent dans les tables du checkpointer, sans être affichés. Le snapshot garde les overrides présents au moment où il est pris.

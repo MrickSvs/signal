@@ -90,7 +90,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm investigate <alert_uuid>` (`--pending`) | Enquête en lecture seule sur une alerte, ou sur toutes les alertes ouvertes sans dossier (≈ 0,02 à 0,05 € par alerte) |
 | `pnpm notion:setup`                                                                                                                                                  | Créer la base Backlog dans Notion (si absente) |
 | `pnpm eval:triage` (`--model haiku\|sonnet`, `--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` (`--runs N`) · `eval:guardrails` (`--tools`) · `eval:calibration-set` (jeu à annoter sur `/evals/annotate`, en local) · `eval:judge-calibration` · `eval:backlog` (`--manual I-xx`) | Evals (`--sample N`, `--full`, `--yes` au-delà de 1 € estimé) ; résultats dans `docs/EVALS.md` et `evals/reports/` |
-| `pnpm demo:snapshot` · `pnpm demo:reset`                                                                                                                             | Démo                           |
+| `pnpm demo:snapshot --keep-backlog I-xx` · `pnpm demo:reset` (`--empty`) · `pnpm tsx --conditions=react-server scripts/demo-purge.ts --from R-xxx` (`--yes`) | Démo : figer la base, la restaurer (ou la vider) en ~20 s, retirer des retours de test ; retours à coller dans `data/demo/retours-a-coller.md` |
 
 Les commandes sont ajoutées au fil des étapes ; garde ce tableau à jour.
 

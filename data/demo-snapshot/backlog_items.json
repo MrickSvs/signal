@@ -1,0 +1,526 @@
+[
+ {
+  "id": "TT-001",
+  "kind": "tache",
+  "epic_id": "E-01",
+  "insight_id": "I-31",
+  "title": "Centraliser les contrôles d'accès par projet",
+  "value": null,
+  "persona": null,
+  "want": null,
+  "success_kpi": null,
+  "expected_behavior": null,
+  "actual_behavior": null,
+  "repro_steps": null,
+  "severity": null,
+  "affected_accounts": [],
+  "objective": "Disposer d'une couche d'autorisation unique qui décide de l'accès à un projet, à la place des contrôles dispersés (page projet, paramètres, liste, tableau, export). Elle débloque les rôles par projet et l'invité externe.",
+  "definition_of_done": [
+   "Toutes les lectures de projet (page projet, paramètres, liste, tableau, export) passent par la couche d'autorisation unique.",
+   "Le modèle de données porte un rôle par projet ; les membres existants sont migrés sans perte d'accès.",
+   "Un utilisateur externe à l'espace, sans rôle sur aucun projet, ne voit aucun projet.",
+   "Tests automatisés : un utilisateur sans rôle sur un projet est refusé sur chaque point d'entrée recensé.",
+   "Aucune régression des accès actuels des admins et des membres."
+  ],
+  "business_rules": [],
+  "acceptance_criteria": [],
+  "points": 8,
+  "complexity_estimate_id": "c4d25b2f-1fdb-478c-a956-a03310fcf776",
+  "evidence": [
+   "R-013",
+   "R-134",
+   "R-110",
+   "R-078"
+  ],
+  "dor_checklist": {
+   "preuves": true,
+   "criteres_testables": true,
+   "valeur_ou_objectif": true,
+   "dependances_listees": true,
+   "estimation_justifiee": true
+  },
+  "status": "brouillon",
+  "push_error": null,
+  "judge": null,
+  "prototype_id": null,
+  "notion_page_id": null,
+  "notion_status_raw": null,
+  "edited_in_notion": false,
+  "created_at": "2026-10-05T02:00:46.222+00:00",
+  "updated_at": "2026-10-05T02:00:46.222+00:00",
+  "risks": [
+   "Un point d'entrée oublié, découvert tard comme en recette de T-103 et T-137, exposerait un projet confidentiel.",
+   "Migration des membres existants vers un rôle par projet : risque de retirer ou d'ouvrir des accès par erreur.",
+   "Ricochet sur le modèle des tâches (pièces jointes, commentaires, notifications)."
+  ],
+  "dependencies": []
+ },
+ {
+  "id": "US-001",
+  "kind": "story",
+  "epic_id": "E-01",
+  "insight_id": "I-31",
+  "title": "Inviter un client sur un seul projet",
+  "value": "partager l'avancement avec mon client sans exposer les projets de mes autres clients",
+  "persona": "chef de projet en agence",
+  "want": "inviter un client externe sur un projet précis avec un accès en lecture seule",
+  "success_kpi": "25 % des projets actifs avec au moins un invité client à 90 jours (O2-KR1)",
+  "expected_behavior": null,
+  "actual_behavior": null,
+  "repro_steps": null,
+  "severity": null,
+  "affected_accounts": [],
+  "objective": null,
+  "definition_of_done": null,
+  "business_rules": [
+   "Un invité ne voit que les projets auxquels il est explicitement invité.",
+   "Un invité ne peut ni modifier ni créer de contenu : l'accès est en lecture seule.",
+   "Seul un admin du projet peut inviter, modifier ou retirer un invité.",
+   "Retirer un invité supprime immédiatement son accès au projet."
+  ],
+  "acceptance_criteria": [
+   {
+    "name": "Invitation d'un client sur un projet",
+    "steps": [
+     {
+      "text": "que je suis admin du projet « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "j'invite client@kaleo.fr avec le rôle « Invité lecture »",
+      "keyword": "Quand"
+     },
+     {
+      "text": "client@kaleo.fr reçoit une invitation",
+      "keyword": "Alors"
+     },
+     {
+      "text": "une fois l'invitation acceptée, il ne voit que le projet « Refonte site Kaléo »",
+      "keyword": "Et"
+     }
+    ],
+    "edge_case": false
+   },
+   {
+    "name": "Accès refusé à un autre projet",
+    "steps": [
+     {
+      "text": "que client@kaleo.fr est invité uniquement sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "il ouvre le lien du projet « Campagne Orion » de la même agence",
+      "keyword": "Quand"
+     },
+     {
+      "text": "l'accès est refusé",
+      "keyword": "Alors"
+     },
+     {
+      "text": "le nom du projet « Campagne Orion » n'est pas affiché",
+      "keyword": "Et"
+     }
+    ],
+    "edge_case": true
+   },
+   {
+    "name": "Retrait d'un invité",
+    "steps": [
+     {
+      "text": "que client@kaleo.fr est invité sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "je retire client@kaleo.fr des membres du projet",
+      "keyword": "Quand"
+     },
+     {
+      "text": "client@kaleo.fr n'a plus accès à « Refonte site Kaléo »",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   },
+   {
+    "name": "Invitation par un non-admin",
+    "steps": [
+     {
+      "text": "que je suis membre simple du projet « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "je tente d'inviter un client externe",
+      "keyword": "Quand"
+     },
+     {
+      "text": "l'action est refusée avec un message explicite",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   }
+  ],
+  "points": 5,
+  "complexity_estimate_id": "79d0aa19-884b-45c7-bc5d-6c9ae8e85303",
+  "evidence": [
+   "R-013",
+   "R-134",
+   "R-146",
+   "R-111"
+  ],
+  "dor_checklist": {
+   "preuves": true,
+   "criteres_testables": true,
+   "valeur_ou_objectif": true,
+   "dependances_listees": true,
+   "estimation_justifiee": true
+  },
+  "status": "brouillon",
+  "push_error": null,
+  "judge": null,
+  "prototype_id": null,
+  "notion_page_id": null,
+  "notion_status_raw": null,
+  "edited_in_notion": false,
+  "created_at": "2026-10-05T02:00:46.523+00:00",
+  "updated_at": "2026-10-05T02:00:46.523+00:00",
+  "risks": [],
+  "dependencies": [
+   "TT-001"
+  ]
+ },
+ {
+  "id": "US-002",
+  "kind": "story",
+  "epic_id": "E-01",
+  "insight_id": "I-31",
+  "title": "Suivre l'avancement de mon projet en lecture",
+  "value": "savoir où en est mon projet sans avoir à relancer l'agence",
+  "persona": "client final invité",
+  "want": "consulter les tâches de mon projet avec leur statut et leur échéance, sans pouvoir rien modifier",
+  "success_kpi": "Au moins 60 % des invités clients se connectent une fois par mois à 90 jours, mesure à confirmer avec le PO (O2-KR1)",
+  "expected_behavior": null,
+  "actual_behavior": null,
+  "repro_steps": null,
+  "severity": null,
+  "affected_accounts": [],
+  "objective": null,
+  "definition_of_done": null,
+  "business_rules": [
+   "L'invité voit les tâches, leur statut et leur échéance du projet auquel il est invité.",
+   "Les commentaires internes ne sont pas visibles par l'invité.",
+   "Les boutons de création et de modification ne sont pas proposés à l'invité.",
+   "Les listes et le tableau n'affichent que le projet de l'invité."
+  ],
+  "acceptance_criteria": [
+   {
+    "name": "Consultation de l'avancement",
+    "steps": [
+     {
+      "text": "que je suis invité en lecture sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "j'ouvre la vue liste du projet",
+      "keyword": "Quand"
+     },
+     {
+      "text": "je vois les tâches avec leur statut et leur échéance",
+      "keyword": "Alors"
+     },
+     {
+      "text": "je ne vois aucun commentaire interne",
+      "keyword": "Et"
+     }
+    ],
+    "edge_case": false
+   },
+   {
+    "name": "Tentative de modification",
+    "steps": [
+     {
+      "text": "que je suis invité en lecture sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "j'ouvre une tâche du projet",
+      "keyword": "Quand"
+     },
+     {
+      "text": "aucun champ n'est modifiable",
+      "keyword": "Alors"
+     },
+     {
+      "text": "aucun bouton de création ou de suppression n'est affiché",
+      "keyword": "Et"
+     }
+    ],
+    "edge_case": true
+   },
+   {
+    "name": "Navigation sans autre projet",
+    "steps": [
+     {
+      "text": "que je suis invité uniquement sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "j'ouvre le sélecteur de projets",
+      "keyword": "Quand"
+     },
+     {
+      "text": "seul « Refonte site Kaléo » est listé",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   }
+  ],
+  "points": 3,
+  "complexity_estimate_id": "78523a9c-2f64-41bd-b2ac-5f14baa29182",
+  "evidence": [
+   "R-007",
+   "R-146",
+   "R-111"
+  ],
+  "dor_checklist": {
+   "preuves": true,
+   "criteres_testables": true,
+   "valeur_ou_objectif": true,
+   "dependances_listees": true,
+   "estimation_justifiee": true
+  },
+  "status": "brouillon",
+  "push_error": null,
+  "judge": null,
+  "prototype_id": null,
+  "notion_page_id": null,
+  "notion_status_raw": null,
+  "edited_in_notion": false,
+  "created_at": "2026-10-05T02:00:46.925+00:00",
+  "updated_at": "2026-10-05T02:00:46.925+00:00",
+  "risks": [],
+  "dependencies": [
+   "US-001"
+  ]
+ },
+ {
+  "id": "US-003",
+  "kind": "story",
+  "epic_id": "E-01",
+  "insight_id": "I-31",
+  "title": "Limiter un freelance aux projets qui lui sont affectés",
+  "value": "protéger les données confidentielles de mes clients tout en travaillant avec des intervenants externes",
+  "persona": "directeur d'agence",
+  "want": "restreindre un membre (freelance, sous-traitant) aux seuls projets auxquels je l'affecte",
+  "success_kpi": "Zéro compte Enterprise perdu au renouvellement pour absence de permissions par projet (O1-KR2)",
+  "expected_behavior": null,
+  "actual_behavior": null,
+  "repro_steps": null,
+  "severity": null,
+  "affected_accounts": [],
+  "objective": null,
+  "definition_of_done": null,
+  "business_rules": [
+   "Un membre restreint ne voit que les projets auxquels il est affecté.",
+   "Un membre restreint peut travailler (modifier, commenter) sur ses projets, contrairement à un invité en lecture.",
+   "L'affectation ou le retrait se gère depuis les paramètres du projet.",
+   "Les membres existants conservent leur accès actuel après la migration."
+  ],
+  "acceptance_criteria": [
+   {
+    "name": "Affectation d'un freelance à un projet",
+    "steps": [
+     {
+      "text": "que je suis admin et que Julie, freelance, est membre restreint",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "je l'affecte au projet « Campagne Orion »",
+      "keyword": "Quand"
+     },
+     {
+      "text": "elle voit « Campagne Orion » et peut y modifier ses tâches",
+      "keyword": "Alors"
+     },
+     {
+      "text": "elle ne voit aucun autre projet de l'espace",
+      "keyword": "Et"
+     }
+    ],
+    "edge_case": false
+   },
+   {
+    "name": "Projet non affecté inaccessible",
+    "steps": [
+     {
+      "text": "que Julie est affectée uniquement à « Campagne Orion »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "elle ouvre le lien du projet « Refonte site Kaléo »",
+      "keyword": "Quand"
+     },
+     {
+      "text": "l'accès est refusé",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   },
+   {
+    "name": "Membres existants non impactés",
+    "steps": [
+     {
+      "text": "que Marie est membre standard avant la mise en service",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "la migration des rôles est terminée",
+      "keyword": "Quand"
+     },
+     {
+      "text": "Marie voit les mêmes projets qu'avant",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   }
+  ],
+  "points": 3,
+  "complexity_estimate_id": "098d28ea-461f-4f87-9af8-715fec867770",
+  "evidence": [
+   "R-141",
+   "R-162",
+   "R-110"
+  ],
+  "dor_checklist": {
+   "preuves": true,
+   "criteres_testables": true,
+   "valeur_ou_objectif": true,
+   "dependances_listees": true,
+   "estimation_justifiee": true
+  },
+  "status": "brouillon",
+  "push_error": null,
+  "judge": null,
+  "prototype_id": null,
+  "notion_page_id": null,
+  "notion_status_raw": null,
+  "edited_in_notion": false,
+  "created_at": "2026-10-05T02:00:47.184+00:00",
+  "updated_at": "2026-10-05T02:00:47.184+00:00",
+  "risks": [],
+  "dependencies": [
+   "TT-001"
+  ]
+ },
+ {
+  "id": "US-004",
+  "kind": "story",
+  "epic_id": "E-01",
+  "insight_id": "I-31",
+  "title": "Empêcher les fuites via exports et pièces jointes",
+  "value": "garantir à mes clients qu'un invité ne verra jamais les données d'un autre client",
+  "persona": "directeur d'agence",
+  "want": "que les exports, pièces jointes et notifications ne montrent à un invité que les données de son projet",
+  "success_kpi": "Zéro incident d'exposition de données entre projets signalé à 90 jours (O1-KR2)",
+  "expected_behavior": null,
+  "actual_behavior": null,
+  "repro_steps": null,
+  "severity": null,
+  "affected_accounts": [],
+  "objective": null,
+  "definition_of_done": null,
+  "business_rules": [
+   "L'export d'un invité ne contient que les données de son projet.",
+   "Le lien de téléchargement d'un export ou d'une pièce jointe n'est valable que pour un utilisateur autorisé sur le projet concerné.",
+   "Une notification envoyée à un invité ne mentionne aucun contenu d'un autre projet.",
+   "Une tâche liée à un autre projet apparaît à l'invité sans titre ni détail."
+  ],
+  "acceptance_criteria": [
+   {
+    "name": "Export limité au projet de l'invité",
+    "steps": [
+     {
+      "text": "que client@kaleo.fr est invité sur « Refonte site Kaléo »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "il exporte la liste des tâches",
+      "keyword": "Quand"
+     },
+     {
+      "text": "le fichier ne contient que les tâches de « Refonte site Kaléo »",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": false
+   },
+   {
+    "name": "Lien de pièce jointe d'un autre projet",
+    "steps": [
+     {
+      "text": "qu'une pièce jointe existe dans « Campagne Orion »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "client@kaleo.fr ouvre le lien de téléchargement de cette pièce jointe",
+      "keyword": "Quand"
+     },
+     {
+      "text": "le téléchargement est refusé",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   },
+   {
+    "name": "Tâche liée à un autre projet",
+    "steps": [
+     {
+      "text": "qu'une tâche de « Refonte site Kaléo » dépend d'une tâche de « Campagne Orion »",
+      "keyword": "Étant donné"
+     },
+     {
+      "text": "client@kaleo.fr ouvre la tâche de « Refonte site Kaléo »",
+      "keyword": "Quand"
+     },
+     {
+      "text": "la tâche liée s'affiche sans titre ni détail",
+      "keyword": "Alors"
+     }
+    ],
+    "edge_case": true
+   }
+  ],
+  "points": 5,
+  "complexity_estimate_id": "20af5ac7-fb33-4b35-bede-a361de4ddaa8",
+  "evidence": [
+   "R-013",
+   "R-110",
+   "R-078"
+  ],
+  "dor_checklist": {
+   "preuves": true,
+   "criteres_testables": true,
+   "valeur_ou_objectif": true,
+   "dependances_listees": true,
+   "estimation_justifiee": true
+  },
+  "status": "brouillon",
+  "push_error": null,
+  "judge": null,
+  "prototype_id": null,
+  "notion_page_id": null,
+  "notion_status_raw": null,
+  "edited_in_notion": false,
+  "created_at": "2026-10-05T02:00:47.437+00:00",
+  "updated_at": "2026-10-05T02:00:47.437+00:00",
+  "risks": [],
+  "dependencies": [
+   "TT-001",
+   "US-001"
+  ]
+ }
+]
