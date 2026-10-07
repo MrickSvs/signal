@@ -38,19 +38,18 @@ export function ReviewPanel({
   return (
     <section
       aria-labelledby="a-valider"
-      className="flex flex-col gap-3 rounded-xl border border-signal/30 bg-signal-soft/40 p-4"
+      className="flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-blue-950/30"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <h3 id="a-valider" className="flex items-baseline gap-2 text-base font-semibold">
-            À valider
+          <h3 id="a-valider" className="flex items-center gap-2 text-base font-semibold">
+            <span aria-hidden className="size-2 rounded-full bg-blue-500" />À valider
             <span className="font-normal text-muted-foreground tabular-nums">
               {insights.length}
             </span>
           </h3>
           <p className="text-muted-foreground">
-            Signal propose ces sujets ; ils sont déjà scorés et classés, mais c&apos;est toi qui
-            décides s&apos;ils en sont. Décoche ceux que tu veux traiter un par un.
+            Proposés par Signal, déjà scorés. Décoche ceux que tu veux traiter un par un.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -59,7 +58,7 @@ export function ReviewPanel({
               type="checkbox"
               checked={all}
               onChange={() => setExcluded(all ? new Set(insights.map((i) => i.id)) : new Set())}
-              className="accent-[var(--signal)]"
+              className="accent-blue-600"
             />
             Tout cocher
           </label>
@@ -91,17 +90,17 @@ export function ReviewPanel({
               aria-label={`Inclure ${insight.id} dans l'acceptation groupée`}
               checked={!excluded.has(insight.id)}
               onChange={() => toggle(insight.id)}
-              className="mt-1 accent-[var(--signal)]"
+              className="mt-1 accent-blue-600"
             />
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <p className="flex min-w-0 items-baseline gap-2">
+                <span className="shrink-0 font-mono font-semibold">{insight.id}</span>
                 <Link
                   href={`/insights/${insight.id}`}
-                  className="shrink-0 font-mono font-semibold text-signal underline-offset-4 hover:underline"
+                  className="font-medium underline-offset-4 hover:underline"
                 >
-                  {insight.id}
+                  {insight.title}
                 </Link>
-                <span className="font-medium">{insight.title}</span>
               </p>
               <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
                 <p className="flex flex-wrap items-center gap-x-2 text-muted-foreground">

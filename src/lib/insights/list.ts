@@ -11,12 +11,28 @@ export const INSIGHT_SORTS = {
 } as const;
 export type InsightSort = keyof typeof INSIGHT_SORTS;
 
+/**
+ * Sorts of the Insights screen (ADR-038): the weight of a problem, not its rank, which belongs to
+ * the Priorisation screen. Volume first: a growth ratio on a handful of feedbacks is noise.
+ */
+export const SCREEN_SORTS = {
+  volume: "Volume",
+  mrr: "MRR exposé",
+  tendance: "Tendance",
+} as const;
+export type ScreenSort = keyof typeof SCREEN_SORTS;
+
 /** « propose »: only what awaits the PO; « rejete »: the rejected ones (out of the ranking). */
 export const STATUS_FILTERS = { propose: "À valider", rejete: "Rejetés" } as const;
 export type StatusFilter = keyof typeof STATUS_FILTERS;
 
+/** Tab of the screen besides the live insights (the rejected ones are `statut=rejete`). */
+export const INSIGHT_VIEWS = { surveiller: "À surveiller" } as const;
+export type InsightView = keyof typeof INSIGHT_VIEWS;
+
 export type InsightFilters = {
-  tri: InsightSort;
+  tri: ScreenSort;
+  vue?: InsightView;
   domaine?: Enums["product_area"];
   alignement?: Enums["alignment"];
   statut?: StatusFilter;
@@ -33,7 +49,8 @@ const oneOf = <T extends string>(values: readonly T[], value: string | undefined
 export function parseInsightFilters(params: Params): InsightFilters {
   const enums = Constants.public.Enums;
   return {
-    tri: oneOf(Object.keys(INSIGHT_SORTS) as InsightSort[], first(params.tri)) ?? "rang",
+    tri: oneOf(Object.keys(SCREEN_SORTS) as ScreenSort[], first(params.tri)) ?? "volume",
+    vue: oneOf(Object.keys(INSIGHT_VIEWS) as InsightView[], first(params.vue)),
     domaine: oneOf(enums.product_area, first(params.domaine)),
     alignement: oneOf(enums.alignment, first(params.alignement)),
     statut: oneOf(Object.keys(STATUS_FILTERS) as StatusFilter[], first(params.statut)),
@@ -42,12 +59,18 @@ export function parseInsightFilters(params: Params): InsightFilters {
 
 export function insightFiltersToQuery(filters: InsightFilters): string {
   const params = new URLSearchParams();
-  if (filters.tri !== "rang") params.set("tri", filters.tri);
+  if (filters.vue) params.set("vue", filters.vue);
+  if (filters.tri !== "volume") params.set("tri", filters.tri);
   if (filters.domaine) params.set("domaine", filters.domaine);
   if (filters.alignement) params.set("alignement", filters.alignement);
   if (filters.statut) params.set("statut", filters.statut);
   const query = params.toString();
   return query ? `?${query}` : "";
+}
+
+/** The open tab: the rejected ones, a view, or the live insights by default. */
+export function insightTab(filters: InsightFilters): "actifs" | InsightView | "rejetes" {
+  return filters.statut === "rejete" ? "rejetes" : (filters.vue ?? "actifs");
 }
 
 export function activeInsightFilterCount(filters: InsightFilters): number {
@@ -100,9 +123,8 @@ export function sortInsights(cards: readonly InsightCard[], sort: InsightSort): 
 export type InsightSections = {
   /** Proposed insights (SPEC §8.10), whatever the filters: the review covers them all. */
   toReview: InsightCard[];
-  ranked: InsightCard[];
-  /** Live insights out of the ranking (SPEC §8: weak signals). */
-  weak: InsightCard[];
+  /** Live insights, ranked or not (a weak signal is marked on its row, SPEC §8). */
+  active: InsightCard[];
   /** Shown only with the « rejete » filter. */
   rejected: InsightCard[];
 };
@@ -125,8 +147,7 @@ export function insightSections(
       cards.filter((c) => c.status === "propose"),
       "rang",
     ),
-    ranked: showLive ? live.filter((c) => c.ranked && matches(c)) : [],
-    weak: showLive ? live.filter((c) => !c.ranked && matches(c)) : [],
+    active: showLive ? live.filter(matches) : [],
     rejected:
       filters.statut === "rejete" ? sorted.filter((c) => c.status === "rejete" && matches(c)) : [],
   };

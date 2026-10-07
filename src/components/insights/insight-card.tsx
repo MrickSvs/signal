@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrendingUp } from "lucide-react";
 import { Sparkline } from "@/components/digest/sparkline";
 import { Pill } from "@/components/signal/badges";
 import { MetricWithSource } from "@/components/signal/metric-with-source";
@@ -7,21 +8,25 @@ import { cardBadges, type InsightCard } from "@/lib/insights/list";
 import {
   ALIGNMENT_LABELS,
   INSIGHT_STATUS_LABELS,
-  MOSCOW_LABELS,
   PLAN_LABELS,
   PRODUCT_AREA_LABELS,
 } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
+// Same meaning, same color as the Digest (ADR-033): blue for what awaits Léa's decision, Signal
+// green for a rising trend; everything else stays neutral.
+export const TO_REVIEW_STYLE =
+  "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200";
+
 const BADGES = {
-  a_valider: {
-    label: "À valider",
-    className:
-      "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
+  a_valider: { label: "À valider", className: TO_REVIEW_STYLE, icon: null },
+  emergent: {
+    label: "Émergent",
+    className: "border-signal/30 bg-signal-soft text-signal",
+    icon: TrendingUp,
   },
-  emergent: { label: "Émergent", className: "border-signal/40 bg-signal-soft text-signal" },
-  nouveau: { label: "Nouveau", className: "border-border bg-muted text-foreground" },
-  manuel: { label: "Manuel", className: "border-border text-muted-foreground" },
+  nouveau: { label: "Nouveau", className: "border-border text-muted-foreground", icon: null },
+  manuel: { label: "Manuel", className: "border-border text-muted-foreground", icon: null },
 } as const;
 
 const planLabel = (plan: string) =>
@@ -38,82 +43,64 @@ export function accountsBreakdown(plans: Record<string, number>) {
     .map(([plan, n]) => ({ label: planLabel(plan), value: formatNumber(n) }));
 }
 
-/** An insight as a card: the problem, its weight, its place in the ranking (SPEC §12.4). */
-export function InsightCardView({
-  card,
-  compact = false,
-}: {
-  card: InsightCard;
-  compact?: boolean;
-}) {
-  const badges = cardBadges(card);
+export function InsightBadges({ card }: { card: InsightCard }) {
   return (
-    <article
-      className={cn(
-        "flex flex-col gap-2.5 rounded-xl border bg-card p-4",
-        card.status === "rejete" && "opacity-80",
+    <>
+      {cardBadges(card).map((b) => {
+        const Icon = BADGES[b].icon;
+        return (
+          <Pill key={b} className={BADGES[b].className}>
+            {Icon && <Icon aria-hidden />}
+            {BADGES[b].label}
+          </Pill>
+        );
+      })}
+      {card.status === "rejete" && (
+        <Pill className="border-border text-muted-foreground">{INSIGHT_STATUS_LABELS.rejete}</Pill>
       )}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
-            <span className="font-mono font-semibold text-foreground">{card.id}</span>
-            {card.product_area && <span>{PRODUCT_AREA_LABELS[card.product_area]}</span>}
-            {badges.map((b) => (
-              <Pill key={b} className={BADGES[b].className}>
-                {BADGES[b].label}
-              </Pill>
-            ))}
-            {card.status === "rejete" && (
-              <Pill className="border-border text-muted-foreground">
-                {INSIGHT_STATUS_LABELS.rejete}
-              </Pill>
-            )}
-          </p>
-          <h4 className="leading-snug font-medium">
-            <Link
-              href={`/insights/${card.id}`}
-              className="underline-offset-4 hover:text-signal hover:underline"
-            >
-              {card.title}
-            </Link>
-          </h4>
-        </div>
-        {card.ranked && card.rank !== null && (
-          <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
-            <Link
-              href={`/priorisation?insight=${card.id}`}
-              title="Voir dans la priorisation"
-              className="text-xl leading-none font-semibold tabular-nums hover:text-signal"
-            >
-              #{card.rank}
-            </Link>
-            {card.moscow && (
-              <span
-                className="text-[13px] text-muted-foreground"
-                title={card.moscow_is_final ? "Choix du PO" : "Recommandation de Signal"}
-              >
-                {MOSCOW_LABELS[card.moscow]}
-                {card.moscow_is_final ? "" : " (reco)"}
-              </span>
-            )}
-          </div>
+    </>
+  );
+}
+
+/**
+ * An insight as one row (SPEC §12.4, ADR-038): the problem, then its weight (feedbacks, accounts,
+ * MRR, alignment) in columns that line up from one row to the next, and its trend. The rank lives
+ * in Priorisation.
+ */
+export function InsightRow({ card }: { card: InsightCard }) {
+  const live = card.status === "propose" || card.status === "actif";
+  return (
+    <li className="relative flex flex-col gap-1.5 px-4 py-3 hover:bg-muted/40">
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
+        <span className="font-mono font-semibold text-foreground">{card.id}</span>
+        {card.product_area && <span>{PRODUCT_AREA_LABELS[card.product_area]}</span>}
+        <InsightBadges card={card} />
+        {live && !card.ranked && (
+          <span title="Moins de 5 retours, sans compte Business ou Enterprise qui menace de partir ni engagement contractuel">
+            · signal faible, hors classement
+          </span>
         )}
-      </div>
-      {!compact && (
-        <p className="line-clamp-2 leading-relaxed text-muted-foreground">
-          {card.problem_statement}
-        </p>
-      )}
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <Link
-            href={`/retours?insight=${card.id}`}
-            className="tabular-nums underline decoration-muted-foreground/40 decoration-dotted underline-offset-4 hover:decoration-signal"
-          >
-            {formatNumber(card.feedbacks_count)}{" "}
-            <span className="text-muted-foreground">retours</span>
-          </Link>
+      </p>
+      <Link
+        href={`/insights/${card.id}`}
+        className={cn(
+          "leading-snug font-medium underline-offset-4 hover:underline",
+          "after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-sm focus-visible:after:ring-2 focus-visible:after:ring-ring",
+        )}
+      >
+        {card.title}
+      </Link>
+
+      <div className="relative z-10 flex flex-wrap items-center gap-x-1 gap-y-1 text-[13px]">
+        <Link
+          href={`/retours?insight=${card.id}`}
+          className="w-20 tabular-nums hover:text-signal"
+          title="Voir ces retours"
+        >
+          <span className="font-medium">{formatNumber(card.feedbacks_count)}</span>{" "}
+          <span className="text-muted-foreground">retours</span>
+        </Link>
+        <span className="w-24">
           <MetricWithSource
             label="Comptes distincts"
             value={formatNumber(card.accounts_count)}
@@ -121,6 +108,8 @@ export function InsightCardView({
             source="calcule"
             breakdown={accountsBreakdown(card.plans)}
           />
+        </span>
+        <span className="w-24">
           <MetricWithSource
             label="MRR exposé"
             value={formatEur(card.mrr_exposed)}
@@ -131,12 +120,21 @@ export function InsightCardView({
             ]}
             rationale="Somme du MRR des clients distincts concernés (prospects exclus)."
           />
-          {card.alignment && (
-            <span className="text-muted-foreground">{ALIGNMENT_LABELS[card.alignment]}</span>
+        </span>
+        <span
+          className={cn(
+            "w-28 text-muted-foreground",
+            card.alignment === "hors_strategie" && "text-foreground",
           )}
-        </div>
-        {card.weekly.length > 1 && <Sparkline weekly={card.weekly} />}
+        >
+          {card.alignment ? ALIGNMENT_LABELS[card.alignment] : ""}
+        </span>
+        {card.weekly.length > 1 && (
+          <span className="ml-auto" title="Retours par semaine sur 6 semaines">
+            <Sparkline weekly={card.weekly} />
+          </span>
+        )}
       </div>
-    </article>
+    </li>
   );
 }

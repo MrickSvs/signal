@@ -5,6 +5,7 @@ import {
   feedbackIdsOfItems,
   insightFiltersToQuery,
   insightSections,
+  insightTab,
   parseInsightFilters,
   sortInsights,
   type InsightCard,
@@ -47,12 +48,14 @@ describe("parseInsightFilters / insightFiltersToQuery", () => {
       }),
     ).toEqual({
       tri: "mrr",
+      vue: undefined,
       domaine: "notifications",
       alignement: "hors_strategie",
       statut: "rejete",
     });
-    expect(parseInsightFilters({ tri: "hasard", domaine: "x", statut: "fusionne" })).toEqual({
-      tri: "rang",
+    expect(parseInsightFilters({ tri: "rang", domaine: "x", statut: "fusionne" })).toEqual({
+      tri: "volume",
+      vue: undefined,
       domaine: undefined,
       alignement: undefined,
       statut: undefined,
@@ -60,12 +63,12 @@ describe("parseInsightFilters / insightFiltersToQuery", () => {
   });
 
   it("round-trips through the URL, the default sort left out", () => {
-    const filters = parseInsightFilters({ tri: "volume", statut: "propose" });
-    expect(insightFiltersToQuery(filters)).toBe("?tri=volume&statut=propose");
+    const filters = parseInsightFilters({ tri: "tendance", statut: "propose" });
+    expect(insightFiltersToQuery(filters)).toBe("?tri=tendance&statut=propose");
     expect(
-      parseInsightFilters(Object.fromEntries(new URLSearchParams("tri=volume&statut=propose"))),
+      parseInsightFilters(Object.fromEntries(new URLSearchParams("tri=tendance&statut=propose"))),
     ).toEqual(filters);
-    expect(insightFiltersToQuery({ tri: "rang" })).toBe("");
+    expect(insightFiltersToQuery({ tri: "volume" })).toBe("");
     expect(activeInsightFilterCount(filters)).toBe(1);
   });
 });
@@ -94,32 +97,29 @@ describe("insightSections", () => {
     card("I-06", { status: "archive", ranked: false }),
   ];
 
-  it("splits ranked insights and weak signals; rejected, merged and archived ones stay out (CL-17)", () => {
-    const s = insightSections(cards, { tri: "rang" });
+  it("lists live insights, ranked or not; rejected, merged and archived ones stay out (CL-17)", () => {
+    const s = insightSections(cards, { tri: "volume" });
     expect(s.toReview.map((c) => c.id)).toEqual(["I-01", "I-03"]);
-    expect(s.ranked.map((c) => c.id)).toEqual(["I-02", "I-01"]);
-    expect(s.weak.map((c) => c.id)).toEqual(["I-03"]);
+    expect(s.active.map((c) => c.id)).toEqual(["I-02", "I-01", "I-03"]);
     expect(s.rejected).toEqual([]);
   });
 
   it("filters by area and alignment; the review section ignores the filters", () => {
-    const s = insightSections(cards, { tri: "rang", alignement: "hors_strategie" });
-    expect(s.ranked.map((c) => c.id)).toEqual(["I-02"]);
-    expect(s.weak).toEqual([]);
+    const s = insightSections(cards, { tri: "volume", alignement: "hors_strategie" });
+    expect(s.active.map((c) => c.id)).toEqual(["I-02"]);
     expect(s.toReview).toHaveLength(2);
     expect(
-      insightSections(cards, { tri: "rang", domaine: "facturation_temps" }).ranked,
+      insightSections(cards, { tri: "volume", domaine: "facturation_temps" }).active,
     ).toHaveLength(1);
   });
 
   it("shows only what awaits the PO, or only the rejected ones", () => {
     expect(
-      insightSections(cards, { tri: "rang", statut: "propose" }).ranked.map((c) => c.id),
-    ).toEqual(["I-01"]);
-    const rejected = insightSections(cards, { tri: "rang", statut: "rejete" });
+      insightSections(cards, { tri: "volume", statut: "propose" }).active.map((c) => c.id),
+    ).toEqual(["I-01", "I-03"]);
+    const rejected = insightSections(cards, { tri: "volume", statut: "rejete" });
     expect(rejected.rejected.map((c) => c.id)).toEqual(["I-04"]);
-    expect(rejected.ranked).toEqual([]);
-    expect(rejected.weak).toEqual([]);
+    expect(rejected.active).toEqual([]);
   });
 });
 
@@ -143,5 +143,19 @@ describe("feedbackIdsOfItems", () => {
       "R-007",
       "R-1000",
     ]);
+  });
+});
+
+describe("insightTab", () => {
+  it("opens the ranked insights by default, a view, or the rejected ones", () => {
+    expect(insightTab(parseInsightFilters({}))).toBe("actifs");
+    expect(insightTab(parseInsightFilters({ vue: "faibles" }))).toBe("actifs");
+    expect(insightTab(parseInsightFilters({ vue: "surveiller", statut: "rejete" }))).toBe(
+      "rejetes",
+    );
+    expect(insightFiltersToQuery(parseInsightFilters({ vue: "surveiller", tri: "mrr" }))).toBe(
+      "?vue=surveiller&tri=mrr",
+    );
+    expect(activeInsightFilterCount(parseInsightFilters({ vue: "surveiller" }))).toBe(0);
   });
 });

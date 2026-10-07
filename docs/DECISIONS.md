@@ -510,7 +510,7 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Alternatives écartées** : changer l'identifiant du rôle `triage` (la comparaison perdrait Haiku et sa grille de prix) ; Opus (environ deux fois le prix de Sonnet, gain attendu marginal sur un classement).
 - **Conséquences** : coût du triage ~0,90 € pour 100 retours au lieu de 0,15 € (run complet de la démo ~3,10 € au lieu de ~1,50 €) ; ~1,5 s de plus par retour collé en direct (latence médiane 4,3 s contre 2,8 s).
 
-## ADR-034 — Écran Retours : une liste à lire, des filtres repliés, un détail qu'on parcourt
+## ADR-037 — Écran Retours : une liste à lire, des filtres repliés, un détail qu'on parcourt
 
 - **Date** : 2026-10-07
 - **Statut** : acceptée
@@ -533,3 +533,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Digest suivant** : les réponses des 30 derniers jours lui sont fournies (règle 10 de la skill digest : ne pas reproposer sans fait nouveau). Contrôle en code (`repeatsHandled`) : une recommandation dont toutes les preuves figuraient déjà dans une recommandation traitée est retirée ; un seul ID nouveau (retour, alerte, insight) suffit à la reproposer.
 - **Alternatives écartées** : donner au digest ses recommandations de la veille (il éviterait de rabâcher sans savoir ce que Léa a fait) ; transformer chaque compte à risque en alerte (un compte peut être à risque sans nouveau retour).
 - **Conséquences** : pas de migration (enums de décisions existants). Le reset de démo efface ces décisions avec les autres.
+
+## ADR-038 — Écran Insights : le poids des problèmes, pas leur rang
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : à 1 280 × 800 avec le chat ouvert, deux colonnes de cartes laissaient voir quatre insights par écran, avec des titres coupés et des chiffres jamais alignés d'une carte à l'autre. Signaux faibles et sujets à surveiller étaient tout en bas d'une longue page. Dans le détail, rang, MoSCoW, RICE, comptes et MRR étaient éclatés sur trois écrans. Les cartes affichaient aussi rang et MoSCoW et se triaient par rang : l'écran doublait la Priorisation.
+- **Décision** :
+  - **Une question par écran.** Insights : « de quoi parlent les clients, et est-ce que ça monte ? » (comprendre, valider, rédiger). Priorisation : « dans quel ordre, et pourquoi ? » (RICE, overrides, MoSCoW, capacité). La liste des insights ne montre ni rang ni MoSCoW ; le détail les garde dans sa bande de chiffres clés, comme pont vers la Priorisation.
+  - **Liste** : une ligne par insight, retours, comptes, MRR et alignement dans des colonnes de largeur fixe, sparkline à droite. Tri par volume (par défaut), MRR ou tendance ; le tri par rang reste pour l'outil `list_insights` de l'agent.
+  - **Onglets** Actifs (classés et signaux faibles réunis, un signal faible marqué « hors classement »), À surveiller, Rejetés. Paramètre `vue=surveiller` ; Rejetés reste `statut=rejete`, et `statut=propose` (lien du Digest) filtre toujours sur les insights à valider.
+  - **Couleurs** du Digest (ADR-033) : bleu pour « À valider », vert Signal pour « Émergent », le reste neutre. Le plan passe en texte.
+  - **Détail** : bande de huit chiffres clés sous le problème, « Qui est concerné » et « Canaux » sur deux colonnes, retours en deux lignes qui ouvrent l'écran Retours filtré sur l'insight (navigation d'ADR-037).
+- **Conséquences** : SPEC §12.4 ne prévoit plus de section « Signaux faibles » à part. Un ancien lien `tri=rang` retombe sur le tri par volume.

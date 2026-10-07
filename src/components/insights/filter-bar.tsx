@@ -1,23 +1,16 @@
 "use client";
 
 import { useTransition } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Constants } from "@/lib/db/types";
-import {
-  INSIGHT_SORTS,
-  STATUS_FILTERS,
-  activeInsightFilterCount,
-  insightFiltersToQuery,
-  type InsightFilters,
-} from "@/lib/insights/list";
+import { SCREEN_SORTS, insightFiltersToQuery, type InsightFilters } from "@/lib/insights/list";
 import { ALIGNMENT_LABELS, PRODUCT_AREA_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
 const enums = Constants.public.Enums;
-const SELECT = "h-8 max-w-56 rounded-lg border border-input bg-background px-2 text-sm";
-const ACTIVE = "border-signal/60 bg-signal-soft font-medium";
+const SELECT = "h-8 max-w-56 rounded-lg border border-input bg-background px-2 text-[13px]";
+const ACTIVE = "border-foreground/40 bg-muted font-medium";
 
 /** Sort and filters of the insight cards, in the URL (PLAN 3.4). */
 export function InsightFilterBar({ filters }: { filters: InsightFilters }) {
@@ -33,18 +26,29 @@ export function InsightFilterBar({ filters }: { filters: InsightFilters }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2" aria-busy={pending}>
-      <select
+      <div
+        role="group"
         aria-label="Trier par"
-        value={filters.tri}
-        onChange={(e) => apply({ tri: e.target.value as InsightFilters["tri"] })}
-        className={SELECT}
+        className="inline-flex h-8 items-center rounded-lg border bg-background p-0.5"
       >
-        {Object.entries(INSIGHT_SORTS).map(([value, label]) => (
-          <option key={value} value={value}>
-            Tri : {label}
-          </option>
-        ))}
-      </select>
+        {Object.entries(SCREEN_SORTS).map(([value, label]) => {
+          const active = filters.tri === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => apply({ tri: value as InsightFilters["tri"] })}
+              className={cn(
+                "h-full rounded-md px-2.5 text-[13px] text-muted-foreground",
+                active ? "bg-foreground font-medium text-background" : "hover:text-foreground",
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
       <select
         aria-label="Domaine"
         value={filters.domaine ?? ""}
@@ -75,30 +79,25 @@ export function InsightFilterBar({ filters }: { filters: InsightFilters }) {
           </option>
         ))}
       </select>
-      <select
-        aria-label="Statut"
-        value={filters.statut ?? ""}
-        onChange={(e) =>
-          apply({ statut: (e.target.value || undefined) as InsightFilters["statut"] })
-        }
-        className={cn(SELECT, filters.statut && ACTIVE)}
-      >
-        <option value="">Statut : en cours</option>
-        {Object.entries(STATUS_FILTERS).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
-      {activeInsightFilterCount(filters) > 0 && (
-        <Link
-          href={`${pathname}${insightFiltersToQuery({ tri: filters.tri })}`}
-          scroll={false}
-          className="inline-flex items-center gap-1 px-1 font-medium text-signal underline-offset-4 hover:underline"
+      {filters.statut === "propose" && (
+        <button
+          type="button"
+          onClick={() => apply({ statut: undefined })}
+          aria-label="Retirer le filtre À valider"
+          className="inline-flex h-7 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 text-[13px] font-medium text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200"
         >
-          <X aria-hidden className="size-3.5" />
-          Effacer les filtres
-        </Link>
+          À valider seulement
+          <X aria-hidden className="size-3" />
+        </button>
+      )}
+      {(filters.domaine || filters.alignement) && (
+        <button
+          type="button"
+          onClick={() => apply({ domaine: undefined, alignement: undefined })}
+          className="px-1 text-[13px] font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Tout effacer
+        </button>
       )}
     </div>
   );

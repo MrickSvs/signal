@@ -4,17 +4,25 @@ import { DraftBacklogButton } from "@/components/backlog/draft-button";
 import { EmptyState } from "@/components/shell/states";
 import { Section } from "@/components/digest/sections";
 import { Sparkline } from "@/components/digest/sparkline";
-import { accountsBreakdown } from "@/components/insights/insight-card";
+import { TO_REVIEW_STYLE, accountsBreakdown } from "@/components/insights/insight-card";
 import { ReviewActions } from "@/components/insights/review-actions";
 import { ScoreBreakdown } from "@/components/insights/score-breakdown";
-import { ChannelBadge, HealthBadge, Pill, PlanBadge } from "@/components/signal/badges";
+import { CHANNEL_ICONS, HealthBadge, Pill } from "@/components/signal/badges";
 import { EvidenceChip, InsightChip } from "@/components/signal/chips";
 import { loadContextPack } from "@/lib/context";
 import { getDb } from "@/lib/db/client";
 import { getDemoNow } from "@/lib/demo-now";
 import { formatDate, formatDaysUntil, formatEur, formatNumber, formatRelative } from "@/lib/format";
 import { feedbackIdsOfItems } from "@/lib/insights/list";
-import { INSIGHT_STATUS_LABELS, PRODUCT_AREA_LABELS, SEGMENT_LABELS } from "@/lib/labels";
+import {
+  CHANNEL_LABELS,
+  INSIGHT_STATUS_LABELS,
+  MOSCOW_LABELS,
+  PLAN_LABELS,
+  PRODUCT_AREA_LABELS,
+  SEGMENT_LABELS,
+} from "@/lib/labels";
+import { cn } from "@/lib/utils";
 import { INSIGHT_ID } from "@/server/queries/evidence";
 import { getInsightDetail, listMergeTargets, type DetailFeedback } from "@/server/queries/insights";
 
@@ -23,36 +31,77 @@ export const maxDuration = 120;
 
 const MAX_REQUEST_CHIPS = 4;
 
-const STATUS_STYLES: Record<string, string> = {
-  propose:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
-  actif: "border-signal/40 bg-signal-soft text-signal",
-};
+const STATUS_STYLES: Record<string, string> = { propose: TO_REVIEW_STYLE };
 
-function FeedbackLine({ feedback, now }: { feedback: DetailFeedback; now: Date }) {
+/** A feedback of the insight: summary first, then where it comes from (as in Retours, ADR-037). */
+function FeedbackLine({
+  feedback,
+  insightId,
+  now,
+}: {
+  feedback: DetailFeedback;
+  insightId: string;
+  now: Date;
+}) {
+  const ChannelIcon = CHANNEL_ICONS[feedback.channel];
   return (
-    <li className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2.5">
-      <EvidenceChip id={feedback.id} />
-      <ChannelBadge channel={feedback.channel} />
-      {feedback.customer ? (
-        <span className="flex items-center gap-1.5">
-          <span className="font-medium">{feedback.customer.name}</span>
-          {feedback.is_prospect ? (
-            <Pill className="border-border text-muted-foreground">Prospect</Pill>
-          ) : (
-            <PlanBadge plan={feedback.customer.plan} />
-          )}
-        </span>
-      ) : (
-        <span className="text-muted-foreground">Compte non identifié</span>
-      )}
-      <span className="min-w-0 flex-1 truncate" title={feedback.summary ?? undefined}>
+    <li className="relative flex flex-col gap-1 px-4 py-2.5 hover:bg-muted/40">
+      <Link
+        href={`/retours?insight=${insightId}&retour=${feedback.id}`}
+        className="line-clamp-2 leading-snug after:absolute after:inset-0 after:content-['']"
+      >
         {feedback.summary ?? feedback.subject}
-      </span>
-      <span className="text-muted-foreground" title={formatDate(feedback.received_at)}>
-        {formatRelative(feedback.received_at, now)}
-      </span>
+      </Link>
+      <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[13px] text-muted-foreground">
+        <span className="font-mono font-medium text-foreground">{feedback.id}</span>
+        <span aria-hidden>·</span>
+        <span className="inline-flex items-center gap-1">
+          <ChannelIcon aria-hidden className="size-3.5" />
+          {CHANNEL_LABELS[feedback.channel]}
+        </span>
+        <span aria-hidden>·</span>
+        <span title={formatDate(feedback.received_at)}>
+          {formatRelative(feedback.received_at, now)}
+        </span>
+        <span aria-hidden>·</span>
+        {feedback.customer ? (
+          <span>
+            <span className="text-foreground">{feedback.customer.name}</span>{" "}
+            {feedback.is_prospect
+              ? "(prospect)"
+              : feedback.customer.plan && `(${PLAN_LABELS[feedback.customer.plan]})`}
+          </span>
+        ) : (
+          <span>Compte non identifié</span>
+        )}
+      </p>
     </li>
+  );
+}
+
+/** One key figure under the title; a link when it leads to its proof. */
+function Figure({
+  label,
+  href,
+  children,
+}: {
+  label: string;
+  href?: string;
+  children: React.ReactNode;
+}) {
+  const body = (
+    <>
+      <span className="text-[13px] text-muted-foreground">{label}</span>
+      <span className="text-lg leading-tight font-semibold tabular-nums">{children}</span>
+    </>
+  );
+  const className = "-mr-px -mb-px flex min-w-0 flex-col gap-0.5 border-r border-b px-3 py-2";
+  return href ? (
+    <Link href={href} className={cn(className, "hover:bg-muted/60")}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className}>{body}</div>
   );
 }
 
@@ -88,9 +137,16 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
   const plans = accountsBreakdown(insight.breakdown.plans);
   const segments = Object.entries(insight.breakdown.segments).toSorted((a, b) => b[1] - a[1]);
   const representativeIds = new Set(insight.representative.map((f) => f.id));
+  const moscowFinal = insight.score?.overrides.find((o) => o.param === "moscow");
+  const moscow =
+    (moscowFinal && typeof moscowFinal.value === "string" && moscowFinal.value in MOSCOW_LABELS
+      ? (moscowFinal.value as keyof typeof MOSCOW_LABELS)
+      : null) ??
+    insight.score?.moscow_reco ??
+    null;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-7 px-8 py-6">
+    <div className="@container mx-auto flex max-w-6xl flex-col gap-7 px-8 py-6">
       <Link
         href="/insights"
         className="inline-flex items-center gap-1 self-start font-medium text-signal underline-offset-4 hover:underline"
@@ -137,6 +193,33 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
             ))}
           </p>
         )}
+        <div className="grid grid-cols-2 overflow-hidden rounded-lg border @xl:grid-cols-4">
+          <Figure label="Rang" href={`/priorisation?insight=${insight.id}`}>
+            {insight.score?.rank != null && insight.ranked ? (
+              `#${insight.score.rank}`
+            ) : (
+              <span className="text-base font-normal text-muted-foreground">Hors classement</span>
+            )}
+          </Figure>
+          <Figure label={moscowFinal ? "MoSCoW (ton choix)" : "MoSCoW (reco)"}>
+            {moscow ? MOSCOW_LABELS[moscow] : "—"}
+          </Figure>
+          <Figure label="RICE">
+            {insight.score ? formatNumber(Number(insight.score.rice), 2) : "—"}
+          </Figure>
+          <Figure label="Tendance, 7 jours">
+            <span className="flex items-center gap-2">
+              {formatNumber(trend.recent ?? 0)}
+              {trend.weekly && trend.weekly.length > 1 && <Sparkline weekly={trend.weekly} />}
+            </span>
+          </Figure>
+          <Figure label="Retours" href={`/retours?insight=${insight.id}`}>
+            {formatNumber(insight.feedbacks.length)}
+          </Figure>
+          <Figure label="Comptes">{formatNumber(insight.accounts_count)}</Figure>
+          <Figure label="MRR exposé">{formatEur(Number(insight.mrr_exposed))}</Figure>
+          <Figure label="Renouvellements < 90 j">{formatNumber(insight.renewals_90d)}</Figure>
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           {live && insight.origin === "retours" && (
             <ReviewActions
@@ -201,72 +284,58 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
         </div>
       </Section>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 @2xl:grid-cols-2">
         <Section title="Qui est concerné">
-          <dl className="grid grid-cols-3 gap-2">
-            <div className="rounded-md bg-muted px-2.5 py-1.5">
-              <dt className="text-[13px] text-muted-foreground">Comptes</dt>
-              <dd className="font-medium tabular-nums">{formatNumber(insight.accounts_count)}</dd>
-            </div>
-            <div className="rounded-md bg-muted px-2.5 py-1.5">
-              <dt className="text-[13px] text-muted-foreground">MRR exposé</dt>
-              <dd className="font-medium tabular-nums">{formatEur(Number(insight.mrr_exposed))}</dd>
-            </div>
-            <div className="rounded-md bg-muted px-2.5 py-1.5">
-              <dt className="text-[13px] text-muted-foreground">Renouv. 90 j</dt>
-              <dd className="font-medium tabular-nums">{formatNumber(insight.renewals_90d)}</dd>
-            </div>
-          </dl>
-          <div className="flex flex-col gap-1">
-            <p className="text-[13px] font-medium text-muted-foreground">Par plan</p>
-            <ul className="flex flex-wrap gap-x-4 gap-y-1">
-              {plans.map((p) => (
-                <li key={p.label}>
-                  {p.label} <span className="font-medium tabular-nums">{p.value}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {segments.length > 0 && (
+          <dl className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
-              <p className="text-[13px] font-medium text-muted-foreground">Par segment</p>
-              <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                {segments.map(([segment, n]) => (
-                  <li key={segment}>
-                    {SEGMENT_LABELS[segment as keyof typeof SEGMENT_LABELS] ?? "Sans compte"}{" "}
-                    <span className="font-medium tabular-nums">{formatNumber(n)}</span>
-                  </li>
+              <dt className="text-[13px] font-medium text-muted-foreground">Par plan</dt>
+              <dd className="flex flex-wrap gap-x-4 gap-y-1">
+                {plans.map((p) => (
+                  <span key={p.label}>
+                    {p.label} <span className="font-medium tabular-nums">{p.value}</span>
+                  </span>
                 ))}
-              </ul>
+              </dd>
             </div>
-          )}
+            {segments.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <dt className="text-[13px] font-medium text-muted-foreground">Par segment</dt>
+                <dd className="flex flex-wrap gap-x-4 gap-y-1">
+                  {segments.map(([segment, n]) => (
+                    <span key={segment}>
+                      {SEGMENT_LABELS[segment as keyof typeof SEGMENT_LABELS] ?? "Sans compte"}{" "}
+                      <span className="font-medium tabular-nums">{formatNumber(n)}</span>
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
         </Section>
         <Section title="Canaux">
           <ul className="flex flex-col gap-1.5">
-            {insight.channelCounts.map(([channel, n]) => (
-              <li key={channel} className="flex items-center justify-between gap-2">
-                <ChannelBadge channel={channel} />
-                <span className="tabular-nums">{formatNumber(n)}</span>
-              </li>
-            ))}
+            {insight.channelCounts.map(([channel, n]) => {
+              const Icon = CHANNEL_ICONS[channel];
+              return (
+                <li key={channel} className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Icon aria-hidden className="size-3.5 text-muted-foreground" />
+                    {CHANNEL_LABELS[channel]}
+                  </span>
+                  <span className="tabular-nums">{formatNumber(n)}</span>
+                </li>
+              );
+            })}
           </ul>
-        </Section>
-        <Section title="Tendance (6 semaines)">
-          {trend.weekly && trend.weekly.length > 1 ? (
-            <div className="flex flex-col gap-2">
-              <Sparkline weekly={trend.weekly} />
-              <p className="text-muted-foreground">
-                {formatNumber(trend.recent ?? 0)} retours sur 7 jours, croissance ×
-                {formatNumber(trend.growth ?? 0, 2)}
-                {trend.is_emerging
-                  ? " : tendance émergente."
-                  : trend.is_new
-                    ? " : sujet nouveau."
-                    : "."}
-              </p>
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Pas d&apos;historique.</p>
+          {trend.weekly && trend.weekly.length > 1 && (
+            <p className="text-[13px] text-muted-foreground">
+              Croissance ×{formatNumber(trend.growth ?? 0, 2)} sur 7 jours
+              {trend.is_emerging
+                ? " : tendance émergente."
+                : trend.is_new
+                  ? " : sujet nouveau."
+                  : "."}
+            </p>
           )}
         </Section>
       </div>
@@ -316,12 +385,8 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
                 {insight.accounts.map((a) => (
                   <tr key={a.id}>
                     <td className="px-3 py-2 font-medium">{a.name}</td>
-                    <td className="px-3 py-2">
-                      {a.status === "prospect" ? (
-                        <Pill className="border-border text-muted-foreground">Prospect</Pill>
-                      ) : (
-                        <PlanBadge plan={a.plan} />
-                      )}
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {a.status === "prospect" ? "Prospect" : a.plan ? PLAN_LABELS[a.plan] : "—"}
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {a.status === "prospect" ? "—" : formatEur(Number(a.mrr_eur))}
@@ -378,9 +443,9 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
         {insight.representative.length > 0 && (
           <>
             <p className="text-[13px] font-medium text-muted-foreground">Représentatifs</p>
-            <ul className="flex flex-col divide-y rounded-lg border border-signal/30">
+            <ul className="flex flex-col divide-y rounded-lg border">
               {insight.representative.map((f) => (
-                <FeedbackLine key={f.id} feedback={f} now={now} />
+                <FeedbackLine key={f.id} feedback={f} insightId={insight.id} now={now} />
               ))}
             </ul>
             <p className="mt-2 text-[13px] font-medium text-muted-foreground">Les autres retours</p>
@@ -390,7 +455,7 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
           {insight.feedbacks
             .filter((f) => !representativeIds.has(f.id))
             .map((f) => (
-              <FeedbackLine key={f.id} feedback={f} now={now} />
+              <FeedbackLine key={f.id} feedback={f} insightId={insight.id} now={now} />
             ))}
         </ul>
         <Link
