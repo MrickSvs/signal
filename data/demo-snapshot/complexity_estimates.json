@@ -1,564 +1,9 @@
 [
  {
-  "id": "05a6c26b-a071-4a19-9dbb-caadbe585a2e",
-  "insight_id": "I-28",
+  "id": "057b9d26-5ad1-4216-8c2d-ad5f15f8f3f6",
+  "insight_id": "I-54",
   "item_id": null,
-  "problem_hash": "76d345e9f0454a80cbc9d1fe7bd2eae9",
-  "components": [
-   "permissions",
-   "export",
-   "taches",
-   "liste"
-  ],
-  "points_min": 13,
-  "points_max": 13,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chaîne de données : l'export reprend la requête de la liste et les champs personnalisés en stockage clé-valeur à pivoter. Un support présentable devra aussi les restituer (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.606
-   },
-   {
-    "close": true,
-    "raison": "La génération est synchrone et reprend la requête de la liste. Un document mis en forme sera plus lourd à produire qu'un CSV, d'où le même risque d'expiration sur les gros projets (8 points réels).",
-    "ticket_id": "T-132",
-    "similarity": 0.572
-   },
-   {
-    "close": true,
-    "raison": "L'export dépend des filtres de la liste, dupliqués et déjà divergents une fois. Un rapport fidèle à la vue affichée impose de les réaligner et de les tester (2 points réels).",
-    "ticket_id": "T-110",
-    "similarity": 0.541
-   }
-  ],
-  "rationale": "Lien de partage hors de l'espace : absent du modèle (aucun accès sans compte ni invité), contrôles de permissions dispersés dans 5 écrans et l'export, permissions historiquement sous-estimées. Nouveau concept dans le modèle de données, proche d'un chantier. Dépasse 8 points : il faut découper (modèle de lien et désactivation, vue en lecture seule, contrôles d'accès). Pas d'analogue proche dans les tickets fournis, T-132 couvre seulement la partie export.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:05:23.914+00:00"
- },
- {
-  "id": "098d28ea-461f-4f87-9af8-715fec867770",
-  "insight_id": "I-31",
-  "item_id": "US-003",
-  "problem_hash": "33501551e96532610ec1d0132c696360",
-  "components": [
-   "permissions",
-   "parametres"
-  ],
-  "points_min": 3,
-  "points_max": 3,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
-   },
-   {
-    "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
-    "ticket_id": "T-137",
-    "similarity": 0.58
-   },
-   {
-    "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
-   }
-  ],
-  "rationale": "Réutilise le rôle par projet de TT-001 : il faut une restriction de périmètre pour un membre qui peut éditer, gérée depuis les paramètres du projet (analogue T-107, 2 points réels). La migration qui conserve l'accès des membres existants est partagée avec TT-001, d'où une valeur modérée. Cette story est hors du besoin initial centré sur l'invité.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:01:06.701+00:00"
- },
- {
-  "id": "0d50afc5-9cba-4741-ae6d-e846d4ea1f9d",
-  "insight_id": "I-35",
-  "item_id": null,
-  "problem_hash": "2c8601c8e220bfc2f01873d9f579570b",
-  "components": [
-   "taches",
-   "tableau",
-   "liste"
-  ],
-  "points_min": 8,
-  "points_max": 13,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module (tableau) et même famille de problème, l'affichage sur petit écran. Ce correctif de style localisé a coûté 1 point réel, mais il ne couvrait que le défilement horizontal et pas l'interaction tactile ni le reste des écrans.",
-    "ticket_id": "T-134",
-    "similarity": 0.568
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la vue liste, dont la requête et les filtres sont repris par l'export. Elle a coûté 5 points réels pour un seul écran : une adaptation mobile de la liste demande un effort du même ordre.",
-    "ticket_id": "T-126",
-    "similarity": 0.536
-   },
-   {
-    "close": true,
-    "raison": "Chaque écran (détail de tâche, tableau, liste) a sa propre logique d'affichage sans couche centrale : il a fallu les relire un par un, et la recette a trouvé un écran oublié. Le risque d'oubli est le même pour une adaptation écran par écran (5 points réels pour 3 estimés).",
-    "ticket_id": "T-123",
-    "similarity": 0.569
-   }
-  ],
-  "rationale": "Le besoin cumule deux choses : rendre le site adaptatif sur les écrans de travail (détail de tâche, tableau, liste) et corriger des boutons qui ne répondent pas sur tablette (validation, ajout de tâche). La cause de ces boutons n'est pas connue. Les analogues sont partiels : T-134 est un simple correctif de style dans le tableau, T-126 est une évolution de la liste, T-123 montre le coût d'une reprise écran par écran. Aucun ne couvre une adaptation transverse. Le module `taches` a un couplage fort et alimente le tableau et la liste. Le tableau n'est pas virtualisé et son glisser-déposer est à adapter au tactile. Le total dépasse donc un correctif isolé, d'où une fourchette de 8 à 13. Les modules touchés sont historiquement un peu sous-estimés (tableau et liste). Au-delà de 8 points, il vaut mieux découper : d'abord les boutons défaillants sur tablette, puis le tableau, la liste et le détail de tâche.",
-  "risks": [
-   "Tableau non virtualisé : toutes les cartes sont chargées et rendues d'un bloc, ce qui est lent sur mobile au-delà d'environ 300 cartes. Le glisser-déposer tactile entre colonnes est délicat.",
-   "Cause inconnue des boutons muets sur tablette (validation, ajout de tâche) : le détail de tâche est dans `taches`, module à couplage fort, et la correction peut en révéler d'autres.",
-   "Chaque écran (page projet, détail de tâche, tableau, liste) a sa propre logique d'affichage, sans couche centrale : risque d'oublier un écran, comme sur T-123.",
-   "Recette multi-appareils (téléphones, tablettes, orientations) coûteuse, et la liste peut se casser avec ses filtres et sa pagination sur petit écran."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:18.301+00:00"
- },
- {
-  "id": "1091317b-51c6-4078-8b36-ab4150a4b94b",
-  "insight_id": "I-28",
-  "item_id": null,
-  "problem_hash": "e1da79d193c9501e204886310880742d",
-  "components": [
-   "export",
-   "liste",
-   "champs_personnalises",
-   "permissions"
-  ],
-  "points_min": 13,
-  "points_max": 21,
-  "tshirt_min": "L",
-  "tshirt_max": "XL",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chaîne de données : l'export reprend la requête de la liste et les champs personnalisés en stockage clé-valeur à pivoter. Un support présentable devra aussi les restituer (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.606
-   },
-   {
-    "close": true,
-    "raison": "La génération est synchrone et reprend la requête de la liste. Un document mis en forme sera plus lourd à produire qu'un CSV, d'où le même risque d'expiration sur les gros projets (8 points réels).",
-    "ticket_id": "T-132",
-    "similarity": 0.572
-   },
-   {
-    "close": true,
-    "raison": "L'export dépend des filtres de la liste, dupliqués et déjà divergents une fois. Un rapport fidèle à la vue affichée impose de les réaligner et de les tester (2 points réels).",
-    "ticket_id": "T-110",
-    "similarity": 0.541
-   }
-  ],
-  "rationale": "Le besoin est de produire un support d'avancement présentable à la place du CSV brut. L'architecture n'a ni moteur de mise en forme (Excel formaté, PDF) ni lien de partage hors de l'espace. Il faut donc un vrai module de mise en forme dans l'export, alimenté par la liste et les champs personnalisés, avec le contrôle d'accès propre à l'export. Les trois analogues sont proches mais partiels : ils portent tous sur le CSV, aucun sur la mise en forme, d'où une confiance moyenne et une fourchette large. Le besoin ne dit pas précisément quel support est attendu (document, Excel, synthèse chiffrée). L'export et les permissions sont historiquement sous-estimés, et les trois analogues ont dépassé leur estimation. La fourchette suppose que la personne envoie elle-même le document au client : tout partage direct avec un accès externe introduirait la notion d'invité, absente du modèle, et relèverait d'un chantier bien plus gros.\n\nCorrection du biais de l'équipe appliquée par le code : × 1,43 (19 tickets livrés sur ces composants), fourchette brute 8–13.",
-  "risks": [
-   "Export : aucun moteur de mise en forme (ni Excel formaté, ni PDF) ; le choix du format et de la mise en page n'est pas tranché et conditionne l'effort.",
-   "Export : génération synchrone, qui peut expirer sur les très gros projets ; un document mis en forme est plus lourd qu'un CSV (cf. T-132).",
-   "Champs personnalisés et liste : valeurs en stockage clé-valeur à pivoter, et paramètres de filtre déjà divergents entre liste et export (cf. T-120, T-110).",
-   "Permissions : le contrôle d'accès de l'export est à part et dispersé ; si le client doit accéder au rapport lui-même, il faut un lien de partage ou un invité, absents du modèle, ce qui ferait basculer vers un chantier."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:34:55.655+00:00"
- },
- {
-  "id": "12855249-e608-4148-8a29-3984979a249b",
-  "insight_id": "I-32",
-  "item_id": null,
-  "problem_hash": "d814e6969e7a71fcc18829e6ef0299bf",
-  "components": [
-   "champs_personnalises",
-   "taches",
-   "liste",
-   "export",
-   "parametres"
-  ],
-  "points_min": 13,
-  "points_max": 21,
-  "tshirt_min": "L",
-  "tshirt_max": "XL",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Ajout d'un type de champ personnalisé (date) : 5 points réels pour un seul type, sans migration, concentré sur le formulaire de tâche et l'affichage. Ici il faut plusieurs types (choix, oui/non, valideur, montant), dont certains demandent plus qu'un simple type stocké.",
-    "ticket_id": "T-105",
-    "similarity": 0.648
-   },
-   {
-    "close": true,
-    "raison": "Les champs personnalisés passent par la liste et l'export : chaque nouveau type doit être pivoté en colonne et formaté dans l'export, ce qui a été sous-estimé (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.588
-   },
-   {
-    "close": true,
-    "raison": "Même module et même zone de configuration : la définition du champ est stockée par projet et reprise par le formulaire, la liste et l'export (3 points réels). Utile pour l'écran de définition des champs et de leurs options.",
-    "ticket_id": "T-133",
-    "similarity": 0.585
-   }
-  ],
-  "rationale": "Le besoin ajoute plusieurs types de saisie contrainte aux champs personnalisés : liste de choix, oui/non, sélection d'un valideur et montant. Chacun doit être pris en charge par le formulaire de tâche, la liste, l'export et la configuration du champ dans les paramètres du projet. T-105 montre qu'un seul type simple tient en 5 points réels grâce au stockage clé-valeur typé. Ici, la liste de choix demande une table d'options (zone à risque citée dans l'architecture). Le champ valideur dépend de la liste des membres, et le montant demande un format et une validation. Les analogues ne couvrent qu'une partie du besoin, d'où une confiance moyenne et une fourchette large. L'export et les champs personnalisés sont historiquement sous-estimés. La fourchette s'élève au-dessus de T-105, car plusieurs types s'additionnent et deux modules à couplage moyen sont touchés par ricochet. Au-delà de 8 points, il faudra découper, par exemple un type par story.",
-  "risks": [
-   "Liste de choix : la table d'options n'existe pas, et le stockage générique clé-valeur typé ne la couvre pas. Il faut gérer la modification ou la suppression d'une option déjà utilisée.",
-   "Export et liste : chaque nouveau type doit être pivoté en colonne et formaté, comme dans T-120. La génération synchrone peut expirer sur les gros projets.",
-   "Champ valideur : dépendance aux membres de l'espace, avec le risque d'exposer un membre qui n'a pas accès au projet, car les contrôles de permissions sont dispersés.",
-   "Filtres de la liste sur champs personnalisés absents : l'exploitation des valeurs normalisées (filtres, comparaisons) pourrait être demandée et élargir le périmètre."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:05.364+00:00"
- },
- {
-  "id": "20af5ac7-fb33-4b35-bede-a361de4ddaa8",
-  "insight_id": "I-31",
-  "item_id": "US-004",
-  "problem_hash": "66103c66b128ce5762b212cd4e45a0d6",
-  "components": [
-   "export",
-   "liste",
-   "notifications",
-   "taches",
-   "permissions"
-  ],
-  "points_min": 5,
-  "points_max": 5,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
-   },
-   {
-    "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
-    "ticket_id": "T-137",
-    "similarity": 0.58
-   },
-   {
-    "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
-   }
-  ],
-  "rationale": "Chemins secondaires à fermer : export filtré au projet, lien de téléchargement des exports et des pièces jointes réservé aux utilisateurs autorisés, notifications sans contenu d'un autre projet, tâche liée masquée. L'export (moyen couplage, historiquement sous-estimé) reprend la requête de la liste et son propre contrôle d'accès. T-103 et T-137 ont montré que ces chemins se découvrent tard, en recette : risque de ricochet sur les tâches et les notifications.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:01:06.701+00:00"
- },
- {
-  "id": "3e12ceb8-6a06-4767-b6e9-b8814c6e6895",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "07c1981f002bf5c7b8008ee84de810d2",
-  "components": [
-   "permissions",
-   "export",
-   "parametres",
-   "taches"
-  ],
-  "points_min": 8,
-  "points_max": 8,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "basse",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
-   }
-  ],
-  "rationale": "Partage en lecture seule pour un client : il n'existe aucune notion d'invité ni de permission par projet, et l'export n'a pas de lien de partage hors de l'espace. Il faut reprendre les 6 points de contrôle de `permissions`, ajouter un réglage de désactivation dans `parametres` et masquer les commentaires internes. Analogue partiel T-127 pour la complexité. À 8 points, la story doit être découpée, et les permissions sont historiquement sous-estimées.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
- },
- {
-  "id": "3f391245-149b-4db3-9930-3123f1171677",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "04c4b490f1d0b2e7dc9249109ba057a6",
-  "components": [
-   "taches",
-   "tableau",
-   "permissions",
-   "liste"
-  ],
-  "points_min": 5,
-  "points_max": 5,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "basse",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
-   }
-  ],
-  "rationale": "Déplacer ou redimensionner une barre sur la frise met à jour les dates et doit bloquer le début avant la fin de la prédécesseure. Analogue T-127 (8 points réels, le glisser-déposer recalcule tout le tableau) : même difficulté d'interaction, mais le socle de la frise existe déjà avec US-010. Le contrôle de permission en modification est à reprendre.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
- },
- {
-  "id": "50cb05af-dac3-4ab8-a66f-66a3c88db641",
-  "insight_id": "I-28",
-  "item_id": null,
-  "problem_hash": "e1e48d4fd9a031b29dfabeac446e5dc1",
-  "components": [
-   "export",
-   "liste",
-   "champs_personnalises"
-  ],
-  "points_min": 5,
-  "points_max": 5,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chaîne de données : l'export reprend la requête de la liste et les champs personnalisés en stockage clé-valeur à pivoter. Un support présentable devra aussi les restituer (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.606
-   },
-   {
-    "close": true,
-    "raison": "La génération est synchrone et reprend la requête de la liste. Un document mis en forme sera plus lourd à produire qu'un CSV, d'où le même risque d'expiration sur les gros projets (8 points réels).",
-    "ticket_id": "T-132",
-    "similarity": 0.572
-   },
-   {
-    "close": true,
-    "raison": "L'export dépend des filtres de la liste, dupliqués et déjà divergents une fois. Un rapport fidèle à la vue affichée impose de les réaligner et de les tester (2 points réels).",
-    "ticket_id": "T-110",
-    "similarity": 0.541
-   }
-  ],
-  "rationale": "Évolution touchant l'export, qui reprend la requête de la liste (filtres) et les champs personnalisés en colonnes. Analogue T-120 (5 points réels) : même chaîne de données, avec pivot du stockage clé-valeur. T-110 (2 points réels) pour les filtres à réaligner. Pas de moteur de mise en forme Excel existant, d'où 5 plutôt que 3. L'export est historiquement sous-estimé.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:05:23.914+00:00"
- },
- {
-  "id": "5c3b50ff-6ebd-4217-bea7-ffe2f37c47e5",
-  "insight_id": "I-29",
-  "item_id": null,
-  "problem_hash": "d67c1ccfd1dcc2319ded47bd4b4a4bc0",
-  "components": [
-   "tableau",
-   "taches"
-  ],
-  "points_min": 5,
-  "points_max": 8,
-  "tshirt_min": "M",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module (tableau), même zone à risque : le glisser-déposer recalcule tout le tableau. Ce ticket a demandé 8 points réels pour reprendre ce recalcul, qu'il faudra de nouveau toucher pour la virtualisation.",
-    "ticket_id": "T-127",
-    "similarity": 0.662
-   },
-   {
-    "close": true,
-    "raison": "Même problème de fond, des projets volumineux chargés d'un coup, résolu côté liste par pagination et chargement progressif (5 points réels). Le tableau doit recevoir une réponse comparable, mais en virtualisant le rendu, ce qui est plus délicat avec le glisser-déposer.",
-    "ticket_id": "T-126",
-    "similarity": 0.644
-   },
-   {
-    "close": true,
-    "raison": "Même module, mais simple correctif de style localisé (1 point réel) : sert de borne basse et montre que ce besoin est d'une autre nature.",
-    "ticket_id": "T-134",
-    "similarity": 0.662
-   }
-  ],
-  "rationale": "Le besoin touche le tableau kanban, à couplage faible, mais traverse sa zone à risque connue : rendu non virtualisé (toutes les cartes chargées en une requête, lent au-delà de ~300 cartes) et recalcul complet au glisser-déposer. Aucun analogue ne couvre exactement la virtualisation : T-127 couvre le même module et le même recalcul du glisser-déposer (8 points réels), T-126 la même nature de problème sur la liste (5 points réels). Les analogues sont donc partiels, d'où une confiance moyenne. Le chantier est front isolé mais délicat (glisser-déposer entre colonnes virtualisées), avec probablement un ajustement du chargement des tâches côté API (modèle de tâches lu par le tableau), sans nouveau concept de données. Le tableau est historiquement un peu sous-estimé.",
-  "risks": [
-   "Tableau : glisser-déposer entre colonnes virtualisées, délicat, et le recalcul complet du tableau à chaque déplacement doit être repris (comme dans T-127).",
-   "Tableau : rendu non virtualisé et chargement des cartes en une seule requête, il faut traiter le rendu et le chargement pour obtenir un vrai gain au-delà de ~300 cartes.",
-   "Tâches : si le chargement est modifié ou paginé côté API, les autres consommateurs du modèle (liste, export) peuvent être affectés ; il faut vérifier qu'ils ne régressent pas, comme le test d'export de T-126.",
-   "Le critère de performance (nombre de cartes visé, seuil de fluidité) n'est pas précisé dans le besoin, ce qui élargit l'incertitude sur le niveau d'optimisation attendu."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:34:50.08+00:00"
- },
- {
-  "id": "5d20f908-1745-4175-9603-dad5e0284b14",
-  "insight_id": "I-34",
-  "item_id": null,
-  "problem_hash": "8a6701cdd4e4aba1d27aad268ffd730c",
-  "components": [
-   "liste",
-   "taches",
-   "permissions",
-   "notifications"
-  ],
-  "points_min": 8,
-  "points_max": 13,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Le filtre par assigné dans la vue liste existe déjà (3 points réels). La partie « retrouver les tâches d'une personne » s'appuie dessus, d'où une partie du besoin déjà couverte. Il avait fallu vérifier la reprise du filtre par l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.688
-   },
-   {
-    "close": true,
-    "raison": "Modifier les assignations touche le modèle de tâche et son champ assigné, devenu une liste de membres (8 points réels). Une réassignation en lot repasse par les mêmes écrans et les mêmes données.",
-    "ticket_id": "T-101",
-    "similarity": 0.604
-   }
-  ],
-  "rationale": "Le besoin recouvre deux choses. D'abord retrouver les tâches d'une personne : le filtre par assigné de T-102 est livré, il reste au mieux à le rendre plus accessible ou à ajouter une vue par personne, ce qui est modeste. Ensuite gérer ces tâches sans les traiter une par une : sélection multiple, changement de statut et réassignation en lot. Aucun ticket de référence ne couvre ce volet, d'où des analogues seulement partiels. Il touche la liste (sélection, actions), les tâches (couplage fort, assignation multiple de T-101), les permissions (chaque action en lot doit respecter les contrôles dispersés, module historiquement sous-estimé) et les notifications (une action en lot émet de nombreux événements). Le besoin est assez flou (vue dédiée ou actions en lot, périmètre des actions), ce qui justifie une fourchette de 8 à 13 plutôt qu'un chiffre unique.",
-  "risks": [
-   "Contrôles de permissions dispersés dans 5 écrans et l'export : une action en lot doit les respecter pour chaque tâche, sinon on contourne un contrôle.",
-   "Une réassignation ou un changement de statut en lot déclenche beaucoup d'événements de `taches` : risque d'afflux de notifications, avec la préférence digest déjà mal lue pour les assignations.",
-   "Modèle de tâche à couplage fort et assignation multiple (T-101) : la réassignation en lot doit gérer les tâches à plusieurs assignés sans écraser les autres.",
-   "Périmètre flou (vue par personne ou actions en lot, préparation des points individuels) : risque de dérive vers un tableau de suivi par personne ; l'export reprend la requête de la liste et doit rester cohérent."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:17.756+00:00"
- },
- {
-  "id": "64166f51-cc11-46d1-8309-bd225a64e44e",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "0402cf02d35f6b4e8ddbd18c286d589e",
-  "components": [
-   "taches",
-   "liste",
-   "tableau",
-   "export",
-   "notifications",
-   "champs_personnalises",
-   "permissions"
-  ],
-  "points_min": 8,
-  "points_max": 8,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "basse",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
-   }
-  ],
-  "rationale": "Nouveau concept dans le modèle de `taches` (couplage fort) : date de début optionnelle, migration sans perte, lien de dépendance sans cycle. Répercussion à vérifier sur liste, tableau, export, notifications et champs personnalisés. Analogues : T-127 (8 points réels, tableau à garder cohérent avec les nouveaux attributs) et T-102 (3 points réels, répercussion sur l'export). Les permissions sont historiquement sous-estimées. À 8 points, il faut découper : d'abord la date de début, puis les dépendances et la détection de cycle.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
- },
- {
-  "id": "6964a520-6735-4ebc-9fba-a8e36d82ea8b",
-  "insight_id": "I-27",
-  "item_id": null,
-  "problem_hash": "28b5c2270e7f6cc1f84e4fb310652a1a",
-  "components": [
-   "notifications",
-   "parametres",
-   "taches"
-  ],
-  "points_min": 3,
-  "points_max": 5,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chemin d'envoi des événements d'assignation émis par les tâches : le filtrage s'était fait en plusieurs endroits, un par type d'événement (3 points réels).",
-    "ticket_id": "T-128",
-    "similarity": 0.635
-   },
-   {
-    "close": true,
-    "raison": "Correctif localisé dans les notifications sur les tâches à plusieurs assignés, avec tests d'envoi : proche pour la partie assignation à plusieurs destinataires (2 points réels).",
-    "ticket_id": "T-108",
-    "similarity": 0.646
-   },
-   {
-    "close": true,
-    "raison": "Même module, même respect des préférences de notification et envoi via la file de tâches ; ici l'événement existe mais le chemin est défectueux (2 points réels).",
-    "ticket_id": "T-119",
-    "similarity": 0.7
-   }
-  ],
-  "rationale": "Le besoin décrit un défaut de fiabilité des e-mails d'assignation, qui correspond à la zone à risque connue : la préférence digest mal lue. Le chemin des assignations lit encore l'ancien champ de préférence, donc certaines assignations ne partent ni en immédiat ni dans le digest. Le correctif touche surtout notifications (lecture de la bonne préférence), avec un ricochet sur parametres (deux champs de préférence coexistent, à unifier ou nettoyer) et un contrôle côté taches pour l'événement d'assignation. Les analogues ont tous des points réels de 2 à 3 sur le même module, sans migration lourde, d'où une fourchette de 3 à 5. Les analogues sont partiels : aucun ne traite la préférence digest ni la cohérence des deux champs, ce qui justifie une confiance moyenne. Le besoin ne précise pas la cause exacte, il pourrait y avoir d'autres causes d'échec d'envoi, d'où le haut de fourchette. L'absence de journal d'envoi exploitable complique le diagnostic.",
-  "risks": [
-   "Préférence digest mal lue : le chemin des assignations lit l'ancien champ, le correctif doit couvrir tous les cas immédiat et digest, sans doublon ni oubli.",
-   "Deux champs de préférence coexistent dans parametres : une migration ou un nettoyage des valeurs existantes peut s'ajouter au périmètre.",
-   "Pas de journal d'envoi exploitable : difficile de confirmer la cause et de vérifier la correction, d'autres causes de non-réception peuvent apparaître.",
-   "Filtrage et événements d'assignation dispersés dans taches, comme observé sur T-128 : plusieurs points à reprendre et à tester."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:34:50.718+00:00"
- },
- {
-  "id": "6c7217c0-f0f3-4f6d-a777-c464e006755a",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "050e873575481b2b1a78de9270d2aaea",
+  "problem_hash": "d8b0a5d90a60fbbe5f2bd945a94ebc58",
   "components": [
    "taches",
    "liste",
@@ -575,85 +20,277 @@
   "analogies": [
    {
     "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
+    "raison": "Même module liste et requêtes filtrées reprises par l'export ; une vue temporelle devra aussi charger de gros volumes de tâches (5 points réels), mais la nature du changement est très différente.",
     "ticket_id": "T-126",
-    "similarity": 0.561
+    "similarity": 0.603
    },
    {
     "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
+    "raison": "Évolution de la vue liste qui touche la requête partagée avec l'export (3 points réels) ; un simple filtre, bien plus petit qu'une nouvelle vue.",
     "ticket_id": "T-102",
-    "similarity": 0.565
+    "similarity": 0.6
+   },
+   {
+    "close": true,
+    "raison": "Autre vue, le kanban non virtualisé : le rendu et le glisser-déposer ont causé une sous-estimation (8 points réels contre 5), ce qui annonce les difficultés d'une nouvelle vue interactive.",
+    "ticket_id": "T-127",
+    "similarity": 0.587
    }
   ],
-  "rationale": "Aucun analogue ne couvre une vue planning. Les trois tickets fournis portent sur la liste ou le tableau, sans nouveau concept dans le modèle de données : leur similarité est limitée, donc la confiance est basse. Le besoin demande une vue du planning dans le temps avec échéances, dépendances, chevauchements et surcharges, ce qui exige une date de début et des dépendances entre tâches, absentes du modèle. C'est un nouveau concept dans le modèle de données, donc un chantier pour le module `taches` à couplage fort : migration, puis reprise du tableau, de la liste, de l'export et des champs personnalisés. S'y ajoutent une vue frontale nouvelle (barres, échelle de temps, interactions) et la détection des surcharges, qui demande de définir une charge par assigné, non modélisée aujourd'hui. Les contrôles de permissions dispersés sont à appliquer à la nouvelle vue, et les permissions et l'export sont historiquement sous-estimés. Le besoin mentionne aussi une présentation aux clients, qui pourrait impliquer un export ou un partage hors de l'espace, absent aujourd'hui et non chiffré ici. La fourchette reste large pour refléter ces incertitudes de périmètre.\n\nCorrection du biais de l'équipe appliquée par le code : × 1,34 (30 tickets livrés sur ces composants), fourchette brute 13–21.",
+  "rationale": "Aucun analogue ne couvre une vue planning : les trois tickets sont des évolutions de vues existantes (liste, kanban), pas la création d'une vue temporelle, donc la confiance reste basse. Les analogues proches sont partiels. Le besoin (tâches, échéances et charge d'équipe étalées dans le temps) est un Gantt ou une timeline. Or le modèle n'a aucune date de début (seulement une échéance) et aucune dépendance entre tâches. Il faut donc d'abord migrer le modèle dans taches, à couplage fort, avec des répercussions sur liste, tableau, champs personnalisés et export. La vue de charge d'équipe demande aussi un calcul par assigné qui n'existe pas. La présentation aux clients laisse supposer un export ou un partage, hors du périmètre actuel (pas de PDF, pas de lien externe). Les permissions sont touchées par ricochet, car la nouvelle vue doit reprendre les contrôles dispersés, et elles sont historiquement sous-estimées. Selon le périmètre retenu (vue simple en lecture ou planning avec dépendances), la fourchette est large.\n\nCorrection du biais de l'équipe appliquée par le code : × 1,34 (30 tickets livrés sur ces composants), fourchette brute 13–21.",
   "risks": [
-   "Aucune date de début ni dépendance entre tâches dans `taches` : migration du modèle de données avec répercussion sur le tableau, la liste, l'export, les notifications et les champs personnalisés.",
-   "Détection des surcharges : aucune notion de charge ou de capacité par assigné dans le modèle, périmètre fonctionnel à préciser.",
-   "Contrôles de permissions dispersés dans 5 écrans et l'export : la nouvelle vue doit les appliquer, et l'export planning ou le partage client est un risque de fuite ou de périmètre accru, car l'export n'a ni mise en forme (PDF, Excel) ni partage hors espace.",
-   "Performance d'une vue planning sur gros projets : le tableau n'est déjà pas virtualisé au-delà de ~300 cartes, et l'interaction de glisser-déposer a déjà été sous-estimée (T-127)."
+   "Aucune date de début ni dépendance dans le modèle de `taches` (couplage fort) : migration de données préalable qui se répercute sur liste, tableau, export et champs personnalisés.",
+   "Rendu non virtualisé, déjà lent au-delà de ~300 cartes sur le tableau : une vue temporelle sur de gros projets risque de poser le même problème de performance.",
+   "Contrôles de permissions dispersés dans 5 écrans et l'export : la nouvelle vue ajoute un point de contrôle à reprendre et à tester.",
+   "Périmètre flou : la charge d'équipe et la présentation aux clients (export mis en forme, partage hors de l'espace) ne sont pas couvertes par l'export actuel (CSV seul) et pourraient élargir fortement le chantier."
   ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:34:51.409+00:00"
+  "created_at": "2026-10-07T21:37:12.348877+00:00"
  },
  {
-  "id": "78523a9c-2f64-41bd-b2ac-5f14baa29182",
-  "insight_id": "I-31",
-  "item_id": "US-002",
-  "problem_hash": "6698a4288ae49ecf3ffce4799ef8e2b8",
+  "id": "22f7b81d-58a9-4e1f-994d-caa95ac535a4",
+  "insight_id": "I-62",
+  "item_id": null,
+  "problem_hash": "5d0062a2dbcfd8c181ec22478fd6427e",
   "components": [
    "taches",
-   "tableau",
+   "permissions",
+   "parametres",
    "liste",
-   "permissions"
+   "export",
+   "notifications",
+   "tableau",
+   "champs_personnalises"
   ],
-  "points_min": 3,
-  "points_max": 3,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
+  "points_min": 8,
+  "points_max": 21,
+  "tshirt_min": "L",
+  "tshirt_max": "XL",
+  "confidence": "basse",
+  "analogies": [
+   {
+    "close": false,
+    "raison": "Partiel : l'export reprend la requête de la liste et un stockage clé-valeur générique, ce qui donnerait une colonne de temps ou de montant à facturer ; 5 points réels pour une simple colonne, mal estimée au départ.",
+    "ticket_id": "T-120",
+    "similarity": 0.448
+   },
+   {
+    "close": false,
+    "raison": "Partiel : ajouter un attribut saisi dans le détail de tâche passe par le formulaire, la liste et l'export, mais sans migration (5 points réels). Ici, le temps passé est un vrai concept métier, pas un simple type de champ.",
+    "ticket_id": "T-105",
+    "similarity": 0.449
+   },
+   {
+    "close": false,
+    "raison": "Partiel : l'export est synchrone et a expiré sur les gros projets (8 points réels). Un export de facturation sur les temps agrégés posera la même contrainte de volume.",
+    "ticket_id": "T-132",
+    "similarity": 0.449
+   }
+  ],
+  "rationale": "Aucun analogue proche : les trois tickets fournis touchent l'export et les champs personnalisés, jamais un suivi du temps, une validation ou une facturation. Le besoin couvre trois capacités : saisir le temps sur les tâches et projets, le faire valider, puis facturer. Il introduit au moins deux nouveaux concepts dans le modèle de données (entrée de temps, statut de validation, et probablement un taux ou un montant facturable), qui s'ajoutent au modèle des tâches à couplage fort. Un rôle de validateur impose de reprendre les permissions, dispersées dans 5 écrans et l'export, historiquement sous-estimées. Les paramètres porteraient les taux et la configuration. La liste, le tableau et l'export doivent afficher ou agréger le temps. Les notifications serviraient aux demandes et décisions de validation. Le périmètre de la facturation reste flou (génération de factures, ou simple export pour un ERP) : c'est le principal facteur d'incertitude. La fourchette brute est donc large et haute, et correspond plutôt à un chantier à découper en plusieurs étapes (saisie du temps, validation, export facturable).\n\nAucun ticket livré proche (meilleure similarité 0,45, seuil 0,45) : fourchette élargie de 13–21 à 8–21 et confiance forcée à basse.",
+  "risks": [
+   "Nouveau concept de temps passé dans le modèle des tâches (couplage fort) : migration, répercussion sur le tableau, la liste, l'export et les champs personnalisés.",
+   "Validation du temps : nouveau rôle ou droit à ajouter aux contrôles de permissions dispersés dans 5 écrans et l'export, sans couche centrale ; un oubli expose des données de facturation.",
+   "Périmètre de la facturation non défini (facture générée ou export vers un ERP) : risque d'écart de portée et de sous-estimation.",
+   "Export synchrone qui a déjà expiré sur les gros projets (T-132) : l'agrégation des temps et des montants pour facturer risque de dépasser le délai."
+  ],
+  "model": "claude-sonnet-5-5",
+  "created_at": "2026-10-07T21:37:35.875761+00:00"
+ },
+ {
+  "id": "4a6efd1b-eebb-4fdd-b89d-db35505a88e3",
+  "insight_id": "I-57",
+  "item_id": null,
+  "problem_hash": "e18b0db3da967c95dca707323465ad9e",
+  "components": [
+   "tableau",
+   "taches"
+  ],
+  "points_min": 8,
+  "points_max": 13,
+  "tshirt_min": "L",
+  "tshirt_max": "L",
   "confidence": "moyenne",
   "analogies": [
    {
     "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
+    "raison": "Même module (tableau), même zone à risque : le glisser-déposer recalcule tout le tableau. Il a coûté 8 points réels pour des colonnes repliables, dont la reprise du recalcul et de nouveaux cas de test.",
+    "ticket_id": "T-127",
+    "similarity": 0.632
    },
    {
     "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
-    "ticket_id": "T-137",
-    "similarity": 0.58
+    "raison": "Même problème de fond : projets volumineux chargés d'un coup. La pagination et le chargement progressif de la liste ont tenu en 5 points réels, mais dans une vue sans glisser-déposer.",
+    "ticket_id": "T-126",
+    "similarity": 0.64
    },
    {
     "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
+    "raison": "Même module (tableau), mais simple correctif de style localisé (1 point réel). Il montre seulement le bas de la fourchette pour une retouche de rendu sans toucher au chargement ni au recalcul.",
+    "ticket_id": "T-134",
+    "similarity": 0.666
    }
   ],
-  "rationale": "Vues existantes à restreindre au projet de l'invité : masquer les boutons de création et de modification, filtrer liste et tableau, cacher les commentaires internes. Évolution simple mais sur plusieurs écrans qui dépendent des permissions ; le gros du contrôle d'accès est dans TT-001. Plus petit que US-001, qui crée le concept d'invité.",
-  "risks": [],
+  "rationale": "Le tableau kanban n'est pas virtualisé : toutes les cartes sont chargées en une requête et rendues d'un bloc, et le glisser-déposer recalcule tout le tableau, ce qui est lent au-delà d'environ 300 cartes. Il faut donc virtualiser le rendu des colonnes et alléger le recalcul au dépôt, voire paginer ou charger progressivement les cartes côté API de tâches, d'où le module taches touché par ricochet. Aucun analogue ne couvre exactement la virtualisation : T-127 est le plus parlant car il a buté sur ce même recalcul (8 points réels), et T-126 donne l'ordre de grandeur d'un chargement progressif (5 points réels). La virtualisation avec glisser-déposer entre colonnes est un chantier front isolé mais délicat, ce qui place la fourchette entre 8 et 13. Analogues partiels, donc confiance moyenne. Le tableau est historiquement un peu sous-estimé.",
+  "risks": [
+   "Tableau non virtualisé : le glisser-déposer entre colonnes virtualisées est délicat, car la carte cible ou source peut ne pas être rendue.",
+   "Le glisser-déposer recalcule tout le tableau : reprise de ce recalcul, comme sur T-127, avec de nouveaux cas de test (colonnes repliées, colonnes vides).",
+   "Si un chargement progressif est ajouté côté tâches (couplage fort), le changement peut se répercuter sur la liste et l'export, qui lisent le même modèle (cf. le test de non-régression de T-126).",
+   "Cause réelle de la lenteur apparue après la dernière mise à jour non confirmée : une régression à corriger pourrait changer la nature et le coût du chantier."
+  ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:01:06.701+00:00"
+  "created_at": "2026-10-07T21:37:12.058338+00:00"
  },
  {
-  "id": "79d0aa19-884b-45c7-bc5d-6c9ae8e85303",
-  "insight_id": "I-31",
-  "item_id": "US-001",
-  "problem_hash": "c354ec75461bd038eb6d84a7707088af",
+  "id": "5117d07d-c1a8-48bd-83b9-abbdcdf51fd8",
+  "insight_id": "I-56",
+  "item_id": null,
+  "problem_hash": "037bb99ff9c0ccf25865fa4639c46a6d",
   "components": [
-   "permissions",
+   "export",
+   "liste",
+   "champs_personnalises"
+  ],
+  "points_min": 13,
+  "points_max": 21,
+  "tshirt_min": "L",
+  "tshirt_max": "XL",
+  "confidence": "moyenne",
+  "analogies": [
+   {
+    "close": true,
+    "raison": "Même module et même requête de liste reprise par l'export. Les champs personnalisés, stockés en clé-valeur, ont dû être pivotés en colonnes (5 points réels), et un export présentable devra les mettre en forme aussi.",
+    "ticket_id": "T-120",
+    "similarity": 0.634
+   },
+   {
+    "close": true,
+    "raison": "La génération de l'export est synchrone. Un rendu mis en forme coûtera plus cher à produire qu'un CSV, donc le risque d'expiration sur les gros projets est le même (8 points réels).",
+    "ticket_id": "T-132",
+    "similarity": 0.6
+   },
+   {
+    "close": true,
+    "raison": "L'export reprend la requête et les filtres de la liste, qui avaient déjà divergé. Un nouveau format de sortie doit rester aligné sur la vue affichée (2 points réels).",
+    "ticket_id": "T-110",
+    "similarity": 0.566
+   }
+  ],
+  "rationale": "Le besoin est un rapport d'avancement présentable pour le client, là où l'export actuel ne sort qu'un CSV brut. Le module d'architecture.md ne contient aucun moteur de mise en forme (ni Excel formaté, ni PDF), il faut donc en introduire un. Les trois analogues sont proches par le module, mais aucun ne couvre cette nature de changement : ils traitent tous du CSV, des filtres ou des champs personnalisés. La confiance reste donc moyenne. L'export dépend de la requête de `liste` et des champs personnalisés, d'où une fourchette au-dessus des tickets d'export unitaires. L'export est historiquement sous-estimé. Le besoin laisse aussi ouvert le contenu du rapport (format, synthèse ou détail, mise en page), ce qui élargit la fourchette. Il n'y a pas de nouveau concept dans le modèle de données, donc pas de chantier à 21.\n\nCorrection du biais de l'équipe appliquée par le code : × 1,32 (13 tickets livrés sur ces composants), fourchette brute 8–13.",
+  "risks": [
+   "Export : aucun moteur de mise en forme (Excel formaté, PDF). Le choix du format et de la bibliothèque est une décision structurante et peut gonfler le chantier.",
+   "Export : la génération est synchrone, et un rendu formaté est plus lourd qu'un CSV. Les gros projets peuvent encore expirer, comme sur T-132.",
+   "Liste et champs personnalisés : le stockage clé-valeur générique doit être pivoté et mis en forme, et la requête de la liste reprise par l'export peut diverger des filtres actifs.",
+   "Besoin flou : le contenu attendu du rapport (indicateurs d'avancement, regroupements, identité visuelle client) n'est pas défini et peut faire déborder la fourchette."
+  ],
+  "model": "claude-sonnet-5-5",
+  "created_at": "2026-10-07T21:37:14.709928+00:00"
+ },
+ {
+  "id": "70597bba-b9b3-4e61-85b4-b4ea5590127a",
+  "insight_id": "I-60",
+  "item_id": null,
+  "problem_hash": "91049236d0dd9cff2df6580b96cc4b43",
+  "components": [
+   "champs_personnalises",
+   "taches",
+   "liste",
+   "export",
+   "parametres"
+  ],
+  "points_min": 8,
+  "points_max": 13,
+  "tshirt_min": "L",
+  "tshirt_max": "L",
+  "confidence": "moyenne",
+  "analogies": [
+   {
+    "close": true,
+    "raison": "Même module et même nature de changement : ajout d'un type de champ personnalisé (5 points réels). Le stockage clé-valeur typé a absorbé le type sans migration, mais ici il faut en plus une table d'options pour les choix.",
+    "ticket_id": "T-105",
+    "similarity": 0.709
+   },
+   {
+    "close": true,
+    "raison": "Les champs personnalisés sont joints à la requête de la liste, construite à la main (5 points réels pour 3 estimés). Un type à choix restreint devra être affiché, et surtout filtrable, dans la liste.",
+    "ticket_id": "T-115",
+    "similarity": 0.617
+   },
+   {
+    "close": true,
+    "raison": "Même module et mêmes dépendances : le formulaire de tâche, la liste et l'export suivent la définition du champ (3 points réels). Le paramétrage des champs se fait dans les paramètres du projet.",
+    "ticket_id": "T-133",
+    "similarity": 0.607
+   }
+  ],
+  "rationale": "Le besoin revient à ajouter des types structurés (oui/non et liste à choix restreint) aux champs personnalisés. Le oui/non est proche de T-105 et reste simple. La liste déroulante demande une table d'options, ce qui sort du stockage clé-valeur actuel. Elle exige aussi un écran de définition des choix dans les paramètres du projet et une saisie dans le détail de tâche. Elle doit être prise en charge par la liste et par l'export (T-115). Le bénéfice attendu (filtres et comparaisons fiables) suppose des filtres sur champs personnalisés, absents aujourd'hui ; je les compte dans la fourchette, sans quoi la valeur du besoin n'est pas livrée. Aucun analogue ne couvre exactement une table d'options, d'où une confiance moyenne. Les champs personnalisés, la liste et l'export sont historiquement sous-estimés.",
+  "risks": [
+   "Champs personnalisés : une liste déroulante demande une table d'options en plus du stockage clé-valeur typé, donc une évolution du modèle et du formulaire de tâche.",
+   "Liste : requête construite à la main et filtres sur champs personnalisés absents ; l'ajout du filtrage par valeur (T-115 : 5 points réels pour 3 estimés) peut ralentir le chargement.",
+   "Export : chaque type supplémentaire doit être géré dans le CSV, module historiquement sous-estimé.",
+   "Cas de la modification ou suppression d'un choix déjà utilisé : les valeurs existantes en texte libre sont à migrer ou à laisser en l'état."
+  ],
+  "model": "claude-sonnet-5-5",
+  "created_at": "2026-10-07T21:37:24.216109+00:00"
+ },
+ {
+  "id": "8f952717-d2a3-4f80-b19c-1a04e9b64c97",
+  "insight_id": "I-60",
+  "item_id": null,
+  "problem_hash": "b457c169b0ad774f54c62433c494f403",
+  "components": [
+   "champs_personnalises",
+   "taches",
+   "liste",
+   "export",
+   "parametres"
+  ],
+  "points_min": 8,
+  "points_max": 13,
+  "tshirt_min": "L",
+  "tshirt_max": "L",
+  "confidence": "moyenne",
+  "analogies": [
+   {
+    "close": true,
+    "raison": "Même module et même nature de changement : ajout d'un type de champ personnalisé. Le travail s'est concentré sur le formulaire de tâche et l'affichage, pour 5 points réels, sans migration grâce au stockage clé-valeur typé.",
+    "ticket_id": "T-105",
+    "similarity": 0.622
+   },
+   {
+    "close": true,
+    "raison": "Les valeurs des champs personnalisés dans la liste ont obligé à reprendre la requête construite à la main (5 points réels). Un type à choix ou à liste d'options aura le même effet sur les filtres de la liste et sur l'export.",
+    "ticket_id": "T-115",
+    "similarity": 0.595
+   },
+   {
+    "close": true,
+    "raison": "Touche la définition des champs et le formulaire de tâche dans les paramètres du projet (3 points réels). Il éclaire la partie configuration des options par un admin, sans propager de changement à la liste ni à l'export.",
+    "ticket_id": "T-133",
+    "similarity": 0.578
+   }
+  ],
+  "rationale": "Le besoin demande des valeurs contrôlées (oui/non, liste de choix pour client, prestation ou valideur), donc de nouveaux types dans `champs_personnalises`. Un type oui/non resterait proche de T-105, mais une liste déroulante demande une table d'options, ce qu'aucun analogue ne couvre : la carte le signale. Il faut aussi une configuration des options par l'admin dans les paramètres, la saisie dans le détail de tâche, l'affichage et le filtrage en liste, et l'export. Les analogues sont partiels : T-105 couvre l'ajout d'un type simple, T-115 le passage par la liste, mais aucun ne couvre une table d'options ni les filtres sur champs personnalisés, absents aujourd'hui de la liste. Les valeurs existantes saisies en texte libre ne sont pas migrées dans cette estimation. La liste et l'export sont historiquement sous-estimés. La fourchette est large, car le périmètre (types retenus, filtres, reprise des données existantes) n'est pas tranché.",
+  "risks": [
+   "Liste déroulante : une table d'options est un nouveau stockage, alors que le stockage clé-valeur typé actuel ne l'a pas prévu, d'où un risque de migration ou de refonte du stockage de `champs_personnalises`.",
+   "Requête de la liste construite à la main : joindre les valeurs et ajouter des filtres sur champs personnalisés, absents aujourd'hui, risque de ralentir le chargement (cf. T-115).",
+   "Export : chaque nouveau type doit être géré, avec un contrôle de permissions propre et une génération synchrone qui peut expirer sur les gros projets.",
+   "Valeurs existantes en texte libre : reprise ou conversion vers les nouveaux types à cadrer, avec un risque d'incohérences ou de doublons difficiles à rapprocher."
+  ],
+  "model": "claude-sonnet-5-5",
+  "created_at": "2026-10-07T21:40:25.077871+00:00"
+ },
+ {
+  "id": "a38da9c0-ef47-47bd-b816-4dd1922429c8",
+  "insight_id": "I-55",
+  "item_id": null,
+  "problem_hash": "1a49b1ed8ccf0c4c6928700fe8ec26c6",
+  "components": [
+   "notifications",
    "parametres",
    "taches"
   ],
-  "points_min": 5,
+  "points_min": 3,
   "points_max": 5,
   "tshirt_min": "M",
   "tshirt_max": "M",
@@ -661,207 +298,38 @@
   "analogies": [
    {
     "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
+    "raison": "Même module et même nature de changement : correction du filtrage des destinataires d'e-mails d'assignation. Le filtrage a dû être repris à plusieurs endroits, un par type d'événement émis par les tâches (3 points réels).",
+    "ticket_id": "T-128",
+    "similarity": 0.641
    },
    {
     "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
-    "ticket_id": "T-137",
-    "similarity": 0.58
+    "raison": "Correctif localisé dans notifications portant sur les destinataires d'un envoi pour des tâches avec plusieurs assignés ; cause trouvée vite, tests d'envoi ajoutés (2 points réels).",
+    "ticket_id": "T-108",
+    "similarity": 0.675
    },
    {
     "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
+    "raison": "Respect des préférences de notification de l'utilisateur lors de l'envoi dans la file de tâches ; le gabarit et l'événement existaient déjà (2 points réels).",
+    "ticket_id": "T-119",
+    "similarity": 0.623
    }
   ],
-  "rationale": "Nouveau concept d'invité externe à l'espace, mais le socle (couche unique et rôle par projet) est porté par TT-001. Reste le parcours d'invitation, le rôle lecture seule et le retrait immédiat de l'accès, géré depuis les paramètres du projet, écran simple (analogue T-107, 2 points réels). Le ricochet sur les tâches (invité sans droit d'écriture) ajoute de l'incertitude.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:01:06.701+00:00"
- },
- {
-  "id": "7c9034ef-60ed-4db6-9bd4-0ef1faf689e4",
-  "insight_id": "I-28",
-  "item_id": null,
-  "problem_hash": "52ca4bb3aba2a62afd5c3b047d758ba4",
-  "components": [
-   "export",
-   "liste",
-   "champs_personnalises",
-   "taches"
-  ],
-  "points_min": 8,
-  "points_max": 8,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chaîne de données : l'export reprend la requête de la liste et les champs personnalisés en stockage clé-valeur à pivoter. Un support présentable devra aussi les restituer (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.606
-   },
-   {
-    "close": true,
-    "raison": "La génération est synchrone et reprend la requête de la liste. Un document mis en forme sera plus lourd à produire qu'un CSV, d'où le même risque d'expiration sur les gros projets (8 points réels).",
-    "ticket_id": "T-132",
-    "similarity": 0.572
-   },
-   {
-    "close": true,
-    "raison": "L'export dépend des filtres de la liste, dupliqués et déjà divergents une fois. Un rapport fidèle à la vue affichée impose de les réaligner et de les tester (2 points réels).",
-    "ticket_id": "T-110",
-    "similarity": 0.541
-   }
-  ],
-  "rationale": "Le PDF demande un moteur de mise en forme inexistant, une génération synchrone lourde (risque d'expiration, cf. T-132 à 8 points réels) et le filtrage des commentaires internes. Reprend aussi les filtres de la liste (T-110). Plus large que l'Excel, d'où 8 ; à découper si le moteur de rendu doit être posé au préalable.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:05:23.914+00:00"
- },
- {
-  "id": "81479fdf-38e4-4acb-b62b-a56b341b34e3",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "6a9ddbcaf1320bfa618e52f157054910",
-  "components": [
-   "liste",
-   "taches"
-  ],
-  "points_min": 3,
-  "points_max": 3,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "basse",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
-   }
-  ],
-  "rationale": "Filtre par assigné et détection de chevauchements en nombre de tâches, sans notion d'heures. Analogue T-102 (3 points réels, évolution de la requête filtrée de la liste). Le périmètre de la charge reste à préciser avant développement : aucune notion de capacité dans le modèle.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
- },
- {
-  "id": "82b5f48e-2128-4132-96e1-7a30b14a9a2e",
-  "insight_id": "I-30",
-  "item_id": null,
-  "problem_hash": "97e2c6165b480838d7b2feb763544a95",
-  "components": [
-   "taches",
-   "champs_personnalises",
-   "parametres",
-   "permissions",
-   "liste",
-   "tableau"
-  ],
-  "points_min": 5,
-  "points_max": 13,
-  "tshirt_min": "M",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Masquer des éléments d'interface selon le rôle : chaque écran avait sa propre condition d'affichage, d'où 5 points réels pour deux écrans. Un allègement de l'interface sur plusieurs écrans repose sur le même type de conditions dispersées.",
-    "ticket_id": "T-123",
-    "similarity": 0.518
-   },
-   {
-    "close": true,
-    "raison": "Même zone : formulaire de tâche et champs personnalisés pilotés depuis les paramètres du projet (3 points réels). Un formulaire de création réduit à l'essentiel suivrait ce modèle de réglage dans les paramètres.",
-    "ticket_id": "T-133",
-    "similarity": 0.477
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la vue liste par ajout à la requête existante (3 points réels). Les écrans liste et tableau seraient touchés si on y masque des options, avec le même point de vigilance côté export.",
-    "ticket_id": "T-102",
-    "similarity": 0.502
-   }
-  ],
-  "rationale": "Le besoin est un problème de ressenti et pas une solution précise : interface trop chargée, création de tâche trop longue pour les petites équipes. La fourchette est donc large. L'hypothèse retenue est une création de tâche simplifiée, c'est-à-dire un formulaire réduit à l'essentiel avec les champs avancés repliés, plus la possibilité de masquer les options inutiles depuis les paramètres. Cela touche le détail de tâche et les champs personnalisés, un réglage dans les paramètres et les conditions d'affichage dans les écrans liste et tableau. Le bas de la fourchette (5) correspond à une simplification limitée au formulaire de création et à un réglage. Le haut (13) correspond à une masquage d'options appliqué à tous les écrans, sans couche d'affichage centrale. Les permissions sont historiquement sous-estimées et la liste aussi. Les analogues sont partiels : aucun ne traite d'une refonte d'ergonomie ou d'un parcours d'accueil. La confiance reste moyenne, car aucun nouveau concept n'entre dans le modèle de données.",
+  "rationale": "Le symptôme (assignations non envoyées sans logique apparente) correspond à la zone à risque connue de la carte : la préférence digest est mal lue sur le chemin des assignations, qui lit encore l'ancien champ de préférence. Quand le digest est activé, certaines assignations ne sont ni envoyées immédiatement ni incluses dans le digest. C'est un correctif dans notifications, avec un ricochet probable sur parametres (deux champs de préférence coexistent) et une lecture des événements d'assignation de taches. Les analogues (T-108, T-128, T-119) sont des correctifs notifications à 2-3 points réels. Les analogues sont proches mais partiels : aucun ne traite la double source de préférence, d'où une confiance moyenne et une fourchette un cran au-dessus d'un correctif trivial. Il faut aussi prévoir un traitement des assignations déjà perdues, à clarifier, et des tests couvrant les deux préférences. Le biais de notifications est faible.",
   "risks": [
-   "Besoin flou : sans cadrage des écrans et des options à alléger, le périmètre peut déborder vers une refonte d'ergonomie complète.",
-   "Conditions d'affichage dispersées dans 5 écrans (page projet, détail de tâche, tableau, liste, paramètres) sans couche centrale : un écran oublié garde l'interface chargée, comme la recette de T-123 l'a montré.",
-   "Formulaire de tâche et champs personnalisés : replier ou masquer des champs doit rester cohérent avec la liste et l'export, qui les affichent aussi.",
-   "Réglage de simplification stocké dans les paramètres : il faut décider s'il est par utilisateur, par projet ou par espace, et gérer la préférence existante des membres."
+   "Deux champs de préférence coexistent dans parametres : choisir le bon champ de référence peut imposer une migration ou un rapprochement des valeurs existantes.",
+   "Plusieurs types d'événements émis par taches : comme pour T-128, le correctif peut devoir être repris à plusieurs endroits.",
+   "Aucun journal d'envoi exploitable dans notifications : la cause réelle est difficile à confirmer et les tests d'envoi sont à construire.",
+   "Le périmètre peut s'étendre à un rattrapage des assignations déjà manquées, non couvert par les analogues."
   ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:05.019+00:00"
+  "created_at": "2026-10-07T21:37:11.013695+00:00"
  },
  {
-  "id": "87c04291-1827-413a-b111-600613e9681d",
-  "insight_id": "I-33",
+  "id": "c770636e-3050-40b3-98d0-93f36def6a13",
+  "insight_id": "I-59",
   "item_id": null,
-  "problem_hash": "a4db46329fd04323a79644af9ca8093b",
-  "components": [
-   "taches",
-   "parametres",
-   "champs_personnalises",
-   "permissions"
-  ],
-  "points_min": 5,
-  "points_max": 13,
-  "tshirt_min": "M",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module (taches), même intention : copier des tâches avec titre, description et sous-tâches pour éviter la ressaisie. Il n'a coûté qu'1 point réel parce qu'il réutilisait le chemin de création, mais il copie une seule tâche et non la structure d'un projet.",
-    "ticket_id": "T-122",
-    "similarity": 0.627
-   },
-   {
-    "close": true,
-    "raison": "Les champs personnalisés sont définis par projet. Recopier la structure d'un projet oblige à reprendre leurs définitions et leur ordre, et la liste et l'export suivent sans changement (3 points réels).",
-    "ticket_id": "T-133",
-    "similarity": 0.533
-   },
-   {
-    "close": true,
-    "raison": "Référence pour un changement sur le modèle de taches, module à couplage fort lu par tout le reste. Il montre l'effet d'une évolution du modèle (8 points réels), mais il est plus lourd qu'une simple duplication.",
-    "ticket_id": "T-101",
-    "similarity": 0.504
-   }
-  ],
-  "rationale": "Le besoin est flou : il peut se limiter à dupliquer un projet avec ses tâches, ou aller jusqu'à des modèles réutilisables et à la récurrence (chaque semaine, chaque mois). La duplication d'une tâche (T-122) est la base : le chemin de création existe et ne demande ni migration ni nouveau modèle. Dupliquer une structure de projet est plus large : il faut copier les tâches et sous-tâches de tout un projet, ses champs personnalisés (T-133) et décider si l'on copie les membres. La création de projet se fait dans parametres, et le contrôle d'accès est dispersé dans permissions. Le bas de la fourchette correspond à une duplication de projet simple, le haut à des modèles de projet persistants avec un déclenchement récurrent, qui introduirait un nouveau concept dans le modèle de données. Les analogues ne couvrent que la copie d'une tâche, pas la copie d'un projet entier, d'où une confiance moyenne et une fourchette large. Les permissions et les champs personnalisés sont historiquement sous-estimés.",
-  "risks": [
-   "Périmètre flou : dupliquer un projet, créer un modèle réutilisable et planifier une récurrence sont trois niveaux d'effort très différents, et la récurrence impliquerait un nouveau concept de modèle et un mécanisme de déclenchement absents de l'architecture.",
-   "Module taches à couplage fort : copier tout un projet (statuts, assignés, échéances, sous-tâches) touche le modèle lu par le tableau, la liste, l'export et les notifications. Il faut décider quoi copier, comme pour les commentaires et pièces jointes volontairement exclus dans T-122, et que faire des échéances et des assignés.",
-   "Contrôles de permissions dispersés dans 5 écrans et l'export : qui peut dupliquer ou créer depuis un modèle doit être contrôlé, et les membres copiés ne doivent pas exposer un projet à des personnes non prévues.",
-   "Champs personnalisés limités à 3 types avec stockage générique : leurs définitions et valeurs doivent être copiées sans perdre l'ordre ni l'association au projet."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:12.843+00:00"
- },
- {
-  "id": "93acde76-04ed-4a9b-bb3e-c15499ffe271",
-  "insight_id": "I-31",
-  "item_id": null,
-  "problem_hash": "4bfd48c304f29bde3f32ecf65840a9a3",
+  "problem_hash": "ab0bd614b9e0a90a9b344d74bf2d0c31",
   "components": [
    "permissions",
    "parametres",
@@ -878,280 +346,118 @@
   "analogies": [
    {
     "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
+    "raison": "Ajout d'un rôle : les contrôles d'accès sont répartis dans cinq écrans et dans l'export, avec deux écrans oubliés rattrapés en recette puis une migration des espaces existants (8 points réels).",
+    "ticket_id": "T-117",
+    "similarity": 0.587
    },
    {
     "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
+    "raison": "Contrôle d'accès à ajouter sur un chemin sans contrôle propre, avec un second chemin découvert en recette et une répercussion sur le modèle des tâches (8 points réels).",
     "ticket_id": "T-137",
-    "similarity": 0.58
+    "similarity": 0.613
    },
    {
     "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
+    "raison": "Même module permissions : une action avec plusieurs points d'entrée, chacun avec sa propre condition, sans couche d'autorisation centrale (3 points réels pour un seul point de contrôle).",
+    "ticket_id": "T-103",
+    "similarity": 0.643
    }
   ],
-  "rationale": "Le besoin demande un accès limité à un seul projet pour une personne extérieure à l'espace. Aujourd'hui, un membre voit tous les projets et il n'existe ni notion d'invité ni permission par projet : c'est un nouveau concept dans le modèle de données, donc un chantier et pas une story. Il faut un périmètre par projet, la reprise des 6 points de contrôle dispersés (page projet, détail de tâche, tableau, liste, paramètres, export) et la migration des membres existants. Les analogues sont partiels : T-103 et T-137 ne portent que sur un seul contrôle (3 et 8 points réels) et ont chacun révélé un chemin d'accès oublié ; ici il y a six points de contrôle et un nouveau type d'utilisateur. T-107 ne couvre que l'écran de gestion des accès, la partie la plus simple. Les permissions sont historiquement sous-estimées. La fourchette brute va donc de 13 à 21, le haut tenant compte de l'invité externe et du risque de chemins oubliés. La découpe en plusieurs lots est recommandée : couche d'autorisation centrale, puis périmètre par projet, puis invité.",
+  "rationale": "Le besoin introduit un nouveau concept dans le modèle de données : un utilisateur externe (client, freelance, sous-traitant) dont l'accès est limité à un seul projet. Aujourd'hui toute personne connectée est un membre et voit tous les projets de l'espace, il n'existe ni invité ni permission par projet. Il faut un périmètre par projet, la gestion des invités dans les paramètres, puis la reprise des 6 points de contrôle dispersés (page projet, détail de tâche, tableau, liste, paramètres, export), sans couche d'autorisation centrale. Les trois analogues sont partiels : chacun traite un rôle interne ou un seul contrôle (3 à 8 points réels), alors qu'ici le périmètre est par projet et l'utilisateur est externe, d'où une fourchette au-dessus de T-117. Les permissions et l'export sont historiquement sous-estimés. Les modules dépendants (tableau, liste, export, tâches) sont touchés par ricochet. Le chantier dépasse 8 points et devra être découpé, avec au préalable la centralisation des contrôles.",
   "risks": [
-   "Permissions : contrôles dispersés dans 5 écrans et dans l'export, sans couche centrale ; un oubli ou un chemin découvert tard (comme en recette de T-103 et T-137) exposerait un projet confidentiel à la mauvaise personne.",
-   "Aucune notion d'invité ni de permission par projet dans le modèle de données : migration des membres existants vers un rôle par projet et nouvelle gestion d'un utilisateur externe à l'espace.",
-   "Export et liste : le lien de téléchargement est réservé aux membres connectés et la requête de liste est reprise par l'export ; il faut garantir que l'invité n'exporte que son projet.",
-   "Tâches : pièces jointes, commentaires et notifications peuvent révéler des données d'autres projets par des chemins secondaires, avec ricochet sur le modèle des tâches."
+   "Contrôles de permissions dispersés dans 5 écrans et dans l'export : un oubli expose un projet confidentiel à un invité, comme les écrans ratés en recette sur T-117.",
+   "Aucune notion d'invité ni de permission par projet : nouveau concept dans le modèle de données (taches, permissions), avec migration des membres existants vers un rôle par projet.",
+   "Chemins annexes sans contrôle propre (téléchargement de pièces jointes, commentaires, export, lien de partage) découverts tardivement, comme sur T-137.",
+   "Reporting consolidé et filtres de la liste, repris par l'export, à adapter au périmètre par projet : une requête mal bornée fait fuiter des données d'autres projets."
   ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:35:02.771+00:00"
+  "created_at": "2026-10-07T21:37:23.002144+00:00"
  },
  {
-  "id": "9c0755eb-4fc7-4ea7-b787-471d7d467b2f",
-  "insight_id": "I-28",
+  "id": "cde7974d-a3d3-4d26-bc8f-f4c2ae724a83",
+  "insight_id": "I-58",
   "item_id": null,
-  "problem_hash": "dc895f6d3292d82761c165f2703ea1da",
+  "problem_hash": "9e2773cd826c8759310d4c629a189233",
   "components": [
-   "notifications",
    "parametres",
-   "taches",
-   "permissions"
-  ],
-  "points_min": 8,
-  "points_max": 8,
-  "tshirt_min": "L",
-  "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chaîne de données : l'export reprend la requête de la liste et les champs personnalisés en stockage clé-valeur à pivoter. Un support présentable devra aussi les restituer (5 points réels contre 3 estimés).",
-    "ticket_id": "T-120",
-    "similarity": 0.606
-   },
-   {
-    "close": true,
-    "raison": "La génération est synchrone et reprend la requête de la liste. Un document mis en forme sera plus lourd à produire qu'un CSV, d'où le même risque d'expiration sur les gros projets (8 points réels).",
-    "ticket_id": "T-132",
-    "similarity": 0.572
-   },
-   {
-    "close": true,
-    "raison": "L'export dépend des filtres de la liste, dupliqués et déjà divergents une fois. Un rapport fidèle à la vue affichée impose de les réaligner et de les tester (2 points réels).",
-    "ticket_id": "T-110",
-    "similarity": 0.541
-   }
-  ],
-  "rationale": "Envoi planifié à un destinataire externe via la file e-mail : programmation, choix et suspension des destinataires, lien de désinscription, règle d'absence d'envoi sans changement. Le module notifications n'a ni journal d'envoi ni gestion de destinataires externes, et la zone à risque des préférences digest est proche. Analogue partiel, limité à l'export synchrone T-132. À découper si la gestion des destinataires s'avère distincte.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:05:23.914+00:00"
- },
- {
-  "id": "9c784941-47e8-4b63-addf-cc959d659a95",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "09a78da7fca7c70aa1b8ca09a0308bf0",
-  "components": [
+   "permissions",
    "taches",
    "liste",
-   "permissions"
+   "tableau"
   ],
   "points_min": 5,
-  "points_max": 5,
+  "points_max": 13,
   "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "basse",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
-   },
-   {
-    "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
-   }
-  ],
-  "rationale": "Nouvelle vue frise avec barres, zoom semaine et mois, et tâches sans date listées à part. Analogue T-126 (5 points réels, charger un gros volume de tâches dans une vue) pour la performance. Le tableau n'est pas virtualisé, donc risque sur les gros projets. La vue doit appliquer les contrôles de permissions dispersés.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
- },
- {
-  "id": "c4d25b2f-1fdb-478c-a956-a03310fcf776",
-  "insight_id": "I-31",
-  "item_id": "TT-001",
-  "problem_hash": "1754eda01ccdd5402650aa93758554ee",
-  "components": [
-   "permissions",
-   "taches",
-   "tableau",
-   "liste",
-   "export",
-   "parametres"
-  ],
-  "points_min": 8,
-  "points_max": 8,
-  "tshirt_min": "L",
   "tshirt_max": "L",
   "confidence": "moyenne",
   "analogies": [
    {
     "close": true,
-    "raison": "Même module permissions, sans couche d'autorisation centrale : les contrôles sont dispersés (page projet, paramètres) et un point d'entrée n'a été trouvé qu'en recette (3 points réels pour un simple contrôle).",
-    "ticket_id": "T-103",
-    "similarity": 0.63
+    "raison": "Même nature de changement : masquer des éléments d'interface selon le profil. Les conditions d'affichage sont dispersées écran par écran, et une action restait visible depuis la liste (5 points réels).",
+    "ticket_id": "T-123",
+    "similarity": 0.475
    },
    {
     "close": true,
-    "raison": "Contrôle d'accès à ajouter sur un chemin sans garde propre, avec ricochet sur le modèle des tâches et un second chemin découvert en recette (8 points réels pour un seul point de contrôle).",
-    "ticket_id": "T-137",
-    "similarity": 0.58
+    "raison": "Écran de configuration dans les paramètres avec peu de logique. Comparable si la solution passe par un réglage ou une préférence d'affichage (3 points réels).",
+    "ticket_id": "T-118",
+    "similarity": 0.454
    },
    {
     "close": true,
-    "raison": "Les paramètres du projet (gestion des membres et de leur rôle) devront porter l'accès par projet ; écran de configuration simple, estimation tenue (2 points réels).",
-    "ticket_id": "T-107",
-    "similarity": 0.554
+    "raison": "Évolution simple de la vue liste. Elle ressemble à ce qu'il faudrait pour simplifier ou réduire les options de cette vue (3 points réels).",
+    "ticket_id": "T-102",
+    "similarity": 0.453
    }
   ],
-  "rationale": "Module permissions à couplage fort, sans couche centrale : il faut reprendre les points de contrôle dispersés (page projet, paramètres, liste, tableau, export), ajouter un rôle par projet au modèle et migrer les membres existants. Analogue T-137 (8 points réels pour un seul point de contrôle avec ricochet) et T-103 (3 points réels, un point d'entrée trouvé en recette) : ici il y en a plusieurs, mais sans nouveau type d'utilisateur. Les permissions sont historiquement sous-estimées. À 8 points, c'est la limite avant découpage : séparer couche d'autorisation et migration des rôles si l'équipe le juge utile.",
-  "risks": [],
+  "rationale": "Le besoin décrit un problème d'usage (interface surchargée, démarrage difficile) et non une solution. La fourchette reste donc large. Les analogues ne couvrent que partiellement le besoin : ils portent sur le masquage par rôle, un écran de paramètres et la liste, mais aucun ne traite l'aide à la prise en main ni la simplification globale de l'interface. L'hypothèse retenue est un affichage simplifié, par exemple une préférence dans les paramètres appliquée aux écrans principaux, avec masquage des options peu utilisées. C'est proche de T-123, et les permissions sont historiquement sous-estimées. Le bas de la fourchette correspond à un réglage limité à un ou deux écrans, le haut à une simplification sur toutes les vues avec un parcours de démarrage. Aucun nouveau concept de données n'est supposé, mais s'il fallait un parcours d'accueil ou un suivi de progression, l'estimation monterait. Le besoin gagnerait à être précisé avant l'engagement.",
+  "risks": [
+   "Conditions d'affichage dispersées dans 5 écrans (permissions, couplage fort) : chaque écran est à reprendre et retester, avec un risque d'option oubliée comme dans T-123.",
+   "Besoin flou, sans solution arrêtée : le périmètre (masquage, mode simplifié, parcours de démarrage) peut faire basculer l'estimation vers le haut de la fourchette.",
+   "Une préférence d'affichage ajoutée dans les paramètres s'ajoute aux deux champs de préférence de notification déjà présents : risque de confusion et de dette supplémentaire.",
+   "Le modèle de données ne permet pas de suivre l'avancement d'un utilisateur ni de distinguer un nouveau collaborateur : un parcours de démarrage personnalisé nécessiterait un ajout hors de cette estimation."
+  ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:01:06.701+00:00"
+  "created_at": "2026-10-07T21:37:26.232555+00:00"
  },
  {
-  "id": "d69dd0da-7f22-4bcd-9382-0e9784b8fb9b",
-  "insight_id": "I-27",
+  "id": "f9ed7171-f11a-4326-ae1b-b1369eb40fbe",
+  "insight_id": "I-61",
   "item_id": null,
-  "problem_hash": "740feaea8b2b06f1564e1dd095cf7d02",
+  "problem_hash": "5fd4aa6302e3490a3a136c70418a6b22",
   "components": [
-   "notifications",
+   "taches",
    "parametres",
-   "taches"
-  ],
-  "points_min": 3,
-  "points_max": 3,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même module et même chemin d'envoi des événements d'assignation émis par les tâches : le filtrage s'était fait en plusieurs endroits, un par type d'événement (3 points réels).",
-    "ticket_id": "T-128",
-    "similarity": 0.635
-   },
-   {
-    "close": true,
-    "raison": "Correctif localisé dans les notifications sur les tâches à plusieurs assignés, avec tests d'envoi : proche pour la partie assignation à plusieurs destinataires (2 points réels).",
-    "ticket_id": "T-108",
-    "similarity": 0.646
-   },
-   {
-    "close": true,
-    "raison": "Même module, même respect des préférences de notification et envoi via la file de tâches ; ici l'événement existe mais le chemin est défectueux (2 points réels).",
-    "ticket_id": "T-119",
-    "similarity": 0.7
-   }
-  ],
-  "rationale": "Correctif localisé dans notifications : le chemin des assignations lit l'ancien champ de préférence au lieu du nouveau, d'où des envois perdus quand le digest est activé. Analogues proches : T-119 (même module, même respect des préférences et envoi via la file, 2 points réels) et T-128 (filtrage d'assignation à reprendre en plusieurs endroits, 3 points réels). Parametres est touché par ricochet à cause des deux champs de préférence qui coexistent, et taches pour les événements d'assignation. On retient 3 points, en haut de ce qu'indique T-119 : il faut couvrir les cas immédiat et digest sans doublon ni oubli, avec des tests, et une éventuelle reprise des valeurs existantes reste possible. Reste dans la fourchette de l'insight (3 à 5) et sous le seuil de 8 : pas de découpage nécessaire.\n\n Risque principal : l'absence de journal d'envoi rend la vérification de la correction difficile.\n Autre risque : d'autres causes de non-réception peuvent apparaître.\n Les deux champs de préférence dans parametres peuvent exiger un nettoyage de données.\n Les événements d'assignation sont dispersés dans taches.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.\n ouvert.",
-  "risks": [],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T02:04:05.767+00:00"
- },
- {
-  "id": "e530cb8a-feaa-45bd-8486-3b150f1b0897",
-  "insight_id": "I-41",
-  "item_id": null,
-  "problem_hash": "028c9ea3f659807e1f2108b2b3f8879c",
-  "components": [
-   "export",
-   "permissions",
-   "liste"
+   "champs_personnalises",
+   "notifications"
   ],
   "points_min": 8,
   "points_max": 13,
   "tshirt_min": "L",
   "tshirt_max": "L",
-  "confidence": "moyenne",
-  "analogies": [
-   {
-    "close": true,
-    "raison": "Même sujet : le lien de téléchargement de l'export a son propre contrôle d'accès et une expiration, et il n'existait aucun stockage des fichiers générés (5 points réels). Le défaut de durée de validité se situe à cet endroit.",
-    "ticket_id": "T-124",
-    "similarity": 0.657
-   },
-   {
-    "close": true,
-    "raison": "Même module, correctif sur la génération du CSV, synchrone et reprenant la requête de la liste. Il a fallu toucher à la lecture des champs personnalisés (8 points réels). Utile pour le volet encodage, qui passe par la même génération.",
-    "ticket_id": "T-132",
-    "similarity": 0.649
-   },
-   {
-    "close": true,
-    "raison": "Le contrôle d'accès de l'export est distinct de celui des écrans, et un second chemin d'export a été oublié (3 points réels). Cela invite à vérifier tous les chemins d'export et de téléchargement.",
-    "ticket_id": "T-112",
-    "similarity": 0.635
-   }
-  ],
-  "rationale": "Le besoin regroupe deux défauts dans le module export : l'encodage des caractères accentués du CSV, et un lien de téléchargement qui expire avant les 7 jours annoncés. Le premier est probablement un correctif localisé dans la génération du fichier (encodage et marqueur pour les tableurs), de l'ordre d'un petit correctif. Le second demande de trouver pourquoi l'expiration est trop courte : durée mal appliquée, nettoyage des fichiers ou contrôle d'accès du lien. T-124 montre que ce lien a son propre contrôle et un stockage récent, donc la cause n'est pas connue d'avance. Les analogues couvrent le module et la nature du changement (correctifs de l'export) mais pas exactement ces deux défauts, d'où une confiance moyenne. L'export et les permissions sont historiquement sous-estimés. La fourchette reste à deux crans, car la cause du défaut d'expiration est inconnue.\n\nCorrection du biais de l'équipe appliquée par le code : × 1,51 (16 tickets livrés sur ces composants), fourchette brute 5–8.",
-  "risks": [
-   "Cause de l'expiration prématurée inconnue : stockage des fichiers générés, nettoyage ou contrôle d'accès du lien, déjà source de surprises sur T-124 (export, permissions).",
-   "Plusieurs chemins d'export ou de téléchargement avec des contrôles distincts : un chemin oublié garde le défaut, comme sur T-112 (export, permissions).",
-   "Le correctif d'encodage touche la génération synchrone, qui reprend la requête de la liste et les champs personnalisés : risque de régression ou de nouvelle lenteur sur les gros projets (export, liste).",
-   "Compatibilité d'encodage variable selon les tableurs : recette à prévoir sur plusieurs outils et plusieurs systèmes (export)."
-  ],
-  "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-03T17:45:44.047+00:00"
- },
- {
-  "id": "f8ff3e51-8163-450e-a38a-8ce010891e33",
-  "insight_id": "I-26",
-  "item_id": null,
-  "problem_hash": "99e44f3b3af313b88397eee111db8c6b",
-  "components": [
-   "taches",
-   "liste",
-   "champs_personnalises"
-  ],
-  "points_min": 3,
-  "points_max": 3,
-  "tshirt_min": "M",
-  "tshirt_max": "M",
   "confidence": "basse",
   "analogies": [
    {
     "close": true,
-    "raison": "Vue kanban : le glisser-déposer recalcule tout le tableau (8 points réels pour 5 estimés). Une vue planning interactive (déplacer ou redimensionner une tâche dans le temps) aurait le même type de difficulté, et le tableau doit lui aussi rester cohérent avec les nouveaux attributs.",
-    "ticket_id": "T-127",
-    "similarity": 0.564
+    "raison": "Même module (taches), même besoin de ne pas ressaisir : la duplication d'une tâche (1 point réel) donne le socle pour copier une tâche ou une structure de projet, mais elle ne couvre ni la récurrence ni la copie d'un projet entier.",
+    "ticket_id": "T-122",
+    "similarity": 0.563
    },
    {
     "close": true,
-    "raison": "Charger un gros volume de tâches dans une vue : la pagination de la liste a demandé 5 points réels. Une vue planning devra gérer le même volume sans ralentir, et l'export reprend la requête de la liste.",
-    "ticket_id": "T-126",
-    "similarity": 0.561
-   },
-   {
-    "close": true,
-    "raison": "Évolution de la requête filtrée de la liste (3 points réels), à reprendre pour filtrer le planning par assigné. Ce ticket rappelle aussi qu'il faut vérifier la répercussion sur l'export.",
-    "ticket_id": "T-102",
-    "similarity": 0.565
+    "raison": "Les champs personnalisés sont définis par projet et stockés avec leur définition : dupliquer une structure de projet doit reprendre ces définitions et leur ordre (3 points réels, estimation tenue).",
+    "ticket_id": "T-133",
+    "similarity": 0.525
    }
   ],
-  "rationale": "Saisie de la date de début dans le détail de tâche et dans la liste, avec règle début avant échéance. Le modèle est porté par TT-002, donc il reste de l'UI et de la validation. Analogue T-102 (3 points réels, évolution de la liste). Les champs personnalisés sont touchés par ricochet via le formulaire de tâche.",
-  "risks": [],
+  "rationale": "Le besoin recouvre deux choses : (1) la récurrence de tâches (hebdomadaire, mensuelle), (2) la réutilisation d'une structure de projet (modèle ou duplication). La seconde est proche de T-122, qui s'est réduit à 1 point réel parce qu'il a réutilisé le chemin de création existant. La récurrence n'a pas d'analogue : le modèle n'a aucune règle de récurrence ni planificateur qui crée les tâches à échéance. C'est un nouveau concept dans le modèle de données (migration, règle, tâche générée), d'où une confiance basse malgré des analogues proches sur la duplication. Les modules touchés sont taches (couplage fort), parametres (création et modèles de projet), champs_personnalises (définitions à copier) et notifications (les tâches créées automatiquement émettent des événements d'assignation). Le périmètre exact reste flou (modèle de projet ou simple duplication, récurrence sur tous les types de tâche ou non), ce qui élargit la fourchette. À découper : dupliquer un projet d'abord, la récurrence ensuite.",
+  "risks": [
+   "taches (couplage fort) : la règle de récurrence est un nouveau concept (migration, planificateur, gestion des échéances et des sous-tâches), sans analogue livré.",
+   "notifications : les tâches générées automatiquement émettent des événements d'assignation, or le chemin des assignations lit encore l'ancien champ de préférence digest (deux champs coexistent) : risque d'assignations perdues ou en double.",
+   "champs_personnalises : copier les définitions et les valeurs d'un projet à l'autre, avec leur ordre et leur stockage clé-valeur, peut dévoiler des cas limites que la duplication d'une tâche (T-122) n'a pas rencontrés.",
+   "Périmètre flou : modèle de projet réutilisable ou simple duplication, copie des membres et des assignations ; la copie de membres toucherait permissions (contrôles dispersés, historiquement sous-estimé)."
+  ],
   "model": "claude-sonnet-5-5",
-  "created_at": "2026-10-05T15:45:23.017+00:00"
+  "created_at": "2026-10-07T21:37:30.523383+00:00"
  }
 ]

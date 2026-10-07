@@ -1,24 +1,22 @@
 {
-  "taken_at": "2026-10-07T02:17:09.053Z",
-  "scenario_now": "2026-10-06T17:22:00.532Z",
-  "kept_backlog": [
-    "I-31"
-  ],
+  "taken_at": "2026-10-07T22:02:19.771Z",
+  "scenario_now": "2026-10-07T21:31:22.796Z",
+  "kept_backlog": [],
   "counts": {
-    "pipeline_runs": 8,
+    "pipeline_runs": 4,
     "customers": 95,
     "feedbacks": 214,
-    "feedback_analyses": 214,
-    "feedback_items": 232,
-    "insights": 24,
-    "insight_items": 174,
+    "feedback_analyses": 216,
+    "feedback_items": 239,
+    "insights": 26,
+    "insight_items": 161,
     "insight_relations": 2,
-    "complexity_estimates": 27,
-    "scores": 49,
-    "overrides": 7,
-    "epics": 1,
-    "backlog_items": 5,
-    "decisions": 38,
+    "complexity_estimates": 10,
+    "scores": 19,
+    "overrides": 0,
+    "epics": 0,
+    "backlog_items": 0,
+    "decisions": 27,
     "alerts": 0,
     "notion_links": 0
   }

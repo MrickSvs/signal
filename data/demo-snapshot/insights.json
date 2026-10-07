@@ -1,9 +1,9 @@
 [
  {
-  "id": "I-26",
+  "id": "I-54",
   "origin": "retours",
-  "title": "Visualiser et présenter le planning des projets dans le temps",
-  "problem_statement": "Les chefs de projet et responsables de missions ne peuvent pas voir leurs tâches, échéances et dépendances étalées dans le temps, ni détecter les chevauchements et surcharges. Ils maintiennent donc un tableur en parallèle et refont à la main les plannings à montrer aux clients ou aux parties prenantes, ce qui leur fait perdre du temps et fragilise le suivi.",
+  "title": "Visualiser les tâches et projets dans le temps",
+  "problem_statement": "Les chefs de projet et responsables d'équipe n'arrivent pas à voir leurs tâches, échéances et la charge de l'équipe étalées dans le temps, car ils ne les voient qu'en liste ou une à une. Ils recoupent donc les informations à la main et tiennent un tableur à côté. Ils y perdent du temps à chaque présentation de planning ou d'avancement aux clients.",
   "product_area": "planification",
   "expressed_requests": [
    {
@@ -11,37 +11,37 @@
      "R-024.1",
      "R-035.1",
      "R-061.1",
+     "R-067.2",
      "R-091.1",
      "R-095.1",
-     "R-114.2",
-     "R-133.1",
+     "R-133.2",
      "R-155.1",
      "R-168.2",
      "R-187.2"
     ],
-    "solution": "Une vue temporelle au choix (calendrier, frise ou timeline)",
+    "solution": "Une vue calendrier ou frise, au choix",
     "frequency": 10
    },
    {
     "item_ids": [
      "R-020.1",
-     "R-033.1",
      "R-048.1",
      "R-090.1",
-     "R-148.1",
+     "R-114.2",
+     "R-148.2",
      "R-161.1",
      "R-207.1"
     ],
-    "solution": "Une vue timeline / frise chronologique",
+    "solution": "Une vue timeline, frise ou ligne de temps des tâches",
     "frequency": 7
    },
    {
     "item_ids": [
      "R-008.1",
      "R-030.1",
+     "R-033.1",
      "R-052.2",
-     "R-083.1",
-     "R-180.1"
+     "R-083.1"
     ],
     "solution": "Un diagramme de Gantt",
     "frequency": 5
@@ -54,7 +54,7 @@
      "R-150.1",
      "R-181.1"
     ],
-    "solution": "Une vue calendrier des échéances",
+    "solution": "Une vue calendrier des tâches et échéances",
     "frequency": 5
    },
    {
@@ -68,185 +68,144 @@
    },
    {
     "item_ids": [
-     "R-056.1"
+     "R-180.1"
     ],
-    "solution": "Des dépendances entre tâches",
-    "frequency": 1
-   },
-   {
-    "item_ids": [
-     "R-139.2"
-    ],
-    "solution": "Une vue rétroplanning",
+    "solution": "Une vue planning générique",
     "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 11,
+    "pro": 12,
     "free": 12,
-    "business": 3,
+    "business": 2,
     "sans_compte": 2
    },
    "segments": {
     "conseil": 5,
-    "agence_com": 8,
+    "agence_com": 7,
     "hors_cible": 3,
     "sans_compte": 2,
     "pme_services": 5,
-    "agence_digitale": 5
+    "agence_digitale": 6
    }
   },
   "accounts_count": 28,
-  "mrr_exposed": 1764,
-  "renewals_90d": 1,
+  "mrr_exposed": 1416,
+  "renewals_90d": 0,
   "channels": {
    "nps": 8,
-   "email_client": 12,
-   "ticket_support": 1,
-   "commentaire_in_app": 11
+   "email_client": 11,
+   "commentaire_in_app": 12
   },
   "trend": {
-   "growth": 0.47,
+   "growth": 0.53,
    "is_new": false,
    "recent": 3,
    "weekly": [
     5,
-    5,
-    3,
-    10,
     6,
+    3,
+    9,
+    5,
     3
    ],
-   "baseline": 19,
+   "baseline": 17,
    "is_emerging": false
   },
   "ranked": true,
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:10.746+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": {
-   "sum": 32,
-   "range": {
-    "max": 21,
-    "min": 21
-   },
-   "chosen": "epic_stories",
-   "epic_id": "E-03",
-   "item_ids": [
-    "TT-002",
-    "US-009",
-    "US-010",
-    "US-011",
-    "US-012",
-    "US-013"
-   ],
-   "proposed": "epic_stories",
-   "confidence": "basse",
-   "drafted_at": "2026-10-05T15:37:08.387Z",
-   "range_note": "La somme (30 points) dépasse la fourchette de l'insight (21). Le partage client (US-013) suppose un utilisateur externe et un périmètre par projet, absents du modèle : c'est un prérequis hors périmètre de la frise. TT-002 porte aussi la migration du modèle, que la fourchette n'incluait peut-être pas. En retirant US-013, on retombe à 22, proche de la fourchette.",
-   "discoverability": null,
-   "proposed_reason": "Besoin fonctionnel, fourchette 21 à 21 points (au-delà de 8).",
-   "deviation_reason": null,
-   "no_close_analogue": false,
-   "sum_outside_range": true
-  }
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:27.855701+00:00",
+  "updated_at": "2026-10-07T21:47:21.561+00:00",
+  "backlog_plan": null
  },
  {
-  "id": "I-27",
+  "id": "I-55",
   "origin": "retours",
-  "title": "Être prévenu quand une tâche m'est assignée",
-  "problem_statement": "Des membres d'équipe, et les chefs de projet qui leur assignent du travail, ne reçoivent pas de façon fiable les e-mails d'assignation de tâches. Ils découvrent leurs tâches tardivement ou pas du tout, ratent des échéances et parfois des livraisons client. Les chefs de projet doivent relancer manuellement chaque jour.",
+  "title": "Collègues non prévenus de leurs assignations de tâches",
+  "problem_statement": "Des responsables d'équipe constatent que certains collègues ne reçoivent pas l'e-mail d'assignation de tâche, alors que d'autres le reçoivent, sans logique apparente. Les personnes concernées découvrent leurs tâches trop tard ou par hasard, ratent des échéances et des livrables, et les responsables doivent les relancer à la main par d'autres canaux.",
   "product_area": "notifications",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-017.1",
-     "R-121.1",
-     "R-159.1"
+     "R-026.1",
+     "R-038.1",
+     "R-041.1",
+     "R-066.1",
+     "R-119.1",
+     "R-147.1",
+     "R-175.1",
+     "R-195.1"
     ],
-    "solution": "Notifications d'assignation dans Teams ou Slack",
-    "frequency": 3
+    "solution": "Que le support examine le problème et en identifie la cause pour les comptes concernés",
+    "frequency": 8
+   },
+   {
+    "item_ids": [
+     "R-040.1"
+    ],
+    "solution": "Savoir si le problème est connu et quels réglages ou vérifications effectuer côté utilisateur",
+    "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 9,
+    "pro": 8,
     "free": 3,
     "business": 5,
     "enterprise": 5
    },
    "segments": {
     "conseil": 2,
-    "agence_com": 6,
+    "agence_com": 5,
     "hors_cible": 1,
     "pme_services": 6,
     "agence_digitale": 7
    }
   },
-  "accounts_count": 22,
-  "mrr_exposed": 19860,
+  "accounts_count": 21,
+  "mrr_exposed": 19776,
   "renewals_90d": 1,
   "channels": {
    "note_csm": 3,
-   "email_client": 6,
+   "email_client": 5,
    "ticket_support": 10,
-   "commentaire_in_app": 6
+   "commentaire_in_app": 4
   },
   "trend": {
-   "growth": 1.13,
+   "growth": 0.8,
    "is_new": false,
-   "recent": 6,
+   "recent": 4,
    "weekly": [
     0,
     3,
-    7,
+    6,
     7,
     2,
-    6
+    4
    ],
-   "baseline": 16,
+   "baseline": 15,
    "is_emerging": false
   },
   "ranked": true,
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:11.456+00:00",
-  "updated_at": "2026-10-05T17:44:00.283+00:00",
-  "backlog_plan": {
-   "sum": 3,
-   "range": {
-    "max": 5,
-    "min": 3
-   },
-   "chosen": "bugs",
-   "epic_id": null,
-   "item_ids": [
-    "BUG-001"
-   ],
-   "proposed": "bugs",
-   "confidence": "moyenne",
-   "drafted_at": "2026-10-05T01:56:23.026Z",
-   "range_note": null,
-   "discoverability": null,
-   "proposed_reason": "87 % des items sont des bugs.",
-   "deviation_reason": null,
-   "no_close_analogue": false,
-   "sum_outside_range": false
-  }
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:28.211402+00:00",
+  "updated_at": "2026-10-07T21:47:17.082+00:00",
+  "backlog_plan": null
  },
  {
-  "id": "I-28",
+  "id": "I-56",
   "origin": "retours",
-  "title": "Rendre compte de l'avancement au client sans tout remettre en forme",
-  "problem_statement": "Les chefs de projet et responsables de compte doivent rendre compte de l'avancement de leurs projets à leurs clients, chaque semaine ou chaque mois et avant les comités de pilotage. Faute d'un support présentable, ils recopient et reformatent à la main les données, notamment l'export CSV brut. Cela leur fait perdre une à deux heures par client et donne un résultat peu professionnel, vite obsolète.",
+  "title": "Rendre compte de l'avancement au client sans tout refaire à la main",
+  "problem_statement": "Les chefs de projet et responsables d'équipe doivent rendre compte de l'avancement de leurs projets à leurs clients, chaque semaine ou avant chaque comité de pilotage. L'export CSV brut n'étant pas présentable, ils recopient et remettent tout en forme à la main. Cela leur coûte une à deux heures par projet ou par client et par période.",
   "product_area": "reporting_export",
   "expressed_requests": [
    {
@@ -257,7 +216,7 @@
      "R-168.1",
      "R-209.2"
     ],
-    "solution": "Export Excel formaté, prêt à envoyer au client",
+    "solution": "Export Excel mis en forme, envoyable tel quel au client",
     "frequency": 5
    },
    {
@@ -267,7 +226,7 @@
      "R-193.1",
      "R-199.1"
     ],
-    "solution": "Lien de partage en lecture seule, sans connexion, pour que le client consulte l'avancement",
+    "solution": "Lien de partage en lecture seule, sans compte ni connexion",
     "frequency": 4
    },
    {
@@ -277,8 +236,17 @@
      "R-169.1",
      "R-201.1"
     ],
-    "solution": "Rapport d'avancement PDF généré automatiquement chaque semaine",
+    "solution": "Rapport d'avancement PDF généré chaque semaine",
     "frequency": 4
+   },
+   {
+    "item_ids": [
+     "R-007.1",
+     "R-062.1",
+     "R-212.1"
+    ],
+    "solution": "Tableau de bord à montrer au client",
+    "frequency": 3
    },
    {
     "item_ids": [
@@ -286,14 +254,6 @@
      "R-205.1"
     ],
     "solution": "E-mail récapitulatif automatique envoyé au client",
-    "frequency": 2
-   },
-   {
-    "item_ids": [
-     "R-062.1",
-     "R-212.1"
-    ],
-    "solution": "Tableau de bord présentable à montrer au client",
     "frequency": 2
    }
   ],
@@ -316,7 +276,7 @@
   "channels": {
    "email_client": 10,
    "ticket_support": 2,
-   "commentaire_in_app": 5
+   "commentaire_in_app": 6
   },
   "trend": {
    "growth": 2.25,
@@ -324,7 +284,7 @@
    "recent": 6,
    "weekly": [
     1,
-    2,
+    3,
     3,
     2,
     3,
@@ -337,105 +297,102 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:11.72+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": {
-   "sum": 34,
-   "range": {
-    "max": 21,
-    "min": 13
-   },
-   "chosen": "epic_stories",
-   "epic_id": "E-02",
-   "item_ids": [
-    "US-005",
-    "US-006",
-    "US-007",
-    "US-008"
-   ],
-   "proposed": "epic_stories",
-   "confidence": "moyenne",
-   "drafted_at": "2026-10-05T01:57:29.513Z",
-   "range_note": "La somme (5+8+13+8 = 34) dépasse la fourchette de l'insight (13–21). Les stories couvrent plus que le besoin initial : US-007 (lien de partage, nouveau concept hors modèle) et US-008 (récapitulatif e-mail, module notifications hors composants de l'insight) sont hors du périmètre de l'export. Hors ces deux stories, US-005 et US-006 totalisent 13, dans la fourchette.",
-   "discoverability": null,
-   "proposed_reason": "Besoin fonctionnel, fourchette 13 à 21 points (au-delà de 8).",
-   "deviation_reason": null,
-   "no_close_analogue": false,
-   "sum_outside_range": true
-  }
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:28.480133+00:00",
+  "updated_at": "2026-10-07T21:54:46.612+00:00",
+  "backlog_plan": null
  },
  {
-  "id": "I-29",
+  "id": "I-57",
   "origin": "retours",
-  "title": "Travailler sur un tableau kanban devenu lent avec beaucoup de cartes",
-  "problem_statement": "Les utilisateurs de projets volumineux (plusieurs centaines de cartes) voient le tableau kanban s'afficher lentement, se figer ou saccader au déplacement des cartes depuis la dernière mise à jour. Leur travail quotidien est ralenti, et certaines équipes se rabattent sur la vue liste faute de pouvoir utiliser leur vue préférée.",
+  "title": "Le kanban est devenu lent sur les gros projets depuis la dernière mise à jour",
+  "problem_statement": "Les utilisateurs de gros projets (plusieurs centaines de cartes) subissent depuis la dernière mise à jour un tableau kanban très lent, saccadé ou figé à l'ouverture et au glisser-déposer. Ils ne peuvent plus travailler normalement dans la vue préférée de leur équipe, certaines équipes repassant en vue liste. Cela coûte du temps chaque jour à des équipes entières.",
   "product_area": "performance",
-  "expressed_requests": [],
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-086.1",
+     "R-116.1",
+     "R-124.1"
+    ],
+    "solution": "Être informé si le problème est connu et quand un correctif est prévu",
+    "frequency": 3
+   },
+   {
+    "item_ids": [
+     "R-079.1",
+     "R-084.1"
+    ],
+    "solution": "Corriger la lenteur du kanban",
+    "frequency": 2
+   }
+  ],
   "segments_breakdown": {
    "plans": {
-    "pro": 1,
-    "free": 1,
-    "business": 12,
-    "enterprise": 1
+    "business": 10
    },
    "segments": {
-    "conseil": 6,
-    "agence_com": 2,
-    "hors_cible": 2,
+    "conseil": 3,
+    "agence_com": 1,
+    "hors_cible": 1,
     "pme_services": 4,
     "agence_digitale": 1
    }
   },
-  "accounts_count": 15,
-  "mrr_exposed": 6612,
+  "accounts_count": 10,
+  "mrr_exposed": 2808,
   "renewals_90d": 4,
   "channels": {
-   "email_client": 1,
-   "ticket_support": 7,
-   "commentaire_in_app": 7
+   "ticket_support": 5,
+   "commentaire_in_app": 5
   },
   "trend": {
-   "growth": 14,
-   "is_new": false,
-   "recent": 14,
+   "growth": 10,
+   "is_new": true,
+   "recent": 10,
    "weekly": [
-    1,
     0,
     0,
     0,
     0,
-    14
+    0,
+    10
    ],
    "baseline": 0,
    "is_emerging": true
   },
   "ranked": true,
   "status": "actif",
-  "title_locked": false,
+  "title_locked": true,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:11.994+00:00",
-  "updated_at": "2026-10-05T16:28:23.842+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:28.774216+00:00",
+  "updated_at": "2026-10-07T21:44:12.291+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-30",
+  "id": "I-58",
   "origin": "retours",
-  "title": "Trouver et utiliser l'essentiel dans une interface trop chargée",
-  "problem_statement": "Des équipes, souvent petites ou peu à l'aise avec l'informatique, se retrouvent face à trop de menus, d'options et de champs par rapport à leur usage réel. Les nouveaux membres sont désorientés, certains n'utilisent l'outil qu'à moitié et la création d'une tâche simple prend plus de temps que nécessaire. Cela freine l'adoption dans l'équipe et ralentit le travail quotidien.",
+  "title": "Se repérer dans une interface trop chargée de menus et d'options",
+  "problem_statement": "Des petites équipes, souvent peu à l'aise avec l'informatique, et leurs nouveaux collaborateurs se perdent dans une interface surchargée de menus, d'options et de réglages dont ils n'utilisent qu'une petite partie. Ils perdent du temps à retrouver où agir, ne savent pas par où commencer et n'exploitent l'outil que partiellement.",
   "product_area": "personnalisation",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-003.1",
      "R-117.1",
      "R-149.1"
     ],
-    "solution": "Une vue ou version simplifiée de l'interface, centrée sur mes tâches",
-    "frequency": 3
+    "solution": "Une vue simple limitée à ses propres tâches",
+    "frequency": 2
+   },
+   {
+    "item_ids": [
+     "R-003.1"
+    ],
+    "solution": "Une version ou vue simplifiée pour démarrer",
+    "frequency": 1
    }
   ],
   "segments_breakdown": {
@@ -476,27 +433,27 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:12.26+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:29.063858+00:00",
+  "updated_at": "2026-10-07T21:56:48.488+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-31",
+  "id": "I-59",
   "origin": "retours",
-  "title": "Donner accès à un projet sans exposer les autres projets",
-  "problem_statement": "Les responsables d'agence et chefs de projet ne peuvent pas ouvrir un seul projet à un client, un freelance ou un sous-traitant : l'accès donne visibilité sur tout l'espace, y compris les données confidentielles d'autres clients. Ils contournent en créant des espaces séparés, ce qui fragmente leur reporting, ou en envoyant des captures d'écran. Plusieurs comptes évoquent un renouvellement menacé ou un concurrent.",
+  "title": "Collaborer avec clients et externes sans exposer les autres projets",
+  "problem_statement": "Des responsables de projet, agences et équipes avec sous-traitants ne peuvent pas donner à leurs clients, freelances ou sous-traitants un accès limité à leur seul projet : les accès actuels ouvrent tout l'espace de travail. Ils exposent des projets d'autres clients ou confidentiels, contournent par des espaces séparés qui cassent le reporting consolidé, ou envoient des captures d'écran chaque jour. Plusieurs comptes remettent en question leur renouvellement.",
   "product_area": "permissions_partage",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-013.1",
+     "R-078.1",
+     "R-089.1",
      "R-110.1",
-     "R-141.1",
      "R-162.1"
     ],
-    "solution": "Permissions par projet pour limiter l'accès des membres, freelances et sous-traitants aux projets auxquels ils participent",
+    "solution": "Permissions par projet : accès limité aux seuls projets affectés",
     "frequency": 4
    },
    {
@@ -505,99 +462,76 @@
      "R-134.1",
      "R-146.1"
     ],
-    "solution": "Accès invité client en lecture seule, limité à un seul projet",
+    "solution": "Invités restreints à un seul projet pour clients et freelances, avec accès en lecture seule",
     "frequency": 3
-   },
-   {
-    "item_ids": [
-     "R-007.1"
-    ],
-    "solution": "Tableau de bord d'avancement à montrer au client",
-    "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 1,
     "business": 2,
     "enterprise": 3
    },
    "segments": {
-    "agence_com": 4,
+    "agence_com": 3,
     "agence_digitale": 2
    }
   },
-  "accounts_count": 6,
-  "mrr_exposed": 11016,
+  "accounts_count": 5,
+  "mrr_exposed": 10920,
   "renewals_90d": 4,
   "channels": {
-   "note_csm": 2,
-   "email_client": 3,
-   "ticket_support": 3,
-   "commentaire_in_app": 1
+   "note_csm": 3,
+   "email_client": 2,
+   "ticket_support": 2
   },
   "trend": {
-   "growth": 0.75,
+   "growth": 0,
    "is_new": false,
-   "recent": 1,
+   "recent": 0,
    "weekly": [
-    0,
-    4,
+    1,
+    3,
     2,
     1,
-    1,
-    1
+    0,
+    0
    ],
-   "baseline": 4,
+   "baseline": 3,
    "is_emerging": false
   },
   "ranked": true,
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:12.525+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": {
-   "sum": 24,
-   "range": {
-    "max": 21,
-    "min": 13
-   },
-   "chosen": "epic_stories",
-   "epic_id": "E-01",
-   "item_ids": [
-    "TT-001",
-    "US-001",
-    "US-002",
-    "US-003",
-    "US-004"
-   ],
-   "proposed": "epic_stories",
-   "confidence": "moyenne",
-   "drafted_at": "2026-10-05T01:52:48.579Z",
-   "range_note": "La somme des éléments (8 + 5 + 3 + 3 + 5 = 24) dépasse la fourchette de l'insight (13–21). TT-001 est un prérequis découvert : la couche d'autorisation et la migration ne figurent pas explicitement dans l'insight. US-003 (freelance restreint) est une story hors du périmètre de l'invité lecture seule. US-004 couvre des chemins secondaires (pièces jointes, notifications) que T-103 et T-137 ont révélés tardivement. Aucun élément ne dépasse 8 points ; TT-001, à 8, reste le candidat au découpage.",
-   "discoverability": null,
-   "proposed_reason": "Besoin fonctionnel, fourchette 13 à 21 points (au-delà de 8).",
-   "deviation_reason": null,
-   "no_close_analogue": false,
-   "sum_outside_range": true
-  }
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:29.319645+00:00",
+  "updated_at": "2026-10-07T21:55:03.408+00:00",
+  "backlog_plan": null
  },
  {
-  "id": "I-32",
+  "id": "I-60",
   "origin": "retours",
-  "title": "Saisir des données cohérentes et normalisées dans les champs personnalisés",
-  "problem_statement": "Les utilisateurs qui structurent leurs tâches avec des champs personnalisés doivent saisir à la main des choix, des oui/non, des noms de valideurs ou des montants. Cela produit des fautes, des doublons et des valeurs incohérentes. Les filtres, les comparaisons, les exports et le suivi des validations deviennent difficiles à exploiter.",
+  "title": "Structurer l'information des tâches avec des valeurs fiables et homogènes",
+  "problem_statement": "Les utilisateurs qui décrivent leurs tâches avec des champs personnalisés n'ont que du texte, des nombres et des dates. Ils simulent oui/non, client, prestation ou valideur en texte libre, d'où des valeurs incohérentes, des fautes et des doublons. Filtres, comparaisons et exports deviennent peu fiables.",
   "product_area": "personnalisation",
   "expressed_requests": [
    {
     "item_ids": [
      "R-004.1",
-     "R-012.1"
+     "R-012.1",
+     "R-050.2",
+     "R-190.2"
     ],
-    "solution": "Champ case à cocher (booléen) pour les choix oui/non",
+    "solution": "Champ personnalisé de type case à cocher (oui/non)",
+    "frequency": 4
+   },
+   {
+    "item_ids": [
+     "R-051.1",
+     "R-068.1"
+    ],
+    "solution": "Champ personnalisé de type liste déroulante",
     "frequency": 2
    },
    {
@@ -605,23 +539,7 @@
      "R-043.1",
      "R-184.1"
     ],
-    "solution": "Champ de type « personne » pour désigner le valideur",
-    "frequency": 2
-   },
-   {
-    "item_ids": [
-     "R-051.1",
-     "R-068.1"
-    ],
-    "solution": "Champ liste déroulante pour standardiser les valeurs",
-    "frequency": 2
-   },
-   {
-    "item_ids": [
-     "R-050.1",
-     "R-190.2"
-    ],
-    "solution": "Plusieurs nouveaux types de champs : listes déroulantes, cases à cocher, voire montants",
+    "solution": "Champ personnalisé de type personne pour désigner le valideur",
     "frequency": 2
    }
   ],
@@ -663,69 +581,62 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:12.782+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:29.591059+00:00",
+  "updated_at": "2026-10-07T21:55:00.1+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-33",
+  "id": "I-61",
   "origin": "retours",
-  "title": "Recréer à la main les mêmes tâches et structures de projet",
-  "problem_statement": "Des chefs de projet et gestionnaires doivent recréer manuellement les mêmes tâches ou la même structure de projet, à chaque nouveau client, campagne, semaine ou mois. Cela leur fait perdre du temps de façon répétée et provoque parfois des oublis quand la duplication n'est pas faite à temps.",
+  "title": "Recréer à la main les mêmes tâches et projets",
+  "problem_statement": "Des utilisateurs doivent reconstruire manuellement les mêmes tâches récurrentes (hebdomadaires, mensuelles) et les mêmes structures de projet à chaque nouveau client, chantier ou campagne. Cette répétition leur fait perdre du temps et provoque des oublis de tâches.",
   "product_area": "taches",
   "expressed_requests": [
    {
     "item_ids": [
      "R-006.1",
      "R-044.1",
-     "R-170.1"
+     "R-170.2"
     ],
-    "solution": "Modèles de projet réutilisables pour créer un projet à partir d'une structure préparée",
+    "solution": "Créer un projet à partir d'un modèle réutilisable",
     "frequency": 3
    },
    {
     "item_ids": [
      "R-164.1",
-     "R-165.1",
+     "R-165.2",
      "R-200.1"
     ],
-    "solution": "Tâches récurrentes créées automatiquement chaque semaine ou chaque mois",
+    "solution": "Tâches récurrentes qui se recréent automatiquement chaque semaine ou chaque mois",
     "frequency": 3
-   },
-   {
-    "item_ids": [
-     "R-192.1"
-    ],
-    "solution": "Dupliquer une tâche existante avec sa description et sa checklist",
-    "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 2,
+    "pro": 1,
     "free": 1,
     "business": 1,
     "enterprise": 3
    },
    "segments": {
     "conseil": 2,
-    "agence_com": 2,
+    "agence_com": 1,
     "hors_cible": 1,
     "pme_services": 1,
     "agence_digitale": 1
    }
   },
-  "accounts_count": 7,
-  "mrr_exposed": 11256,
+  "accounts_count": 6,
+  "mrr_exposed": 11220,
   "renewals_90d": 1,
   "channels": {
-   "email_client": 2,
+   "email_client": 1,
    "commentaire_in_app": 5
   },
   "trend": {
-   "growth": 0.75,
+   "growth": 1,
    "is_new": false,
    "recent": 1,
    "weekly": [
@@ -733,74 +644,8 @@
     1,
     1,
     2,
-    1,
+    0,
     1
-   ],
-   "baseline": 4,
-   "is_emerging": false
-  },
-  "ranked": true,
-  "status": "actif",
-  "title_locked": false,
-  "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:13.079+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": null
- },
- {
-  "id": "I-34",
-  "origin": "retours",
-  "title": "Retrouver et gérer les tâches d'une personne sans tout parcourir",
-  "problem_statement": "Des chefs de projet et responsables d'équipe doivent parcourir toute la liste de tâches du projet pour retrouver celles d'une personne, ou les traiter une par une. Ils perdent du temps à suivre le travail de chacun, à préparer leurs points individuels et à mettre à jour les statuts et les assignations. Ce travail manuel est fastidieux et ralentit le pilotage quotidien des équipes.",
-  "product_area": "taches",
-  "expressed_requests": [
-   {
-    "item_ids": [
-     "R-010.1",
-     "R-198.1"
-    ],
-    "solution": "Un filtre par personne assignée dans la liste des tâches",
-    "frequency": 2
-   },
-   {
-    "item_ids": [
-     "R-144.1"
-    ],
-    "solution": "Modifier plusieurs tâches en masse (statut, assigné)",
-    "frequency": 1
-   }
-  ],
-  "segments_breakdown": {
-   "plans": {
-    "pro": 3,
-    "enterprise": 2
-   },
-   "segments": {
-    "agence_com": 4,
-    "agence_digitale": 1
-   }
-  },
-  "accounts_count": 5,
-  "mrr_exposed": 7134,
-  "renewals_90d": 0,
-  "channels": {
-   "email_client": 1,
-   "ticket_support": 2,
-   "commentaire_in_app": 2
-  },
-  "trend": {
-   "growth": 0,
-   "is_new": false,
-   "recent": 0,
-   "weekly": [
-    2,
-    0,
-    0,
-    2,
-    1,
-    0
    ],
    "baseline": 3,
    "is_emerging": false
@@ -809,59 +654,133 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:13.327+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:29.897848+00:00",
+  "updated_at": "2026-10-07T21:54:55.901+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-35",
+  "id": "I-62",
   "origin": "retours",
-  "title": "Consulter et gérer mes tâches depuis un mobile ou une tablette",
-  "problem_statement": "Des utilisateurs nomades, en déplacement ou chez un client, n'arrivent pas à consulter ni modifier leurs tâches depuis un téléphone ou une tablette. Le site n'est pas adapté au mobile et certains boutons ne répondent pas sur tablette (validation, ajout de tâche). Ils perdent en autonomie sur le terrain et doivent attendre d'avoir un ordinateur.",
-  "product_area": "autre",
+  "title": "Facturer et suivre le temps passé sans quitter l'outil",
+  "problem_statement": "Des prospects, relayés par les équipes commerciales, ne peuvent ni suivre le temps passé sur les tâches et projets, ni le faire valider, ni facturer leurs clients sans passer par un autre outil ou un ERP. Cette absence bloque leur choix de solution et conditionne des signatures prévues ce trimestre.",
+  "product_area": "facturation_temps",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-063.1",
-     "R-142.1",
-     "R-143.1"
+     "R-122.1",
+     "R-130.1",
+     "R-191.1"
     ],
-    "solution": "Une application mobile pour consulter les tâches",
+    "solution": "Ajouter facturation et suivi du temps dans l'outil",
     "frequency": 3
+   },
+   {
+    "item_ids": [
+     "R-154.1"
+    ],
+    "solution": "Afficher les heures passées par tâche",
+    "frequency": 1
+   },
+   {
+    "item_ids": [
+     "R-125.1"
+    ],
+    "solution": "Émettre devis et factures depuis l'outil, avec heures associées",
+    "frequency": 1
+   },
+   {
+    "item_ids": [
+     "R-213.1"
+    ],
+    "solution": "Feuilles de temps hebdomadaires avec validation par le manager",
+    "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 2,
-    "free": 1,
-    "business": 1,
-    "enterprise": 1
+    "prospect": 1
    },
    "segments": {
-    "conseil": 3,
-    "agence_com": 1,
-    "agence_digitale": 1
+    "hors_cible": 1
    }
   },
-  "accounts_count": 5,
-  "mrr_exposed": 5460,
+  "accounts_count": 1,
+  "mrr_exposed": 0,
   "renewals_90d": 0,
   "channels": {
-   "nps": 2,
-   "email_client": 2,
-   "commentaire_in_app": 1
+   "note_sales": 4,
+   "slack_interne": 2
   },
   "trend": {
    "growth": 0,
    "is_new": false,
    "recent": 0,
    "weekly": [
-    3,
     0,
     2,
+    1,
     0,
+    3,
+    0
+   ],
+   "baseline": 4,
+   "is_emerging": false
+  },
+  "ranked": true,
+  "status": "actif",
+  "title_locked": false,
+  "merged_into": null,
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:30.200175+00:00",
+  "updated_at": "2026-10-07T21:55:09.42+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-63",
+  "origin": "retours",
+  "title": "Isoler les tâches d'une personne dans une longue liste",
+  "problem_statement": "Les utilisateurs de projets à nombreux intervenants, responsables de pôle comme contributeurs, n'arrivent pas à voir seulement les tâches d'une personne ou d'une équipe dans la liste. Ils perdent du temps à retrouver leurs propres tâches ou à suivre leur périmètre. Le filtre par assigné existe déjà, mais ils ne le trouvent pas.",
+  "product_area": "taches",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-010.1",
+     "R-152.1",
+     "R-198.1"
+    ],
+    "solution": "Filtrer la liste des tâches par personne assignée",
+    "frequency": 3
+   }
+  ],
+  "segments_breakdown": {
+   "plans": {
+    "pro": 1,
+    "enterprise": 2
+   },
+   "segments": {
+    "agence_com": 2,
+    "agence_digitale": 1
+   }
+  },
+  "accounts_count": 3,
+  "mrr_exposed": 7002,
+  "renewals_90d": 0,
+  "channels": {
+   "email_client": 1,
+   "commentaire_in_app": 2
+  },
+  "trend": {
+   "growth": 0,
+   "is_new": false,
+   "recent": 0,
+   "weekly": [
+    1,
+    0,
+    0,
+    2,
     0,
     0
    ],
@@ -869,22 +788,102 @@
    "is_emerging": false
   },
   "ranked": false,
-  "status": "rejete",
+  "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:13.578+00:00",
-  "updated_at": "2026-10-03T22:04:37.423+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:30.53415+00:00",
+  "updated_at": "2026-10-07T21:55:55.847+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-36",
+  "id": "I-64",
   "origin": "retours",
-  "title": "Je ne peux pas me fier aux échéances affichées",
-  "problem_statement": "Les utilisateurs de la gestion de tâches voient des échéances décalées d'un jour entre la liste et le détail de la tâche, et un tri par échéance qui change au rechargement. Ils ne peuvent pas se fier aux dates pour prioriser le travail, préparer leurs points hebdomadaires ni décider avec leurs clients. Cela provoque des erreurs d'organisation sur le terrain.",
+  "title": "Être prévenu à temps des tâches assignées là où je travaille",
+  "problem_statement": "Les utilisateurs qui passent leur journée dans leur outil de messagerie d'équipe ne sont prévenus des nouvelles tâches assignées que par e-mail. Ils les voient avec plusieurs heures de décalage, voire les ratent. Cela retarde la prise en charge du travail assigné.",
+  "product_area": "integrations",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-159.1"
+    ],
+    "solution": "Notifications d'assignation de tâches dans Slack",
+    "frequency": 1
+   },
+   {
+    "item_ids": [
+     "R-017.1"
+    ],
+    "solution": "Notifications d'assignation de tâches dans Teams ou Slack",
+    "frequency": 1
+   },
+   {
+    "item_ids": [
+     "R-121.1"
+    ],
+    "solution": "Notifications d'assignation de tâches dans Teams, en plus de l'e-mail",
+    "frequency": 1
+   }
+  ],
+  "segments_breakdown": {
+   "plans": {
+    "pro": 1,
+    "enterprise": 2
+   },
+   "segments": {
+    "agence_com": 1,
+    "pme_services": 1,
+    "agence_digitale": 1
+   }
+  },
+  "accounts_count": 3,
+  "mrr_exposed": 7164,
+  "renewals_90d": 0,
+  "channels": {
+   "email_client": 1,
+   "commentaire_in_app": 2
+  },
+  "trend": {
+   "growth": 2,
+   "is_new": false,
+   "recent": 2,
+   "weekly": [
+    0,
+    0,
+    1,
+    0,
+    0,
+    2
+   ],
+   "baseline": 1,
+   "is_emerging": false
+  },
+  "ranked": false,
+  "status": "actif",
+  "title_locked": false,
+  "merged_into": null,
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:30.783132+00:00",
+  "updated_at": "2026-10-07T21:57:32.914+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-65",
+  "origin": "retours",
+  "title": "Échéances peu fiables : tri instable et date décalée d'un jour",
+  "problem_statement": "Des utilisateurs qui pilotent des équipes et des clients voient des échéances incohérentes : la fiche d'une tâche affiche une date décalée d'un jour par rapport à la vue liste, et le tri par échéance change à chaque rechargement. Ils ne peuvent plus s'y fier pour confirmer des délais, prioriser ou préparer leurs points hebdomadaires, et leurs équipes se déplacent un jour trop tôt.",
   "product_area": "taches",
-  "expressed_requests": [],
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-036.1"
+    ],
+    "solution": "Corriger l'affichage de l'échéance dans la fiche de la tâche",
+    "frequency": 1
+   }
+  ],
   "segments_breakdown": {
    "plans": {
     "pro": 2,
@@ -920,191 +919,60 @@
   },
   "ranked": false,
   "status": "actif",
-  "title_locked": false,
+  "title_locked": true,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:13.83+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:31.074476+00:00",
+  "updated_at": "2026-10-07T21:58:11.215+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-37",
+  "id": "I-66",
   "origin": "retours",
-  "title": "Suivre mes échéances de tâches dans mon agenda sans ressaisie",
-  "problem_statement": "Les utilisateurs qui planifient leurs journées dans leur agenda ne voient pas les échéances de leurs tâches Jalon et doivent les recopier à la main ou consulter deux outils. Cela leur fait perdre du temps, provoque des désynchronisations, des oublis, des doubles réservations de rendez-vous clients et des livrables ratés.",
-  "product_area": "integrations",
+  "title": "Exprimer l'ordre d'enchaînement entre tâches qui dépendent les unes des autres",
+  "problem_statement": "Les utilisateurs ne peuvent pas indiquer dans l'outil qu'une tâche ne peut démarrer qu'après la fin d'une autre. Ils notent cet enchaînement à la main dans les descriptions ou le gardent en tête, ce qui le rend invisible pour l'équipe et source d'oublis ou d'erreurs d'ordonnancement.",
+  "product_area": "planification",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-049.1",
-     "R-088.1",
-     "R-120.1"
+     "R-056.2",
+     "R-131.2",
+     "R-214.1"
     ],
-    "solution": "Synchronisation automatique des échéances avec Google Agenda (ou Outlook)",
+    "solution": "Déclarer des dépendances entre tâches (une tâche attend la fin d'une autre)",
     "frequency": 3
-   },
-   {
-    "item_ids": [
-     "R-129.1"
-    ],
-    "solution": "Synchronisation des échéances avec le calendrier de l'utilisateur, sans précision d'outil",
-    "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "pro": 2,
+    "pro": 1,
     "free": 1,
     "business": 1
    },
    "segments": {
-    "agence_com": 1,
-    "hors_cible": 1,
-    "agence_digitale": 2
-   }
-  },
-  "accounts_count": 4,
-  "mrr_exposed": 528,
-  "renewals_90d": 0,
-  "channels": {
-   "email_client": 2,
-   "commentaire_in_app": 2
-  },
-  "trend": {
-   "growth": 0,
-   "is_new": false,
-   "recent": 0,
-   "weekly": [
-    0,
-    0,
-    4,
-    0,
-    0,
-    0
-   ],
-   "baseline": 4,
-   "is_emerging": false
-  },
-  "ranked": false,
-  "status": "actif",
-  "title_locked": false,
-  "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:14.105+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": null
- },
- {
-  "id": "I-38",
-  "origin": "retours",
-  "title": "Reprendre ses projets existants dans Jalon sans tout ressaisir",
-  "problem_statement": "Des utilisateurs qui passent d'un ancien outil ou d'un tableur à Jalon n'arrivent pas à reprendre leurs projets, tâches, assignations et échéances existants. Ils doivent tout ressaisir à la main, ce qui est long, source d'erreurs et freine leur adoption, jusqu'à 150 projets à migrer pour l'un d'eux.",
-  "product_area": "autre",
-  "expressed_requests": [
-   {
-    "item_ids": [
-     "R-145.1",
-     "R-163.1",
-     "R-211.1"
-    ],
-    "solution": "Importer en masse projets, tâches, assignations et échéances depuis un tableur ou un ancien outil",
-    "frequency": 3
-   },
-   {
-    "item_ids": [
-     "R-080.1"
-    ],
-    "solution": "Bouton d'export CSV visible dans la vue tableau",
-    "frequency": 1
-   }
-  ],
-  "segments_breakdown": {
-   "plans": {
-    "free": 2,
-    "enterprise": 2
-   },
-   "segments": {
-    "conseil": 1,
     "agence_com": 2,
-    "agence_digitale": 1
-   }
-  },
-  "accounts_count": 4,
-  "mrr_exposed": 7470,
-  "renewals_90d": 0,
-  "channels": {
-   "email_client": 3,
-   "ticket_support": 1
-  },
-  "trend": {
-   "growth": 1,
-   "is_new": false,
-   "recent": 1,
-   "weekly": [
-    2,
-    0,
-    0,
-    0,
-    1,
-    1
-   ],
-   "baseline": 1,
-   "is_emerging": false
-  },
-  "ranked": false,
-  "status": "actif",
-  "title_locked": false,
-  "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:14.356+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": null
- },
- {
-  "id": "I-39",
-  "origin": "retours",
-  "title": "Facturer les clients sur le temps passé sans outil dédié",
-  "problem_statement": "Des équipes et des prospects de grande taille doivent facturer leurs clients et suivre le temps passé sur les projets, mais ne peuvent pas le faire dans Jalon. Elles gèrent cela en dehors de l'outil, avec des allers-retours et des risques d'erreur. Plusieurs signatures de contrat en dépendent ce trimestre.",
-  "product_area": "facturation_temps",
-  "expressed_requests": [
-   {
-    "item_ids": [
-     "R-125.1",
-     "R-130.1",
-     "R-191.1"
-    ],
-    "solution": "Facturation et suivi du temps intégrés à Jalon (devis, factures, heures par tâche)",
-    "frequency": 3
-   }
-  ],
-  "segments_breakdown": {
-   "plans": {
-    "prospect": 1
-   },
-   "segments": {
     "hors_cible": 1
    }
   },
-  "accounts_count": 1,
-  "mrr_exposed": 0,
-  "renewals_90d": 0,
+  "accounts_count": 3,
+  "mrr_exposed": 480,
+  "renewals_90d": 1,
   "channels": {
-   "note_sales": 3,
-   "slack_interne": 1
+   "nps": 1,
+   "email_client": 1,
+   "commentaire_in_app": 1
   },
   "trend": {
    "growth": 0,
    "is_new": false,
    "recent": 0,
    "weekly": [
+    1,
+    0,
+    0,
     0,
     2,
-    1,
-    0,
-    1,
     0
    ],
    "baseline": 2,
@@ -1114,17 +982,17 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:14.61+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:31.341467+00:00",
+  "updated_at": "2026-10-07T21:58:28.417+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-40",
+  "id": "I-67",
   "origin": "retours",
-  "title": "Le prix par membre est trop élevé pour une petite équipe",
-  "problem_statement": "Des petites équipes de 2 à 4 personnes jugent le coût par membre du plan Pro disproportionné par rapport à leur marge ou à leur budget. Elles envisagent de réduire le nombre de sièges, de chercher une alternative ou d'arrêter Jalon. Le risque est une perte de clients ou une baisse du nombre de sièges payants.",
+  "title": "Justifier le coût par membre pour une petite équipe",
+  "problem_statement": "Des responsables de petites équipes (2 à 6 personnes) jugent le tarif par membre trop lourd au regard de leur usage réel et de leurs marges. Ils n'arrivent pas à justifier cette dépense dans leur budget. Ils envisagent de réduire le nombre de sièges, de ne garder que le minimum, de changer d'outil ou d'arrêter.",
   "product_area": "facturation_temps",
   "expressed_requests": [
    {
@@ -1132,7 +1000,7 @@
      "R-105.1",
      "R-157.1"
     ],
-    "solution": "Une offre ou option tarifaire adaptée aux très petites équipes",
+    "solution": "Une offre ou un tarif adapté aux très petites équipes",
     "frequency": 2
    }
   ],
@@ -1173,19 +1041,93 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:14.865+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:31.602738+00:00",
+  "updated_at": "2026-10-07T21:58:31.348+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-41",
+  "id": "I-68",
   "origin": "retours",
-  "title": "Exploiter les fichiers exportés sans qu'ils soient illisibles ou expirés",
-  "problem_statement": "Les utilisateurs qui exportent leurs données en CSV ne peuvent pas lire correctement le fichier dans leur tableur, car les caractères accentués sont mal encodés. D'autres ne peuvent pas partager l'export avec leurs collègues, car le lien de téléchargement cesse de fonctionner bien avant la durée annoncée. Ils perdent du temps à contourner ces défauts ou à refaire l'export.",
+  "title": "Consulter mes tâches en déplacement depuis mon téléphone",
+  "problem_statement": "Des utilisateurs et leurs équipes, souvent en déplacement ou chez des clients, n'arrivent pas à consulter facilement leurs tâches depuis un téléphone, car le site n'y est pas adapté. Ils doivent passer par le navigateur du téléphone, peu pratique, ce qui freine leur suivi du travail hors du bureau.",
+  "product_area": "autre",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-063.1",
+     "R-142.1",
+     "R-143.2"
+    ],
+    "solution": "Une application mobile pour consulter les tâches",
+    "frequency": 3
+   }
+  ],
+  "segments_breakdown": {
+   "plans": {
+    "pro": 2,
+    "enterprise": 1
+   },
+   "segments": {
+    "conseil": 2,
+    "agence_digitale": 1
+   }
+  },
+  "accounts_count": 3,
+  "mrr_exposed": 5052,
+  "renewals_90d": 0,
+  "channels": {
+   "nps": 2,
+   "commentaire_in_app": 1
+  },
+  "trend": {
+   "growth": 0,
+   "is_new": false,
+   "recent": 0,
+   "weekly": [
+    2,
+    0,
+    1,
+    0,
+    0,
+    0
+   ],
+   "baseline": 1,
+   "is_emerging": false
+  },
+  "ranked": false,
+  "status": "actif",
+  "title_locked": false,
+  "merged_into": null,
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:31.853307+00:00",
+  "updated_at": "2026-10-07T21:58:41.615+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-69",
+  "origin": "retours",
+  "title": "Exploiter un export de la vue liste tel quel",
+  "problem_statement": "Les utilisateurs qui exportent la vue liste n'arrivent pas à exploiter ou transmettre le fichier : accents illisibles à l'ouverture dans un tableur, lien de téléchargement devenu inopérant le lendemain. Ils perdent du temps à contourner ces défauts ou ne peuvent pas partager l'export avec leurs collègues.",
   "product_area": "reporting_export",
-  "expressed_requests": [],
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-076.1"
+    ],
+    "solution": "Corriger l'affichage des accents dans l'export CSV",
+    "frequency": 1
+   },
+   {
+    "item_ids": [
+     "R-070.1"
+    ],
+    "solution": "Être informé d'un incident en cours côté Jalon",
+    "frequency": 1
+   }
+  ],
   "segments_breakdown": {
    "plans": {
     "business": 1,
@@ -1222,17 +1164,17 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:15.117+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:32.124711+00:00",
+  "updated_at": "2026-10-07T21:58:38.961+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-42",
+  "id": "I-70",
   "origin": "retours",
-  "title": "Fatigue visuelle en travaillant le soir sur l'interface",
-  "problem_statement": "Des utilisateurs, et les équipiers de certains d'entre eux, travaillent en fin de journée ou tard le soir sur l'interface actuelle. L'écran trop lumineux leur fatigue les yeux, ce qui dégrade leur confort de travail et leur capacité à travailler en soirée.",
+  "title": "Travailler le soir sans fatigue visuelle ni inconfort",
+  "problem_statement": "Des utilisateurs, seuls ou en équipe, travaillent en fin de journée ou tard le soir et trouvent l'interface claire fatigante pour les yeux et inconfortable. Ils ne peuvent pas adapter l'affichage à leurs conditions de travail. Cela dégrade leur confort et leur endurance visuelle sur de longues sessions.",
   "product_area": "personnalisation",
   "expressed_requests": [
    {
@@ -1241,7 +1183,7 @@
      "R-107.1",
      "R-196.2"
     ],
-    "solution": "Un thème ou mode sombre",
+    "solution": "Un thème sombre / mode sombre",
     "frequency": 3
    }
   ],
@@ -1280,25 +1222,25 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:15.364+00:00",
-  "updated_at": "2026-10-05T01:30:29.101+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:32.459851+00:00",
+  "updated_at": "2026-10-07T21:58:36.059+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-43",
+  "id": "I-71",
   "origin": "retours",
-  "title": "Effectuer les actions courantes sans passer par la souris",
-  "problem_statement": "Les utilisateurs doivent recourir à la souris pour chaque action, notamment créer et déplacer des tâches. Cela ralentit leur flux de travail au quotidien et leur fait perdre du temps sur des gestes répétitifs.",
-  "product_area": "personnalisation",
+  "title": "Gérer ses tâches rapidement sans passer par la souris",
+  "problem_statement": "Des utilisateurs qui créent, déplacent et changent le statut de tâches tout au long de la journée n'y parviennent pas rapidement sans la souris. Cette manipulation répétitive leur fait perdre du temps au quotidien.",
+  "product_area": "taches",
   "expressed_requests": [
    {
     "item_ids": [
      "R-014.1",
      "R-179.1"
     ],
-    "solution": "Raccourcis clavier pour les actions courantes (création de tâche, changement de statut)",
+    "solution": "Des raccourcis clavier pour créer des tâches, les déplacer et changer leur statut",
     "frequency": 2
    }
   ],
@@ -1336,19 +1278,27 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": null,
-  "created_at": "2026-10-03T17:34:15.613+00:00",
-  "updated_at": "2026-10-05T16:28:24.102+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:32.722835+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-44",
+  "id": "I-72",
   "origin": "retours",
-  "title": "Impossible de renommer un projet de façon fiable",
-  "problem_statement": "Les utilisateurs qui tentent de renommer un projet voient un message d'erreur, et le nouveau nom n'est parfois pas enregistré. Ils ne savent pas si l'opération a abouti, ce qui crée de l'incertitude sur l'état du projet et les empêche d'organiser leurs projets comme ils le souhaitent.",
+  "title": "Impossible de renommer un projet sans erreur",
+  "problem_statement": "Des utilisateurs qui veulent renommer un projet voient un message d'erreur s'afficher. L'ancien nom reste en place ou ils ignorent si le nouveau nom a été enregistré. Ils ne peuvent pas tenir à jour l'intitulé de leurs projets et perdent confiance dans le résultat de leur action.",
   "product_area": "autre",
-  "expressed_requests": [],
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-018.1"
+    ],
+    "solution": "Qu'une personne de l'équipe examine le problème",
+    "frequency": 1
+   }
+  ],
   "segments_breakdown": {
    "plans": {
     "pro": 1,
@@ -1384,19 +1334,75 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:15.876+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:33.069656+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-45",
+  "id": "I-73",
   "origin": "retours",
-  "title": "Consulter les pièces jointes PNG de mes tâches",
-  "problem_statement": "Des utilisateurs de Jalon n'arrivent pas à ouvrir les pièces jointes au format PNG attachées à leurs tâches, alors que les PDF s'ouvrent normalement. Ils ne peuvent plus consulter les documents fournis, et dans un cas cela bloque un livrable client.",
+  "title": "Impossible de créer ou modifier des tâches depuis une tablette",
+  "problem_statement": "Des utilisateurs sur tablette (notamment iPad) n'arrivent plus à ajouter une tâche depuis le tableau ni à valider la modification d'une tâche, alors que tout fonctionne sur ordinateur. Ils doivent attendre d'être devant leur ordinateur pour terminer leur travail, ce qui ralentit leur usage quotidien en mobilité.",
   "product_area": "taches",
   "expressed_requests": [],
+  "segments_breakdown": {
+   "plans": {
+    "free": 1,
+    "business": 1
+   },
+   "segments": {
+    "conseil": 1,
+    "agence_com": 1
+   }
+  },
+  "accounts_count": 2,
+  "mrr_exposed": 408,
+  "renewals_90d": 0,
+  "channels": {
+   "email_client": 2
+  },
+  "trend": {
+   "growth": 0,
+   "is_new": false,
+   "recent": 0,
+   "weekly": [
+    1,
+    0,
+    1,
+    0,
+    0,
+    0
+   ],
+   "baseline": 1,
+   "is_emerging": false
+  },
+  "ranked": false,
+  "status": "actif",
+  "title_locked": false,
+  "merged_into": null,
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:33.377345+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-74",
+  "origin": "retours",
+  "title": "Impossible d'ouvrir les pièces jointes PNG d'une tâche",
+  "problem_statement": "Les utilisateurs qui joignent des images PNG à leurs tâches n'arrivent pas à les ouvrir au clic, alors que les fichiers sont valides et que les PDF s'ouvrent normalement. Ils ne peuvent plus consulter ou transmettre le document attendu, ce qui peut retarder un client qui l'attend.",
+  "product_area": "taches",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-023.1"
+    ],
+    "solution": "Examiner le problème d'ouverture des pièces jointes PNG",
+    "frequency": 1
+   }
+  ],
   "segments_breakdown": {
    "plans": {
     "pro": 1,
@@ -1432,48 +1438,156 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:16.126+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:33.687407+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-46",
+  "id": "I-75",
   "origin": "retours",
-  "title": "Suivre des données financières chiffrées directement dans les tâches",
-  "problem_statement": "Les utilisateurs qui pilotent des devis, des marges ou du reste à faire n'ont pas de moyen de saisir et de calculer ces valeurs dans leurs tâches. Ils doivent refaire les calculs à la main dans Excel après l'export. Cela leur fait perdre du temps et rend le suivi financier moins fiable.",
-  "product_area": "personnalisation",
+  "title": "Compteur de commentaires des cartes incohérent avec la tâche",
+  "problem_statement": "Les utilisateurs du tableau kanban constatent que le nombre de commentaires affiché sur une carte diffère de celui de la tâche ouverte. Ils ne peuvent plus se fier à ce qu'ils voient d'un coup d'œil et doivent ouvrir chaque tâche pour vérifier, ce qui fait perdre du temps et de la confiance dans le tableau.",
+  "product_area": "tableau_kanban",
   "expressed_requests": [
    {
     "item_ids": [
-     "R-064.1"
+     "R-140.1"
     ],
-    "solution": "Un champ formule pour calculer marge ou reste à faire",
-    "frequency": 1
-   },
-   {
-    "item_ids": [
-     "R-053.2"
-    ],
-    "solution": "Un champ montant en euros pour les devis",
+    "solution": "Vérifier et corriger l'affichage du nombre de commentaires sur les cartes",
     "frequency": 1
    }
   ],
   "segments_breakdown": {
    "plans": {
-    "business": 2
+    "free": 1,
+    "enterprise": 1
    },
    "segments": {
-    "hors_cible": 1,
-    "pme_services": 1
+    "conseil": 1,
+    "agence_com": 1
    }
   },
   "accounts_count": 2,
-  "mrr_exposed": 480,
-  "renewals_90d": 1,
+  "mrr_exposed": 3060,
+  "renewals_90d": 0,
+  "channels": {
+   "commentaire_in_app": 2
+  },
+  "trend": {
+   "growth": 1,
+   "is_new": false,
+   "recent": 1,
+   "weekly": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseline": 0,
+   "is_emerging": false
+  },
+  "ranked": false,
+  "status": "actif",
+  "title_locked": false,
+  "merged_into": null,
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:33.952028+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-76",
+  "origin": "retours",
+  "title": "Créer une tâche vite malgré un formulaire surchargé de champs inutiles",
+  "problem_statement": "Les utilisateurs qui créent des tâches, y compris en usage solo, doivent parcourir de nombreux champs dont ils n'ont pas besoin alors qu'ils n'en utilisent que quelques-uns. Ils perdent du temps à chaque création et jugent l'interface trop chargée pour leur usage.",
+  "product_area": "personnalisation",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-167.1"
+    ],
+    "solution": "Un formulaire de tâche limité au titre et à l'échéance",
+    "frequency": 1
+   }
+  ],
+  "segments_breakdown": {
+   "plans": {
+    "pro": 1,
+    "free": 1
+   },
+   "segments": {
+    "conseil": 1,
+    "agence_digitale": 1
+   }
+  },
+  "accounts_count": 2,
+  "mrr_exposed": 24,
+  "renewals_90d": 0,
   "channels": {
    "nps": 1,
+   "commentaire_in_app": 1
+  },
+  "trend": {
+   "growth": 1,
+   "is_new": false,
+   "recent": 1,
+   "weekly": [
+    0,
+    0,
+    1,
+    0,
+    0,
+    1
+   ],
+   "baseline": 1,
+   "is_emerging": false
+  },
+  "ranked": false,
+  "status": "fusionne",
+  "title_locked": false,
+  "merged_into": "I-58",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:34.216876+00:00",
+  "updated_at": "2026-10-07T21:56:45.904+00:00",
+  "backlog_plan": null
+ },
+ {
+  "id": "I-77",
+  "origin": "retours",
+  "title": "Garder les échéances visibles là où l'équipe travaille",
+  "problem_statement": "Des responsables d'équipe doivent recopier à la main les échéances de leurs tâches dans les agendas, et ces dates deviennent obsolètes dès qu'elles changent. Leurs équipes consultent surtout leur agenda et peu Jalon, donc elles ne voient pas leurs échéances à temps. Cela coûte du temps de saisie et fait courir le risque de dates erronées ou manquées.",
+  "product_area": "integrations",
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-088.1",
+     "R-120.1"
+    ],
+    "solution": "Synchronisation automatique des échéances de tâches avec l'agenda (Outlook, Google Agenda)",
+    "frequency": 2
+   }
+  ],
+  "segments_breakdown": {
+   "plans": {
+    "pro": 1,
+    "business": 1
+   },
+   "segments": {
+    "hors_cible": 1,
+    "agence_digitale": 1
+   }
+  },
+  "accounts_count": 2,
+  "mrr_exposed": 432,
+  "renewals_90d": 0,
+  "channels": {
+   "email_client": 1,
    "commentaire_in_app": 1
   },
   "trend": {
@@ -1481,33 +1595,41 @@
    "is_new": false,
    "recent": 0,
    "weekly": [
-    1,
     0,
     0,
-    1,
+    2,
+    0,
     0,
     0
    ],
-   "baseline": 1,
+   "baseline": 2,
    "is_emerging": false
   },
   "ranked": false,
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:16.399+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:34.465679+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-47",
+  "id": "I-78",
   "origin": "retours",
-  "title": "Ma photo de profil enregistrée ne s'affiche pas",
-  "problem_statement": "Des utilisateurs ont enregistré une photo de profil dans leur compte, mais elle n'apparaît pas et les initiales s'affichent à la place. Ils ne peuvent pas s'identifier visuellement dans l'outil, et leur mise à jour semble ne pas avoir d'effet.",
+  "title": "Ma photo de profil ne s'affiche plus",
+  "problem_statement": "Des utilisateurs voient leurs initiales à la place de leur photo de profil, alors que l'image est bien enregistrée dans leurs paramètres. Le problème persiste après une nouvelle sauvegarde et un changement de navigateur, et pour l'un d'eux il est apparu depuis la dernière mise à jour. Les comptes concernés n'ont plus leur identité visuelle dans l'outil, alors que celle de leurs collègues s'affiche.",
   "product_area": "autre",
-  "expressed_requests": [],
+  "expressed_requests": [
+   {
+    "item_ids": [
+     "R-102.1"
+    ],
+    "solution": "Que l'équipe examine le problème d'affichage",
+    "frequency": 1
+   }
+  ],
   "segments_breakdown": {
    "plans": {
     "pro": 1,
@@ -1543,17 +1665,17 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:16.652+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:34.743124+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  },
  {
-  "id": "I-48",
+  "id": "I-79",
   "origin": "retours",
-  "title": "Retrouver l'état de mes sous-tâches cochées en rouvrant une tâche",
-  "problem_statement": "Les utilisateurs qui suivent leur travail avec des checklists de sous-tâches voient leurs cases cochées se décocher quand ils ferment puis rouvrent la tâche. Ils perdent l'état de leur checklist et ne peuvent plus se fier à l'avancement affiché. Ils doivent revérifier et recocher à la main ce qui était déjà fait.",
+  "title": "Cases de sous-tâches cochées qui se décochent à la réouverture",
+  "problem_statement": "Les utilisateurs qui cochent des sous-tâches dans la checklist d'une tâche les retrouvent décochées en rouvrant la tâche, sur Chrome comme sur Firefox. Ils ne peuvent plus se fier à la checklist pour connaître l'avancement réel ni ce qui reste à faire, ce qui oblige à vérifier ou à re-cocher.",
   "product_area": "taches",
   "expressed_requests": [],
   "segments_breakdown": {
@@ -1591,68 +1713,10 @@
   "status": "actif",
   "title_locked": false,
   "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:16.937+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
-  "backlog_plan": null
- },
- {
-  "id": "I-49",
-  "origin": "retours",
-  "title": "Séquencer le travail sans pouvoir exprimer l'ordre entre tâches",
-  "problem_statement": "Les utilisateurs qui planifient des projets ne peuvent pas indiquer qu'une tâche doit attendre la fin d'une autre. Ils doivent garder l'enchaînement des tâches en tête, ce qui expose à des oublis et à des erreurs d'ordre et fait perdre du temps de suivi.",
-  "product_area": "planification",
-  "expressed_requests": [
-   {
-    "item_ids": [
-     "R-131.2",
-     "R-214.1"
-    ],
-    "solution": "Pouvoir lier des tâches entre elles par des dépendances (une tâche dépend d'une autre)",
-    "frequency": 2
-   }
-  ],
-  "segments_breakdown": {
-   "plans": {
-    "pro": 1,
-    "free": 1
-   },
-   "segments": {
-    "agence_com": 1,
-    "hors_cible": 1
-   }
-  },
-  "accounts_count": 2,
-  "mrr_exposed": 96,
-  "renewals_90d": 0,
-  "channels": {
-   "nps": 1,
-   "commentaire_in_app": 1
-  },
-  "trend": {
-   "growth": 0,
-   "is_new": false,
-   "recent": 0,
-   "weekly": [
-    1,
-    0,
-    0,
-    0,
-    1,
-    0
-   ],
-   "baseline": 1,
-   "is_emerging": false
-  },
-  "ranked": false,
-  "status": "actif",
-  "title_locked": false,
-  "merged_into": null,
-  "first_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "last_run_id": "1e8af357-ba78-464b-b75c-1802bf499a18",
-  "created_at": "2026-10-03T17:34:17.193+00:00",
-  "updated_at": "2026-10-03T22:06:11.243+00:00",
+  "first_run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
+  "last_run_id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "created_at": "2026-10-07T21:36:35.004935+00:00",
+  "updated_at": "2026-10-07T21:59:02.462+00:00",
   "backlog_plan": null
  }
 ]

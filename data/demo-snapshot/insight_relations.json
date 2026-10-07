@@ -1,38 +1,38 @@
 [
  {
-  "id": "3be41a70-a3f3-482f-b310-7510d3f17c31",
-  "insight_a": "I-30",
-  "insight_b": "I-32",
+  "id": "67c98000-3d18-4201-9963-2a47aeb7dee6",
+  "insight_a": "I-60",
+  "insight_b": "I-76",
   "kind": "tension",
   "segments": [
    {
     "segment": "Free / Pro",
-    "position": "Veulent une interface allégée, avec moins de menus, d'options et de champs, et une version simplifiée centrée sur leurs tâches."
+    "position": "Un formulaire de création de tâche réduit au titre et à l'échéance, sans champs inutiles."
    },
    {
     "segment": "Business",
-    "position": "Demandent davantage de types de champs personnalisés (liste déroulante, case à cocher, personne, montant) pour normaliser leurs données."
+    "position": "De nouveaux types de champs personnalisés (listes, cases à cocher) pour structurer la saisie des tâches."
    }
   ],
-  "rationale": "Les comptes Free et Pro trouvent déjà l'interface trop chargée, alors que les comptes Business veulent y ajouter des types de champs, ce qui accroît la complexité.",
-  "run_id": "1e8af357-ba78-464b-b75c-1802bf499a18"
+  "rationale": "Les petits comptes veulent moins de champs dans le formulaire de tâche, alors que les comptes Business veulent en enrichir l'éventail et l'usage.",
+  "run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4"
  },
  {
-  "id": "3ddf46c4-40b8-4b12-9770-2b30f23134bf",
-  "insight_a": "I-30",
-  "insight_b": "I-46",
+  "id": "e432c79c-0b8b-4e9c-a9d8-bbf693b06c0b",
+  "insight_a": "I-58",
+  "insight_b": "I-60",
   "kind": "tension",
   "segments": [
    {
-    "segment": "Free / Pro",
-    "position": "Veulent réduire le nombre d'options et de champs affichés pour retrouver l'essentiel."
+    "segment": "Pro / Free",
+    "position": "Une interface plus simple, avec moins de menus et d'options, ou une vue limitée à ses propres tâches."
    },
    {
     "segment": "Business",
-    "position": "Veulent des champs financiers supplémentaires (formule, montant en euros) pour suivre devis, marges et reste à faire dans les tâches."
+    "position": "Plus de types de champs personnalisés (liste déroulante, case à cocher, montant) pour saisir des valeurs structurées."
    }
   ],
-  "rationale": "Simplifier l'interface pour les petites équipes s'oppose à l'ajout de champs spécialisés demandés par les comptes Business.",
-  "run_id": "1e8af357-ba78-464b-b75c-1802bf499a18"
+  "rationale": "Les comptes Pro et Free veulent réduire les options et la complexité de l'interface, alors que les comptes Business demandent d'en ajouter via de nouveaux types de champs.",
+  "run_id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4"
  }
 ]

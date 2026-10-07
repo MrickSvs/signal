@@ -7,11 +7,11 @@
   "plan": "business",
   "seats": 10,
   "mrr_eur": 240,
-  "renewal_date": "2027-02-17",
+  "renewal_date": "2027-02-18",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "cap-horizon-conseil.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-002",
@@ -25,7 +25,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-tamaris.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-003",
@@ -39,7 +39,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "logis-entretien.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-004",
@@ -49,11 +49,11 @@
   "plan": "enterprise",
   "seats": 131,
   "mrr_eur": 3930,
-  "renewal_date": "2027-05-23",
+  "renewal_date": "2027-05-24",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "studio-marelle.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-005",
@@ -63,11 +63,11 @@
   "plan": "business",
   "seats": 16,
   "mrr_eur": 384,
-  "renewal_date": "2027-04-26",
+  "renewal_date": "2027-04-27",
   "health": "orange",
   "csm": "Thomas Roussel",
   "email_domain": "agence-pixel-sauvage.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-006",
@@ -81,7 +81,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "cabinet-brevent.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-007",
@@ -95,7 +95,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "cabinet-ouessant.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-008",
@@ -105,11 +105,11 @@
   "plan": "business",
   "seats": 16,
   "mrr_eur": 384,
-  "renewal_date": "2027-03-03",
+  "renewal_date": "2027-03-04",
   "health": "vert",
   "csm": "Hugo Lefèvre",
   "email_domain": "atelier-vermillon.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-009",
@@ -119,11 +119,11 @@
   "plan": "business",
   "seats": 16,
   "mrr_eur": 384,
-  "renewal_date": "2026-11-30",
+  "renewal_date": "2026-12-01",
   "health": "orange",
   "csm": "Hugo Lefèvre",
   "email_domain": "agence-ponant.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-010",
@@ -137,7 +137,7 @@
   "health": null,
   "csm": null,
   "email_domain": "forgeval-industrie.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-011",
@@ -151,7 +151,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "agence-sillage.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-012",
@@ -165,7 +165,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "netea-services.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-013",
@@ -175,11 +175,11 @@
   "plan": "enterprise",
   "seats": 90,
   "mrr_eur": 2700,
-  "renewal_date": "2026-11-13",
+  "renewal_date": "2026-11-14",
   "health": "rouge",
   "csm": "Thomas Roussel",
   "email_domain": "studio-bastide.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-014",
@@ -193,7 +193,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "evenements-garance.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-015",
@@ -203,11 +203,11 @@
   "plan": "business",
   "seats": 7,
   "mrr_eur": 168,
-  "renewal_date": "2026-11-19",
+  "renewal_date": "2026-11-20",
   "health": "orange",
   "csm": "Hugo Lefèvre",
   "email_domain": "domicile-services-plus.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-016",
@@ -217,11 +217,11 @@
   "plan": "business",
   "seats": 13,
   "mrr_eur": 312,
-  "renewal_date": "2027-08-18",
+  "renewal_date": "2027-08-19",
   "health": "orange",
   "csm": "Thomas Roussel",
   "email_domain": "boussole-conseil.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-017",
@@ -235,7 +235,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "les-artisans-du-web.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-018",
@@ -249,7 +249,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-archipel.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-019",
@@ -263,7 +263,7 @@
   "health": null,
   "csm": null,
   "email_domain": "maison-lumen.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-020",
@@ -277,7 +277,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "studio-bifurque.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-021",
@@ -287,11 +287,11 @@
   "plan": "business",
   "seats": 14,
   "mrr_eur": 336,
-  "renewal_date": "2027-05-29",
+  "renewal_date": "2027-05-30",
   "health": "orange",
   "csm": "Thomas Roussel",
   "email_domain": "plasturgie-valliere.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-022",
@@ -305,7 +305,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "studio-capucine.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-023",
@@ -319,7 +319,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-fil-rouge.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-024",
@@ -333,7 +333,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "proprete-lumiere.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-025",
@@ -347,7 +347,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "studio-lagune.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-026",
@@ -361,7 +361,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "metallerie-brunet.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-027",
@@ -371,11 +371,11 @@
   "plan": "business",
   "seats": 7,
   "mrr_eur": 168,
-  "renewal_date": "2027-04-04",
+  "renewal_date": "2027-04-05",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "thermique-rousseau.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-028",
@@ -385,11 +385,11 @@
   "plan": "business",
   "seats": 9,
   "mrr_eur": 216,
-  "renewal_date": "2026-12-22",
+  "renewal_date": "2026-12-23",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "agence-kiosque.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-029",
@@ -403,7 +403,7 @@
   "health": "rouge",
   "csm": null,
   "email_domain": "hygiene-pro-atlantique.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-030",
@@ -417,7 +417,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-grand-large.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-031",
@@ -427,11 +427,11 @@
   "plan": "enterprise",
   "seats": 97,
   "mrr_eur": 2910,
-  "renewal_date": "2027-03-28",
+  "renewal_date": "2027-03-29",
   "health": "vert",
   "csm": "Hugo Lefèvre",
   "email_domain": "code-et-craie.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-032",
@@ -445,7 +445,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "cabinet-arpege.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-033",
@@ -459,7 +459,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-boreale.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-034",
@@ -473,7 +473,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "studio-escale.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-035",
@@ -483,11 +483,11 @@
   "plan": "business",
   "seats": 16,
   "mrr_eur": 384,
-  "renewal_date": "2027-07-09",
+  "renewal_date": "2027-07-10",
   "health": "vert",
   "csm": "Thomas Roussel",
   "email_domain": "agence-quai-ouest.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-036",
@@ -501,7 +501,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "maintenance-delorme.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-037",
@@ -511,11 +511,11 @@
   "plan": "business",
   "seats": 14,
   "mrr_eur": 336,
-  "renewal_date": "2027-02-07",
+  "renewal_date": "2027-02-08",
   "health": "vert",
   "csm": "Thomas Roussel",
   "email_domain": "agence-carambole.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-038",
@@ -525,11 +525,11 @@
   "plan": "business",
   "seats": 6,
   "mrr_eur": 144,
-  "renewal_date": "2027-06-30",
+  "renewal_date": "2027-07-01",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "agence-hublot.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-039",
@@ -543,7 +543,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "maison-cardinal.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-040",
@@ -557,7 +557,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "atelier-pivoine.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-041",
@@ -571,7 +571,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "menuiserie-arnoux.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-042",
@@ -585,7 +585,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "studio-neon-bleu.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-043",
@@ -599,7 +599,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "maison-orage.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-044",
@@ -613,7 +613,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "lumiere-numerique.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-045",
@@ -627,7 +627,7 @@
   "health": null,
   "csm": null,
   "email_domain": "services-ondine.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-046",
@@ -637,11 +637,11 @@
   "plan": "business",
   "seats": 17,
   "mrr_eur": 408,
-  "renewal_date": "2027-03-08",
+  "renewal_date": "2027-03-09",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "agence-saltimbanque.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-047",
@@ -651,11 +651,11 @@
   "plan": "enterprise",
   "seats": 152,
   "mrr_eur": 4560,
-  "renewal_date": "2027-05-23",
+  "renewal_date": "2027-05-24",
   "health": "vert",
   "csm": "Thomas Roussel",
   "email_domain": "le-bureau-des-idees.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-048",
@@ -665,11 +665,11 @@
   "plan": "business",
   "seats": 16,
   "mrr_eur": 384,
-  "renewal_date": "2026-12-15",
+  "renewal_date": "2026-12-16",
   "health": "orange",
   "csm": "Hugo Lefèvre",
   "email_domain": "jardins-de-l-estuaire.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-049",
@@ -679,11 +679,11 @@
   "plan": "business",
   "seats": 6,
   "mrr_eur": 144,
-  "renewal_date": "2026-12-03",
+  "renewal_date": "2026-12-04",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "bureau-vauban-ingenierie.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-050",
@@ -693,11 +693,11 @@
   "plan": "business",
   "seats": 9,
   "mrr_eur": 216,
-  "renewal_date": "2027-03-03",
+  "renewal_date": "2027-03-04",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "agence-tangente.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-051",
@@ -711,7 +711,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "agence-belvedere.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-052",
@@ -725,7 +725,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-semaphore.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-053",
@@ -739,7 +739,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "btp-ravel-et-fils.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-054",
@@ -753,7 +753,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "fonderie-du-lac.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-055",
@@ -763,11 +763,11 @@
   "plan": "enterprise",
   "seats": 166,
   "mrr_eur": 4980,
-  "renewal_date": "2027-05-24",
+  "renewal_date": "2027-05-25",
   "health": "vert",
   "csm": "Thomas Roussel",
   "email_domain": "altitude-rh-conseil.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-056",
@@ -777,11 +777,11 @@
   "plan": "enterprise",
   "seats": 102,
   "mrr_eur": 3060,
-  "renewal_date": "2027-08-16",
+  "renewal_date": "2027-08-17",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "valmont-conseil.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-057",
@@ -795,7 +795,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "nuage-rose.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-058",
@@ -805,11 +805,11 @@
   "plan": "business",
   "seats": 17,
   "mrr_eur": 408,
-  "renewal_date": "2027-07-08",
+  "renewal_date": "2027-07-09",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "equinoxe-conseil.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-059",
@@ -823,7 +823,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "carrelages-sudre.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-060",
@@ -837,7 +837,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "boulangeries-fournil-d-or.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-061",
@@ -851,7 +851,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-vif-argent.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-062",
@@ -865,7 +865,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "archives-et-co.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-063",
@@ -879,7 +879,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "ascenseurs-guerin.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-064",
@@ -889,11 +889,11 @@
   "plan": "enterprise",
   "seats": 100,
   "mrr_eur": 3000,
-  "renewal_date": "2027-08-15",
+  "renewal_date": "2027-08-16",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "studio-alize.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-065",
@@ -907,7 +907,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "energie-services-ouest.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-066",
@@ -921,7 +921,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "agence-mistral.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-067",
@@ -935,7 +935,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "traducteurs-associes-lyon.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-068",
@@ -949,7 +949,7 @@
   "health": "orange",
   "csm": null,
   "email_domain": "studio-origami.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-069",
@@ -959,11 +959,11 @@
   "plan": "business",
   "seats": 11,
   "mrr_eur": 264,
-  "renewal_date": "2027-09-10",
+  "renewal_date": "2027-09-11",
   "health": "vert",
   "csm": "Hugo Lefèvre",
   "email_domain": "studio-coquelicot.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-070",
@@ -977,7 +977,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "trame-conseil.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-071",
@@ -987,11 +987,11 @@
   "plan": "business",
   "seats": 14,
   "mrr_eur": 336,
-  "renewal_date": "2027-08-01",
+  "renewal_date": "2027-08-02",
   "health": "orange",
   "csm": "Clara Benali",
   "email_domain": "plume-et-cie.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-072",
@@ -1001,11 +1001,11 @@
   "plan": "business",
   "seats": 14,
   "mrr_eur": 336,
-  "renewal_date": "2027-03-15",
+  "renewal_date": "2027-03-16",
   "health": "orange",
   "csm": "Inès Marchand",
   "email_domain": "agence-polygone.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-073",
@@ -1019,7 +1019,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "techniplus-maintenance.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-074",
@@ -1033,7 +1033,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "ferrand-strategie.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-075",
@@ -1043,11 +1043,11 @@
   "plan": "business",
   "seats": 11,
   "mrr_eur": 264,
-  "renewal_date": "2026-12-17",
+  "renewal_date": "2026-12-18",
   "health": "rouge",
   "csm": "Thomas Roussel",
   "email_domain": "clim-ouest-services.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-076",
@@ -1057,11 +1057,11 @@
   "plan": "enterprise",
   "seats": 110,
   "mrr_eur": 3300,
-  "renewal_date": "2026-12-15",
+  "renewal_date": "2026-12-16",
   "health": "orange",
   "csm": "Clara Benali",
   "email_domain": "groupe-helix.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-077",
@@ -1071,11 +1071,11 @@
   "plan": "enterprise",
   "seats": 140,
   "mrr_eur": 4200,
-  "renewal_date": "2026-11-20",
+  "renewal_date": "2026-11-21",
   "health": "orange",
   "csm": "Inès Marchand",
   "email_domain": "atelier-mercure.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-078",
@@ -1085,11 +1085,11 @@
   "plan": "business",
   "seats": 15,
   "mrr_eur": 360,
-  "renewal_date": "2027-07-03",
+  "renewal_date": "2027-07-04",
   "health": "vert",
   "csm": "Hugo Lefèvre",
   "email_domain": "cabinet-lorient-et-associes.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-079",
@@ -1103,7 +1103,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-octet.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-080",
@@ -1113,11 +1113,11 @@
   "plan": "business",
   "seats": 8,
   "mrr_eur": 192,
-  "renewal_date": "2026-12-06",
+  "renewal_date": "2026-12-07",
   "health": "vert",
   "csm": "Inès Marchand",
   "email_domain": "charpentes-lemoine.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-081",
@@ -1127,11 +1127,11 @@
   "plan": "business",
   "seats": 17,
   "mrr_eur": 408,
-  "renewal_date": "2027-08-01",
+  "renewal_date": "2027-08-02",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "oxalis-communication.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-082",
@@ -1145,7 +1145,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "cabinet-mediane.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-083",
@@ -1159,7 +1159,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-galaxie.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-084",
@@ -1173,7 +1173,7 @@
   "health": null,
   "csm": null,
   "email_domain": "agence-myrtille.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-085",
@@ -1187,7 +1187,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "les-faiseurs.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-086",
@@ -1201,7 +1201,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "heliotrope-communication.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-087",
@@ -1215,7 +1215,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "diagnostic-habitat-morel.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-088",
@@ -1229,7 +1229,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "studio-lucarne.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-089",
@@ -1243,7 +1243,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "agence-rivage.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-090",
@@ -1257,7 +1257,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "boutique-les-galets.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-091",
@@ -1271,7 +1271,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "pixelune.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-092",
@@ -1285,7 +1285,7 @@
   "health": "vert",
   "csm": null,
   "email_domain": "sextant-partenaires.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-093",
@@ -1299,7 +1299,7 @@
   "health": null,
   "csm": null,
   "email_domain": "cabinet-ardent.fr",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-094",
@@ -1309,11 +1309,11 @@
   "plan": "business",
   "seats": 11,
   "mrr_eur": 264,
-  "renewal_date": "2027-07-25",
+  "renewal_date": "2027-07-26",
   "health": "vert",
   "csm": "Hugo Lefèvre",
   "email_domain": "agence-contrepoint.com",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  },
  {
   "id": "C-095",
@@ -1323,10 +1323,10 @@
   "plan": "enterprise",
   "seats": 105,
   "mrr_eur": 3150,
-  "renewal_date": "2027-05-28",
+  "renewal_date": "2027-05-29",
   "health": "vert",
   "csm": "Clara Benali",
   "email_domain": "securia-services.eu",
-  "created_at": "2026-10-03T01:49:11.126+00:00"
+  "created_at": "2026-10-03T01:49:51.097+00:00"
  }
 ]

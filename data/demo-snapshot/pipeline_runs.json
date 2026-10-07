@@ -1,9 +1,9 @@
 [
  {
-  "id": "1e8af357-ba78-464b-b75c-1802bf499a18",
+  "id": "2041e3cc-67fd-4b1d-90a6-536a0700b6e4",
   "kind": "full",
-  "started_at": "2026-10-03T17:29:48.544+00:00",
-  "ended_at": "2026-10-03T17:36:05.016+00:00",
+  "started_at": "2026-10-07T21:31:32.818852+00:00",
+  "ended_at": "2026-10-07T21:38:22.327+00:00",
   "status": "termine",
   "stats": {
    "mode": "full",
@@ -13,21 +13,20 @@
     "enriched": []
    },
    "embed": {
-    "embedded": 232
+    "embedded": 237
    },
    "score": {
-    "judged": 10,
+    "judged": 9,
     "ranked": [
-     "I-27",
-     "I-29",
-     "I-26",
-     "I-28",
-     "I-30",
-     "I-34",
-     "I-31",
-     "I-33",
-     "I-35",
-     "I-32"
+     "I-55",
+     "I-54",
+     "I-56",
+     "I-57",
+     "I-58",
+     "I-61",
+     "I-59",
+     "I-60",
+     "I-62"
     ],
     "capacity": {
      "alert": false,
@@ -38,6 +37,10 @@
     },
     "reach_mode": "comptes",
     "context_changed": []
+   },
+   "digest": {
+    "id": "4f603522-bfab-4777-b927-ac6fae68954b",
+    "writer": "modele"
    },
    "enrich": {
     "linked": 104,
@@ -53,209 +56,253 @@
     "pending": 214
    },
    "triage": {
-    "ok": 206,
+    "ok": 212,
+    "failed": 2
+   },
+   "cluster": {
+    "events": [],
+    "merges": [],
+    "ranked": [
+     "I-54",
+     "I-55",
+     "I-56",
+     "I-57",
+     "I-58",
+     "I-59",
+     "I-60",
+     "I-61",
+     "I-62"
+    ],
+    "created": [
+     "I-54",
+     "I-55",
+     "I-56",
+     "I-57",
+     "I-58",
+     "I-59",
+     "I-60",
+     "I-61",
+     "I-62",
+     "I-63",
+     "I-64",
+     "I-65",
+     "I-66",
+     "I-67",
+     "I-68",
+     "I-69",
+     "I-70",
+     "I-71",
+     "I-72",
+     "I-73",
+     "I-74",
+     "I-75",
+     "I-76",
+     "I-77",
+     "I-78",
+     "I-79"
+    ],
+    "clusters": 26,
+    "tensions": [
+     [
+      "I-58",
+      "I-60"
+     ],
+     [
+      "I-76",
+      "I-60"
+     ]
+    ],
+    "threshold": 0.28,
+    "relabelled": [],
+    "label_calls": 26,
+    "unclustered": 5
+   },
+   "estimate": {
+    "cached": 0,
+    "insights": 9
+   },
+   "failures": [
+    {
+     "id": "R-043",
+     "step": "triage",
+     "error": "Sortie invalide après 2 tentatives (triage-feedback) : [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"items\",\n      0,\n      \"summary\"\n    ],\n    \"message\": \"summary: 20 mots au plus\"\n  }\n]"
+    },
+    {
+     "id": "R-185",
+     "step": "triage",
+     "error": "Sortie invalide après 2 tentatives (triage-feedback) : [\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"items\",\n      0,\n      \"summary\"\n    ],\n    \"message\": \"summary: 20 mots au plus\"\n  }\n]"
+    }
+   ],
+   "duration_s": 408,
+   "cost_by_node": {
+    "embed": 0.0008,
+    "score": 0.278,
+    "digest": 0.0339,
+    "triage": 1.713,
+    "cluster": 0.2468,
+    "estimate": 0.2453
+   }
+  },
+  "tokens_in": 2798254,
+  "tokens_out": 134757,
+  "cost_eur": 2.5178,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/017abe5a873020a7b855887cf9609d8c"
+ },
+ {
+  "id": "891a31fb-e795-4ef8-bf18-f0a81ca54b31",
+  "kind": "full",
+  "started_at": "2026-10-07T21:39:00.059768+00:00",
+  "ended_at": "2026-10-07T21:39:12.92+00:00",
+  "status": "termine",
+  "stats": {
+   "ok": 2,
+   "step": "triage",
+   "model": "sonnet",
+   "types": {
+    "bug": 1,
+    "demande_fonctionnelle": 1
+   },
+   "failed": [],
+   "processed": 2,
+   "duration_s": 11,
+   "items_per_feedback": {
+    "1": 2
+   }
+  },
+  "tokens_in": 25343,
+  "tokens_out": 1153,
+  "cost_eur": 0.0498,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/5430cf32fba6156dcffb5cc0b0e96d09"
+ },
+ {
+  "id": "b28ec521-5412-46e7-bf87-deb4b302f418",
+  "kind": "full",
+  "started_at": "2026-10-07T21:39:20.562328+00:00",
+  "ended_at": "2026-10-07T21:41:18.23+00:00",
+  "status": "termine",
+  "stats": {
+   "mode": "full",
+   "alert": {
+    "created": [],
+    "enriched": []
+   },
+   "embed": {
+    "embedded": 2
+   },
+   "score": {
+    "judged": 9,
+    "ranked": [
+     "I-55",
+     "I-54",
+     "I-56",
+     "I-57",
+     "I-58",
+     "I-61",
+     "I-60",
+     "I-59",
+     "I-62"
+    ],
+    "capacity": {
+     "alert": false,
+     "share": 0.14,
+     "downgrade": [],
+     "must_weeks": 5.67,
+     "capacity_weeks": 42
+    },
+    "reach_mode": "comptes",
+    "context_changed": []
+   },
+   "digest": {
+    "id": "61c98e09-032a-4f94-8cdd-c91112e5f698",
+    "writer": "modele"
+   },
+   "enrich": {
+    "linked": 0,
+    "by_method": {
+     "aucun": 11,
+     "connu": 203,
+     "domaine": 0,
+     "nom_exact": 0,
+     "nom_approche": 0
+    }
+   },
+   "ingest": {
+    "pending": 0
+   },
+   "triage": {
+    "ok": 0,
     "failed": 0
    },
    "cluster": {
     "events": [],
     "merges": [],
     "ranked": [
-     "I-26",
-     "I-27",
-     "I-28",
-     "I-29",
-     "I-30",
-     "I-31",
-     "I-32",
-     "I-33",
-     "I-34",
-     "I-35"
+     "I-54",
+     "I-55",
+     "I-56",
+     "I-57",
+     "I-58",
+     "I-60",
+     "I-59",
+     "I-61",
+     "I-62"
     ],
-    "created": [
-     "I-26",
-     "I-27",
-     "I-28",
-     "I-29",
-     "I-30",
-     "I-31",
-     "I-32",
-     "I-33",
-     "I-34",
-     "I-35",
-     "I-36",
-     "I-37",
-     "I-38",
-     "I-39",
-     "I-40",
-     "I-41",
-     "I-42",
-     "I-43",
-     "I-44",
-     "I-45",
-     "I-46",
-     "I-47",
-     "I-48",
-     "I-49"
-    ],
-    "clusters": 24,
+    "created": [],
+    "clusters": 26,
     "tensions": [
      [
-      "I-30",
-      "I-32"
+      "I-58",
+      "I-60"
      ],
      [
-      "I-46",
-      "I-30"
+      "I-60",
+      "I-76"
      ]
     ],
     "threshold": 0.28,
-    "relabelled": [],
-    "label_calls": 24,
+    "relabelled": [
+     "I-60",
+     "I-65"
+    ],
+    "label_calls": 2,
     "unclustered": 4
    },
    "estimate": {
-    "cached": 0,
-    "insights": 10
+    "cached": 8,
+    "insights": 9
    },
    "failures": [],
-   "duration_s": 301
+   "duration_s": 116,
+   "cost_by_node": {
+    "embed": 0,
+    "score": 0.1511,
+    "digest": 0.0205,
+    "cluster": 0.0753,
+    "estimate": 0.0123
+   }
   },
-  "tokens_in": 1657254,
-  "tokens_out": 66750,
-  "cost_eur": 1.2191,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/5a4fa9a9808784ce3ea9c9c81a2a9b48"
+  "tokens_in": 168718,
+  "tokens_out": 13408,
+  "cost_eur": 0.2593,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/29d33cbda58054a61d29212266cc01bc"
  },
  {
-  "id": "8f7cf5d2-86c0-4eff-8f91-55bbea68d4ff",
+  "id": "2f0ab0ec-e5dc-4f24-b28b-01fddc551f8e",
   "kind": "digest",
-  "started_at": "2026-10-03T18:08:37.314+00:00",
-  "ended_at": "2026-10-03T18:08:59.48+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": null,
-   "first": true,
-   "writer": "modele",
-   "digest_id": "f4da2399-ca20-475b-b288-3dc33a8b23af",
-   "duration_ms": 23575
-  },
-  "tokens_in": 8498,
-  "tokens_out": 2279,
-  "cost_eur": 0.0369,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/e3275eb4e3f72bd415ad2c2acf0e8272"
- },
- {
-  "id": "675b784e-4792-4262-8b7a-bdf593fa361e",
-  "kind": "digest",
-  "started_at": "2026-10-03T18:09:35.678+00:00",
-  "ended_at": "2026-10-03T18:09:53.479+00:00",
+  "started_at": "2026-10-07T22:01:53.644406+00:00",
+  "ended_at": "2026-10-07T22:02:08.696+00:00",
   "status": "termine",
   "stats": {
    "mode": "digest",
    "error": null,
    "first": false,
    "writer": "modele",
-   "digest_id": "0e961181-7a15-4eb5-bb3a-9d7c348fca66",
-   "duration_ms": 18322
+   "digest_id": "5937a83d-f62c-4cd8-84cd-1a3c1efb66a8",
+   "duration_ms": 15277
   },
-  "tokens_in": 5370,
-  "tokens_out": 1970,
-  "cost_eur": 0.022,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/d3db051eb72e6724b0d89fa854714aa7"
- },
- {
-  "id": "7dd93c7b-e74f-4857-acee-396b6c9d0542",
-  "kind": "digest",
-  "started_at": "2026-10-03T20:25:20.38+00:00",
-  "ended_at": "2026-10-03T20:25:36.085+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": null,
-   "first": false,
-   "writer": "modele",
-   "digest_id": "8471f17d-bd94-4c20-82f2-f6d803856691",
-   "duration_ms": 15735
-  },
-  "tokens_in": 5370,
-  "tokens_out": 2121,
-  "cost_eur": 0.0299,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/5ef264ee8313e4695d1bf301dbd1c00b"
- },
- {
-  "id": "6b41d85b-16d8-4733-92e4-a670e1169a72",
-  "kind": "digest",
-  "started_at": "2026-10-03T20:59:46.576+00:00",
-  "ended_at": "2026-10-03T21:00:07.586+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": null,
-   "first": false,
-   "writer": "modele",
-   "digest_id": "6a8ac5f0-ed47-4add-b1d6-325564004ac1",
-   "duration_ms": 22022
-  },
-  "tokens_in": 5468,
-  "tokens_out": 1968,
-  "cost_eur": 0.0287,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/1c91fe749fbc9eb1ee90a8db4777086c"
- },
- {
-  "id": "0cdd651b-418b-4ebd-b3e3-16f0b639852b",
-  "kind": "digest",
-  "started_at": "2026-10-04T04:48:37.875+00:00",
-  "ended_at": "2026-10-04T04:48:51.75+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": null,
-   "first": false,
-   "writer": "modele",
-   "digest_id": "56a92247-17d5-48b6-9604-976c3fe58fce",
-   "duration_ms": 13905
-  },
-  "tokens_in": 5537,
-  "tokens_out": 1954,
-  "cost_eur": 0.0287,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/55f305e2f5d08c22688899913d6d9140"
- },
- {
-  "id": "497ea833-b6ff-43a1-afd8-753c3569f748",
-  "kind": "digest",
-  "started_at": "2026-10-05T04:48:37.666+00:00",
-  "ended_at": "2026-10-05T04:48:57.832+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": null,
-   "first": false,
-   "writer": "modele",
-   "digest_id": "c91c976e-19e3-4752-8000-704f4948bc0a",
-   "duration_ms": 20190
-  },
-  "tokens_in": 6406,
-  "tokens_out": 2724,
-  "cost_eur": 0.0371,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/ea1ee0f25d3b73295446d3c603ff4c15"
- },
- {
-  "id": "51382ce7-9497-4c52-9a4c-171f7ce60631",
-  "kind": "digest",
-  "started_at": "2026-10-06T04:48:37.961+00:00",
-  "ended_at": "2026-10-06T04:48:38.847+00:00",
-  "status": "termine",
-  "stats": {
-   "mode": "digest",
-   "error": "Appel au modèle en échec (write-digest)",
-   "first": false,
-   "writer": "repli",
-   "digest_id": "025cc1d1-daf1-400e-82e0-eb9f626190e7",
-   "duration_ms": 909
-  },
-  "tokens_in": 0,
-  "tokens_out": 0,
-  "cost_eur": 0,
-  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/cc91e3cbe57b95b1bbbe8924427f2c39"
+  "tokens_in": 4620,
+  "tokens_out": 1734,
+  "cost_eur": 0.0251,
+  "langfuse_url": "https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/traces/fb914601ca049d5c9d150d5966728e62"
  }
 ]
