@@ -27,6 +27,7 @@ import {
   type SnapshotTable,
 } from "./lib/demo";
 import { readTable, SNAPSHOT_DIR } from "./demo-snapshot";
+import { startSpinner, type Spinner } from "./lib/spinner";
 
 const CHUNK = 100;
 
@@ -34,23 +35,24 @@ function readJson<T>(file: string): T {
   return JSON.parse(readFileSync(join(SNAPSHOT_DIR, file), "utf8")) as T;
 }
 
-function notionOrWarn(what: string): ReturnType<typeof notionClient> | null {
+function notionOrWarn(what: string, progress: Spinner): ReturnType<typeof notionClient> | null {
   try {
     return notionClient(notionConfig());
   } catch (error) {
-    console.warn(`Notion ignoré (${notionErrorMessage(error)}) : ${what} à la main.`);
+    progress.log(`Notion ignoré (${notionErrorMessage(error)}) : ${what} à la main.`);
     return null;
   }
 }
 
 /** Moves pages to the trash (rehearsals) or out of it (pages of the snapshot, trashed by an
  * earlier --empty). A page that fails is reported, never blocking. */
-async function setTrashed(pageIds: string[], inTrash: boolean): Promise<void> {
+async function setTrashed(pageIds: string[], inTrash: boolean, progress: Spinner): Promise<void> {
   if (pageIds.length === 0) return;
   const what = inTrash
     ? "page(s) de répétition à la corbeille"
     : "page(s) du snapshot restaurée(s)";
-  const client = notionOrWarn(`${pageIds.length} ${what}`);
+  progress.update(`Notion : ${pageIds.length} ${what}`);
+  const client = notionOrWarn(`${pageIds.length} ${what}`, progress);
   if (!client) return;
   let done = 0;
   for (const pageId of pageIds) {
@@ -58,26 +60,32 @@ async function setTrashed(pageIds: string[], inTrash: boolean): Promise<void> {
       await client.pages.update({ page_id: pageId, in_trash: inTrash });
       done++;
     } catch (error) {
-      console.warn(`Notion : page ${pageId} (${notionErrorMessage(error)}).`);
+      progress.log(`Notion : page ${pageId} (${notionErrorMessage(error)}).`);
     }
   }
-  console.log(`Notion : ${done}/${pageIds.length} ${what}.`);
+  progress.log(`Notion : ${done}/${pageIds.length} ${what}.`);
 }
 
-async function clearBase(db: Db): Promise<void> {
+async function clearBase(db: Db, progress: Spinner): Promise<void> {
   const { error } = await db
     .from("po_state")
     .update({ last_digest_id: null, last_seen_at: null })
     .eq("id", true);
   if (error) throw new Error(`po_state (${error.message})`);
-  for (const [table, column] of RESET_TABLES) {
+  for (const [index, [table, column]] of RESET_TABLES.entries()) {
+    progress.update(`Suppression : ${table} (${index + 1}/${RESET_TABLES.length})`);
     const { error: deleteError } = await db.from(table).delete().not(column, "is", null);
     if (deleteError) throw new Error(`Suppression de ${table} (${deleteError.message})`);
   }
 }
 
-async function restore(db: Db, tables: Record<SnapshotTable, Row[]>): Promise<void> {
-  for (const table of SNAPSHOT_TABLES) {
+async function restore(
+  db: Db,
+  tables: Record<SnapshotTable, Row[]>,
+  progress: Spinner,
+): Promise<void> {
+  for (const [index, table] of SNAPSHOT_TABLES.entries()) {
+    progress.update(`Restauration : ${table} (${index + 1}/${SNAPSHOT_TABLES.length})`);
     const rows = tables[table].map((r) => insertableRow(table, r));
     for (let i = 0; i < rows.length; i += CHUNK) {
       const batch = rows.slice(i, i + CHUNK) as never[];
@@ -89,6 +97,7 @@ async function restore(db: Db, tables: Record<SnapshotTable, Row[]>): Promise<vo
     }
   }
   // Self and circular references, once every table is in.
+  progress.update("Restauration : références croisées");
   for (const table of SNAPSHOT_TABLES) {
     const deferred = DEFERRED[table];
     if (!deferred) continue;
@@ -126,14 +135,24 @@ async function main() {
     }
   }
 
-  await setTrashed(pagesToTrash(await readTable(db, "notion_links"), snapshotLinks), true);
-  await clearBase(db);
-  if (meta) {
-    await restore(db, snapshot);
+  const progress = startSpinner("Lecture des liens Notion");
+  try {
     await setTrashed(
-      snapshotLinks.map((l) => String(l.notion_page_id)),
-      false,
+      pagesToTrash(await readTable(db, "notion_links"), snapshotLinks),
+      true,
+      progress,
     );
+    await clearBase(db, progress);
+    if (meta) {
+      await restore(db, snapshot, progress);
+      await setTrashed(
+        snapshotLinks.map((l) => String(l.notion_page_id)),
+        false,
+        progress,
+      );
+    }
+  } finally {
+    progress.stop();
   }
 
   const seconds = Math.round((Date.now() - started) / 1000);

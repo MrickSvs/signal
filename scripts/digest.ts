@@ -9,6 +9,7 @@ import { initTracing, shutdownTracing } from "@/lib/llm/tracing";
 import { loadSkill } from "@/lib/skills";
 import { generateDigest } from "@/pipeline/daily";
 import { PipelineBusyError, withPipelineLock } from "@/pipeline/lock";
+import { startSpinner } from "./lib/spinner";
 
 async function main() {
   const db = getScriptDb(); // loads .env
@@ -21,6 +22,7 @@ async function main() {
     loadSkill("digest"),
   ]);
   const started = Date.now();
+  const progress = startSpinner("Signal rédige le digest (Sonnet)");
   const result = await withPipelineLock(() =>
     generateDigest(db, {
       pack,
@@ -32,7 +34,7 @@ async function main() {
       },
       now: getDemoNow(),
     }),
-  );
+  ).finally(() => progress.stop());
   console.log(result.markdown);
   console.log(
     `Digest ${result.id} · run ${result.runId} · ${result.writer === "modele" ? "rédigé par Signal" : `REPLI (${result.error})`} · ` +
