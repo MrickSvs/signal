@@ -21,6 +21,8 @@ Transformer un retour brut (e-mail, ticket, commentaire, NPS, note interne) en d
 8. **Note interne** (CSM, sales, Slack) : le problème est celui du client cité, pas celui du collègue qui relaie. Le type et le domaine sont ceux de la demande relayée, même si la note la juge « hors cible » ou « non prioritaire » : une facturation ou un suivi du temps demandé par un prospect et relayé par sales reste `demande_fonctionnelle` / `facturation_temps`. Ce jugement stratégique se fait à la priorisation, pas au triage ; `autre` est réservé au hors sujet.
 9. **Résumé** : 20 mots au plus, factuel, sans citer le nom du client. **Tags** : 3 au plus, en minuscules, sans doublon avec le domaine.
 10. **Pas d'invention.** Si le retour est trop vague pour un problème, dis-le dans `underlying_problem` (« Insatisfaction générale, sans problème précis ») et baisse `confidence`.
+11. **Moment d'apparition.** Si le retour situe le début du problème (« depuis la dernière mise à jour », « depuis la nouvelle version », « ça marchait avant »), garde-le dans `underlying_problem` et dans le résumé : il distingue une régression d'une limite connue. Même formulé avec hésitation (« il me semble que ça a commencé après la mise à jour »). Ne l'ajoute jamais s'il n'est pas dans le retour.
+12. **Question d'usage.** Un retour qui demande comment faire (« comment on… ? », « y a-t-il une astuce ? ») est une `question`, même s'il décrit la gêne qui l'amène à demander. Il devient `irritant_ux` seulement si l'utilisateur se plaint du fonctionnement sans demander d'aide.
 
 ## Niveau retour
 

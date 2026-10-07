@@ -43,6 +43,10 @@ export type ClusteringOptions = {
   distanceThreshold: number;
   /** Groups smaller than this are returned as `unclustered`. */
   minClusterSize: number;
+  /** One label per vector (the item's product area): two items with different labels start
+   * `crossLabelPenalty` farther apart, so they merge only when clearly closer. */
+  labels?: readonly string[];
+  crossLabelPenalty?: number;
 };
 
 export type ClusteringResult = {
@@ -63,8 +67,13 @@ export function agglomerativeCluster(
 ): ClusteringResult {
   const n = vectors.length;
   const members: (number[] | null)[] = vectors.map((_, i) => [i]);
+  const { labels, crossLabelPenalty = 0 } = options;
   const distance: number[][] = vectors.map((a, i) =>
-    vectors.map((b, j) => (i === j ? 0 : cosineDistance(a, b))),
+    vectors.map((b, j) =>
+      i === j
+        ? 0
+        : cosineDistance(a, b) + (labels && labels[i] !== labels[j] ? crossLabelPenalty : 0),
+    ),
   );
 
   for (;;) {

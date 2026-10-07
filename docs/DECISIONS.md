@@ -473,3 +473,29 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Préparation de la base** (`scripts/demo-purge.ts --from R-215`) : retire les retours ajoutés pendant les tests et ce qu'ils ont seuls produit (insights, alertes, décisions, runs), recalcule en code les agrégats des insights touchés et les re-score avec leur jugement stocké.
 - **Alternatives écartées** : régénérer le digest dans le reset (on veut le montrer en direct) ; reconstruire la base par un run complet (~1,60 € et une nouvelle revue du PO) ; dump SQL (exige un accès Postgres direct, le JSON passe par le client de service) ; un seul décalage de dates (soit la préparation passe dans le futur, soit le scénario vieillit et S7 sort de la fenêtre de 7 jours).
 - **Conséquences** : le dossier d'une alerte déclenchée en direct n'a pas de secours précalculé ; plan B : `pnpm investigate --pending`. Les traces Langfuse des répétitions restent (service externe, rétention 30 jours). Les messages des fils supprimés restent dans les tables du checkpointer, sans être affichés. Le snapshot garde les overrides présents au moment où il est pris.
+
+## ADR-033 — Écran Digest ordonné par décision, sans historique ni texte rédigé
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : SPEC §12.2 rangeait le digest en sept sections de même poids, dans l'ordre des faits. Les recommandations arrivaient en dernier (troisième écran à 1 280 × 800, chat ouvert), le dossier d'une alerte était toujours déplié et sans action (les actions n'existaient que dans la cloche), et les sections vides prenaient chacune un titre.
+- **Décision** :
+  - **Deux blocs** : « À traiter » (alertes, recommandations, décisions en attente, dans cet ordre, une ligne chacune avec son action) puis « Ce qui bouge » (tendances, classement, comptes à risque, nouveaux retours, en cartes compactes). Une alerte reste en tête.
+  - **Synthèse en code** : une phrase et une barre de compteurs calculées à partir des faits du digest et des alertes ouvertes (`lib/digest/content.ts`), jamais par le modèle.
+  - **Alerte repliée** dans le digest, avec les mêmes actions que la cloche : la logique est partagée avec `AlertCard` (`useAlertActions`).
+  - **Sections vides** regroupées en une ligne.
+  - **Ni lien vers le digest précédent, ni texte rédigé intégral** : un ancien digest montre des choses déjà tranchées et n'aide à aucune décision ; ce que Signal a écrit est dans Langfuse. Le paramètre `?digest=` disparaît ; la table `digests` reste (période, `po_state.last_digest_id`).
+  - La skill `digest` garde son ordre : il régit le texte rédigé, pas l'écran.
+- **Alternatives écartées** : écarter une recommandation depuis l'écran (demande un stockage et une décision journalisée pour une liste régénérée chaque jour).
+- **Conséquences** : PLAN 3.2 (« lien vers le digest précédent ») est remplacé par cette décision. `digests.markdown` reste écrit pour la CLI `pnpm digest`.
+
+## ADR-033 — Pénalité entre domaines au regroupement, moment d'apparition gardé au triage
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : en préparant la base de démo (8.1), l'insight de S7 (kanban lent depuis la dernière mise à jour) contenait trois retours étrangers (compteur de commentaires faux, question sur l'ordre des cartes) et son titre parlait de taille de projet, pas de régression. Le triage avait pourtant classé ces retours dans un autre domaine (`tableau_kanban` contre `performance`) ; les résumés avaient perdu « depuis la dernière version ».
+- **Décision** :
+  - **Regroupement** : `clustering.cross_area_penalty` (0,1) s'ajoute à la distance cosinus de deux items de domaines différents, au run complet, au rattachement incrémental et dans la file « à surveiller ». Mesuré hors ligne sur le jeu de dev, sans appel de modèle : intrus dans les sujets du scénario 13 → 6 (S7 et S1 propres), aucun sujet perdu, S4 4 → 3 items ; 0,15 et 0,2 ne font pas mieux.
+  - **Skill triage-taxonomy**, règles 11 et 12 : le moment d'apparition cité par le client (« depuis la dernière mise à jour ») reste dans le problème sous-jacent et le résumé, jamais inventé ; une demande d'aide (« comment on… ? ») est une `question` même si elle décrit une gêne.
+- **Alternatives écartées** : contrainte stricte « jamais deux domaines dans un insight » (casse les sujets légitimement transverses, S2b et S3 mêlent partage et export) ; ajouter le domaine au texte vectorisé (impose de tout revectoriser et rend le seuil de 0,28 à recalibrer).
+- **Conséquences** : un run complet est nécessaire pour en profiter (la base de démo est reconstruite). Le seuil de 0,28 n'est pas re-calibré : la pénalité ne change pas la distance entre items d'un même domaine.

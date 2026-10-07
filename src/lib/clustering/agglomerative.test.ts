@@ -40,6 +40,23 @@ describe("cosine helpers", () => {
 describe("agglomerativeCluster", () => {
   const options = { distanceThreshold: 0.05, minClusterSize: 2 };
 
+  it("keeps close items of different labels apart unless they are much closer", () => {
+    // at(0)/at(5): distance ≈ 0.0038; at(0)/at(15): ≈ 0.034.
+    const vectors = [at(0), at(5), at(15)];
+    const labels = ["performance", "performance", "tableau_kanban"];
+    expect(agglomerativeCluster(vectors, options).clusters).toEqual([[0, 1, 2]]);
+    expect(
+      agglomerativeCluster(vectors, { ...options, labels, crossLabelPenalty: 0.03 }).clusters,
+    ).toEqual([[0, 1]]);
+    expect(
+      agglomerativeCluster(vectors, {
+        ...options,
+        labels: ["a", "b", "c"],
+        crossLabelPenalty: 0.001,
+      }).clusters,
+    ).toEqual([[0, 1, 2]]);
+  });
+
   it("finds well-separated groups and leaves isolated points out", () => {
     // Three groups around 0°, 90° and 180°, plus a lonely point at 45°.
     const vectors = [at(0), at(90), at(2), at(180), at(45), at(92), at(4), at(178)];

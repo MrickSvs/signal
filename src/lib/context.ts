@@ -155,6 +155,7 @@ export const weightingSchema = z.strictObject({
   }),
   clustering: z.strictObject({
     distance_threshold: z.number().gt(0).lt(2),
+    cross_area_penalty: z.number().min(0).lt(2),
     min_cluster_size: positiveInt,
     run_matching_jaccard: share,
     run_matching_centroid_similarity: share,

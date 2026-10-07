@@ -102,13 +102,18 @@ export type Attachment = { itemId: string; insightId: string; similarity: number
  * Average-linkage similarity of an item to an insight, the measure the full run clusters with:
  * an item joins the closest insight when its mean cosine distance to the insight's items is
  * within the clustering threshold. A rejected insight still absorbs its items (it stays rejected,
- * CL-53); merged ones are frozen memories and never attract anything.
+ * CL-53); merged ones are frozen memories and never attract anything. As in the full run, an
+ * insight item of another product area counts `crossArea.penalty` farther.
  */
 export function attachItems(
-  items: readonly { id: string; vector: Vector }[],
+  items: readonly { id: string; vector: Vector; product_area?: string }[],
   insights: readonly AttachCandidate[],
   vectors: ReadonlyMap<string, Vector>,
   distanceThreshold: number,
+  crossArea: { areas: ReadonlyMap<string, string>; penalty: number } = {
+    areas: new Map(),
+    penalty: 0,
+  },
 ): { attached: Attachment[]; watch: string[] } {
   const open = insights.filter(
     (i) => i.status === "propose" || i.status === "actif" || i.status === "rejete",
@@ -120,9 +125,17 @@ export function attachItems(
     for (const insight of open) {
       const others = insight.itemIds.filter((id) => id !== item.id && vectors.has(id));
       if (others.length === 0) continue;
+      const penalty = (id: string) =>
+        item.product_area !== undefined &&
+        crossArea.areas.has(id) &&
+        crossArea.areas.get(id) !== item.product_area
+          ? crossArea.penalty
+          : 0;
       const mean =
-        others.reduce((sum, id) => sum + cosineSimilarity(item.vector, vectors.get(id)!), 0) /
-        others.length;
+        others.reduce(
+          (sum, id) => sum + cosineSimilarity(item.vector, vectors.get(id)!) - penalty(id),
+          0,
+        ) / others.length;
       if (
         !best ||
         mean > best.similarity ||
@@ -139,14 +152,20 @@ export function attachItems(
 
 /** Groups of at least `minItems` close watched items: each becomes a proposed insight (CL-16). */
 export function watchGroups(
-  items: readonly { id: string; vector: Vector }[],
+  items: readonly { id: string; vector: Vector; product_area?: string }[],
   distanceThreshold: number,
   minItems: number,
+  crossAreaPenalty = 0,
 ): string[][] {
   const sorted = items.toSorted((a, b) => a.id.localeCompare(b.id, "en", { numeric: true }));
   const { clusters } = agglomerativeCluster(
     sorted.map((i) => i.vector),
-    { distanceThreshold, minClusterSize: minItems },
+    {
+      distanceThreshold,
+      minClusterSize: minItems,
+      labels: sorted.map((i) => i.product_area ?? ""),
+      crossLabelPenalty: crossAreaPenalty,
+    },
   );
   return clusters.map((c) => c.map((k) => sorted[k].id).sort());
 }
@@ -392,7 +411,10 @@ async function incrementalSteps(
 
   const toPlace = newItems.filter((i) => isClusterable(i) && !inInsight.has(i.id));
   const { attached, watch } = await step("match", { items: toPlace.length }, async () =>
-    attachItems(toPlace, state.previous, vectors, threshold),
+    attachItems(toPlace, state.previous, vectors, threshold, {
+      areas: new Map(state.items.map((i) => [i.id, i.product_area])),
+      penalty: weighting.clustering.cross_area_penalty,
+    }),
   );
   const touched = new Set<string>(attached.map((a) => a.insightId));
   if (attached.length) {
@@ -423,7 +445,12 @@ async function incrementalSteps(
   const watched = (watchedRows ?? [])
     .map((r) => byId.get(r.id))
     .filter((i): i is ClusteringItem => i !== undefined && !inInsight.has(i.id));
-  const groups = watchGroups(watched, threshold, weighting.clustering.watch_queue_min_items);
+  const groups = watchGroups(
+    watched,
+    threshold,
+    weighting.clustering.watch_queue_min_items,
+    weighting.clustering.cross_area_penalty,
+  );
   await step("label", { groups: groups.length }, async () => {
     for (const group of groups) {
       const items = group.map((id) => byId.get(id)!);

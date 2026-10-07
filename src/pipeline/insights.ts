@@ -226,12 +226,17 @@ export async function loadClusteringState(
 /** Clusters the items that carry a problem (praise, questions and « autre » are left out, CL-04). */
 export function clusterItems(
   items: readonly ClusteringItem[],
-  options: { distanceThreshold: number; minClusterSize: number },
+  options: { distanceThreshold: number; minClusterSize: number; crossAreaPenalty?: number },
 ): { clusters: CurrentCluster[]; unclustered: string[]; eligible: number } {
   const eligible = items.filter(isClusterable);
   const result = agglomerativeCluster(
     eligible.map((i) => i.vector),
-    options,
+    {
+      distanceThreshold: options.distanceThreshold,
+      minClusterSize: options.minClusterSize,
+      labels: eligible.map((i) => i.product_area),
+      crossLabelPenalty: options.crossAreaPenalty,
+    },
   );
   return {
     clusters: result.clusters.map((c) => ({ itemIds: c.map((k) => eligible[k].id).sort() })),
@@ -302,6 +307,7 @@ export async function runClustering(
   const clustered = clusterItems(state.items, {
     distanceThreshold: threshold,
     minClusterSize: weighting.clustering.min_cluster_size,
+    crossAreaPenalty: weighting.clustering.cross_area_penalty,
   });
   const match = matchClusters(state.previous, clustered.clusters, {
     jaccard: weighting.clustering.run_matching_jaccard,

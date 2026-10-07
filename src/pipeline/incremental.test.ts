@@ -60,6 +60,31 @@ describe("attachItems", () => {
   });
 });
 
+describe("attachItems across product areas", () => {
+  it("counts an insight item of another area farther, as the full run does", () => {
+    const vectors = new Map<string, number[]>([
+      ["R-1.1", [1, 0, 0]],
+      ["R-2.1", [0.95, 0.05, 0]],
+    ]);
+    const insights = [{ id: "I-01", status: "actif" as const, itemIds: ["R-1.1", "R-2.1"] }];
+    const areas = new Map([
+      ["R-1.1", "performance"],
+      ["R-2.1", "performance"],
+    ]);
+    const item = (area: string) => ({ id: "R-9.1", vector: [1, 0.85, 0], product_area: area });
+    expect(
+      attachItems([item("performance")], insights, vectors, THRESHOLD, { areas, penalty: 0.1 })
+        .attached,
+    ).toHaveLength(1);
+    expect(
+      attachItems([item("tableau_kanban")], insights, vectors, THRESHOLD, { areas, penalty: 0.1 }),
+    ).toEqual({
+      attached: [],
+      watch: ["R-9.1"],
+    });
+  });
+});
+
 describe("watchGroups", () => {
   it("forms a group from 3 close watched items only (CL-16)", () => {
     const close = (id: string, x: number) => ({ id, vector: [1, x, 0] });
@@ -76,6 +101,17 @@ describe("watchGroups", () => {
         3,
       ),
     ).toEqual([["R-1.1", "R-2.1", "R-3.1"]]);
+  });
+
+  it("does not group watched items of different areas that are only loosely close", () => {
+    const item = (id: string, x: number, product_area: string) => ({
+      id,
+      vector: [1, x, 0],
+      product_area,
+    });
+    const watched = [item("R-1.1", 0, "a"), item("R-2.1", 0.3, "b"), item("R-3.1", 0.6, "c")];
+    expect(watchGroups(watched, THRESHOLD, 3)).toHaveLength(1);
+    expect(watchGroups(watched, THRESHOLD, 3, 0.2)).toEqual([]);
   });
 });
 
