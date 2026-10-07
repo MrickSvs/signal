@@ -8,76 +8,22 @@ import { MODELS } from "@/lib/llm/models";
 
 export type DigestView = Pick<
   Tables<"digests">,
-  "id" | "period_start" | "period_end" | "created_at" | "markdown"
+  "id" | "period_start" | "period_end" | "created_at"
 > &
-  DigestContent & {
-    /** Digest written just before this one, for the « digest précédent » link. */
-    previousId: string | null;
-    isLatest: boolean;
-  };
+  DigestContent;
 
-/** The latest digest, or the one asked for; null when no digest exists yet (or unknown id). */
-export async function getDigest(db: Db, id?: string): Promise<DigestView | null> {
-  const select = "id, period_start, period_end, created_at, markdown, content";
-  const latest = await db
-    .from("digests")
-    .select(select)
-    .order("period_end", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (latest.error) throw new Error(`Lecture du dernier digest (${latest.error.message})`);
-  if (!latest.data) return null;
-  let digest = latest.data;
-  if (id && id !== digest.id) {
-    if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
-    const asked = await db.from("digests").select(select).eq("id", id).maybeSingle();
-    if (asked.error) throw new Error(`Lecture du digest ${id} (${asked.error.message})`);
-    if (!asked.data) return null;
-    digest = asked.data;
-  }
-  const previous = await db
-    .from("digests")
-    .select("id")
-    .lt("period_end", digest.period_end)
-    .order("period_end", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (previous.error) throw new Error(`Lecture du digest précédent (${previous.error.message})`);
-  const { content, ...rest } = digest;
-  return {
-    ...rest,
-    ...readDigestContent(content, MODELS.reasoning),
-    previousId: previous.data?.id ?? null,
-    isLatest: digest.id === latest.data.id,
-  };
-}
-
-export type OpenAlertDossier = Pick<
-  Tables<"alerts">,
-  | "id"
-  | "kind"
-  | "insight_id"
-  | "feedback_ids"
-  | "dossier_status"
-  | "dossier_markdown"
-  | "created_at"
-> & { insight_title: string | null };
-
-/** Alerts still open now, with their dossier when it is written (SPEC §10.10), oldest first. */
-export async function listOpenAlertDossiers(db: Db): Promise<OpenAlertDossier[]> {
+/** The latest digest; null before the first one (ADR-033: older digests are not shown). */
+export async function getDigest(db: Db): Promise<DigestView | null> {
   const { data, error } = await db
-    .from("alerts")
-    .select(
-      "id, kind, insight_id, feedback_ids, dossier_status, dossier_markdown, created_at, insights(title)",
-    )
-    .in("status", ["nouvelle", "vue"])
-    .order("created_at")
-    .limit(20);
-  if (error) throw new Error(`Lecture des alertes (${error.message})`);
-  return data.map(({ insights, ...alert }) => ({
-    ...alert,
-    insight_title: insights?.title ?? null,
-  }));
+    .from("digests")
+    .select("id, period_start, period_end, created_at, content")
+    .order("period_end", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Lecture du dernier digest (${error.message})`);
+  if (!data) return null;
+  const { content, ...rest } = data;
+  return { ...rest, ...readDigestContent(content, MODELS.reasoning) };
 }
 
 /** Feedbacks per week over the history window (insights.trend.weekly, oldest first, §8.8). */

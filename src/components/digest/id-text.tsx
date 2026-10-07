@@ -2,7 +2,7 @@ import { BacklogItemChip, EvidenceChip, InsightChip } from "@/components/signal/
 import { parseDigestMarkdown, splitIds } from "@/lib/digest/content";
 
 /** A text whose readable ids become clickable chips (SPEC §12.1). Rendered as text, never HTML. */
-export function IdText({ text }: { text: string }) {
+export function IdText({ text, bare = false }: { text: string; bare?: boolean }) {
   return (
     <>
       {splitIds(text).map((part, index) => {
@@ -11,7 +11,7 @@ export function IdText({ text }: { text: string }) {
         // An item (R-042.1) opens the preview of its feedback.
         if (id.startsWith("R-")) return <EvidenceChip key={index} id={id.split(".")[0]!} />;
         if (id.startsWith("I-")) return <InsightChip key={index} id={id} />;
-        if (/^(?:US|BUG|TT)-/.test(id)) return <BacklogItemChip key={index} id={id} />;
+        if (/^(?:US|BUG|TT)-/.test(id)) return <BacklogItemChip key={index} id={id} bare={bare} />;
         return (
           <span key={index} className="font-mono text-[13px] font-medium">
             {id}

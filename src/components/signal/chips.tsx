@@ -165,10 +165,19 @@ function PreviewStat({ label, value }: { label: string; value: string }) {
 }
 
 /** « US-012 » / « BUG-003 » / « TT-004 » with a type badge → summary of the backlog item. */
-export function BacklogItemChip({ id, title }: { id: string; title?: string | null }) {
+export function BacklogItemChip({
+  id,
+  title,
+  bare = false,
+}: {
+  id: string;
+  title?: string | null;
+  /** Without the kind badge, where the id sits among other ids (the preview still shows it). */
+  bare?: boolean;
+}) {
   return (
     <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
-      <BacklogKindBadge kind={kindFromBacklogId(id)} />
+      {!bare && <BacklogKindBadge kind={kindFromBacklogId(id)} />}
       <IdPreview
         id={id}
         load={loadBacklogItemPreview}

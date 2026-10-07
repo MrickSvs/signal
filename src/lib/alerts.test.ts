@@ -37,12 +37,19 @@ describe("alert messages", () => {
     expect(
       dossierSummary({
         titre: "T",
+        recommandation: "R",
         confiance: "haute",
         action: { type: "prevenir_csm", cible: "C-013" },
       }),
-    ).toEqual({ titre: "T", confiance: "haute", action: { type: "prevenir_csm", cible: "C-013" } });
+    ).toEqual({
+      titre: "T",
+      recommandation: "R",
+      confiance: "haute",
+      action: { type: "prevenir_csm", cible: "C-013" },
+    });
     expect(dossierSummary({ erreur: "budget" })).toEqual({
       titre: null,
+      recommandation: null,
       confiance: null,
       action: null,
     });

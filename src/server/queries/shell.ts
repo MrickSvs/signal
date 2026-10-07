@@ -35,8 +35,9 @@ export type OpenAlert = Pick<
   | "created_at"
 > & {
   insight_title: string | null;
-  /** From the dossier: its title, confidence and the proposed action (closed list). */
+  /** From the dossier: its title, recommendation, confidence and the proposed action (closed list). */
   titre: string | null;
+  recommandation: string | null;
   confiance: string | null;
   action: { type: DossierAction; cible: string | null } | null;
 };
@@ -44,15 +45,17 @@ export type OpenAlert = Pick<
 /** The parts of a stored dossier the cards show (jsonb written by the investigation). */
 export function dossierSummary(
   dossier: unknown,
-): Pick<OpenAlert, "titre" | "confiance" | "action"> {
+): Pick<OpenAlert, "titre" | "recommandation" | "confiance" | "action"> {
   const d = (dossier ?? {}) as {
     titre?: unknown;
+    recommandation?: unknown;
     confiance?: unknown;
     action?: { type?: unknown; cible?: unknown };
   };
   const type = d.action?.type;
   return {
     titre: typeof d.titre === "string" ? d.titre : null,
+    recommandation: typeof d.recommandation === "string" ? d.recommandation : null,
     confiance: typeof d.confiance === "string" ? d.confiance : null,
     action:
       typeof type === "string" && (DOSSIER_ACTIONS as readonly string[]).includes(type)

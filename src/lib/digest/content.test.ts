@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { parseDigestMarkdown, pendingDecisions, readDigestContent, splitIds } from "./content";
+import {
+  digestLede,
+  digestPulse,
+  evidenceNotInText,
+  parseDigestMarkdown,
+  pendingDecisions,
+  quietSections,
+  readDigestContent,
+  splitIds,
+} from "./content";
 
 const facts = { period: { start: null, end: "2026-10-03T04:00:00Z" } };
 const writing = {
@@ -126,5 +135,126 @@ describe("pendingDecisions (CL-15)", () => {
     expect(rows[2]!.relation).toEqual({ left: "I-02", verb: "a absorbé", right: "I-05" });
     expect(rows[3]!.relation).toEqual({ left: "I-14", verb: "détaché de", right: "I-03" });
     expect(rows[4]!.param).toBe("impact");
+  });
+});
+
+const emptyFacts = {
+  feedbacks: { total: 0, by_channel: {}, ids: [], confirming_known: [] },
+  emerging: [],
+  new_insights: [],
+  accounts_at_risk: [],
+  ranking: { has_history: true, moves: [], top: [] },
+  pending: {
+    insights_to_validate: [],
+    backlog_to_validate: [],
+    merges: [],
+    splits: [],
+    overrides_context_changed: [],
+  },
+};
+
+describe("digestPulse", () => {
+  it("counts every pending item, the accounts and the new feedbacks", () => {
+    const pulse = digestPulse(
+      {
+        ...emptyFacts,
+        feedbacks: { ...emptyFacts.feedbacks, total: 4 },
+        accounts_at_risk: [
+          {
+            customer_id: "C-013",
+            name: "Studio Bastide",
+            plan: "enterprise",
+            renewal_in_days: 37,
+            health: "rouge",
+            churn_feedback_ids: [],
+            insight_ids: [],
+          },
+        ],
+        pending: {
+          insights_to_validate: ["I-12"],
+          backlog_to_validate: ["US-001", "US-002"],
+          merges: [{ from: "I-05", into: "I-02" }],
+          splits: [],
+          overrides_context_changed: [{ insight_id: "I-03", param: "impact" }],
+        },
+      },
+      2,
+      3,
+    );
+    expect(pulse).toEqual({
+      alerts: 2,
+      recommendations: 3,
+      pending: 5,
+      accountsAtRisk: 1,
+      newFeedbacks: 4,
+    });
+  });
+});
+
+describe("digestLede", () => {
+  const zero = { alerts: 0, recommendations: 0, pending: 0, accountsAtRisk: 0, newFeedbacks: 0 };
+
+  it("puts what waits for a decision first, with singulars and plurals", () => {
+    expect(
+      digestLede({ ...zero, alerts: 1, recommendations: 3, pending: 5, newFeedbacks: 1 }, false),
+    ).toBe(
+      "1 alerte attend ta décision. Signal a 3 recommandations. 5 décisions sont en attente. 1 nouveau retour depuis ta dernière visite.",
+    );
+    expect(digestLede({ ...zero, alerts: 2, recommendations: 1, pending: 1 }, false)).toBe(
+      "2 alertes attendent ta décision. Signal a 1 recommandation. 1 décision est en attente. Aucun nouveau retour depuis ta dernière visite.",
+    );
+  });
+
+  it("says when nothing waits, and does not count new feedbacks on a first digest", () => {
+    expect(digestLede(zero, false)).toBe(
+      "Rien n'attend ta décision. Aucun nouveau retour depuis ta dernière visite.",
+    );
+    expect(digestLede({ ...zero, newFeedbacks: 240 }, true)).toBe(
+      "Rien n'attend ta décision. C'est le premier digest.",
+    );
+  });
+});
+
+describe("quietSections", () => {
+  it("gathers every empty section", () => {
+    expect(quietSections(emptyFacts, true)).toEqual([
+      "aucune décision en attente",
+      "aucune tendance émergente ni sujet nouveau",
+      "aucun mouvement dans le classement",
+      "aucun compte à risque",
+      "aucun nouveau retour",
+    ]);
+  });
+
+  it("says there is no ranking history yet on a first run (CL-18)", () => {
+    const first = { ...emptyFacts, ranking: { has_history: false, moves: [], top: [] } };
+    expect(quietSections(first, false)).toContain("pas encore d'historique de classement");
+    expect(quietSections(first, false)).not.toContain("aucune décision en attente");
+  });
+
+  it("leaves out the sections that have something to show", () => {
+    const busy = {
+      ...emptyFacts,
+      feedbacks: { ...emptyFacts.feedbacks, total: 3 },
+      new_insights: [{ insight_id: "I-12", title: "T", ranked: false }],
+      ranking: {
+        has_history: true,
+        moves: [{ insight_id: "I-35", title: "T", from: 9, to: null }],
+        top: [],
+      },
+    };
+    expect(quietSections(busy, false)).toEqual(["aucun compte à risque"]);
+  });
+});
+
+describe("evidenceNotInText", () => {
+  it("drops the ids the texts already cite, and duplicates", () => {
+    expect(
+      evidenceNotInText(
+        ["C-013", "I-31", "R-078", "R-078", "R-111"],
+        ["Prévenir le CSM", "Deux comptes rattachés à I-31 (C-013 à J+37)."],
+      ),
+    ).toEqual(["R-078", "R-111"]);
+    expect(evidenceNotInText(["R-001"], [])).toEqual(["R-001"]);
   });
 });

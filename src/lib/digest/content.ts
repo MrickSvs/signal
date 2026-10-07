@@ -153,3 +153,80 @@ export function pendingDecisions(pending: DigestFacts["pending"]): PendingDecisi
     });
   return rows;
 }
+
+export type DigestPulse = {
+  alerts: number;
+  recommendations: number;
+  /** Pending decisions, counted one per item (an insight, a backlog item, a merge…). */
+  pending: number;
+  accountsAtRisk: number;
+  newFeedbacks: number;
+};
+
+/** The counters at the top of the Digest screen (SPEC §12.2), from the facts and the open alerts. */
+export function digestPulse(
+  facts: Pick<DigestFacts, "pending" | "accounts_at_risk" | "feedbacks">,
+  openAlerts: number,
+  recommendations: number,
+): DigestPulse {
+  const p = facts.pending;
+  return {
+    alerts: openAlerts,
+    recommendations,
+    pending:
+      p.insights_to_validate.length +
+      p.backlog_to_validate.length +
+      p.merges.length +
+      p.splits.length +
+      p.overrides_context_changed.length,
+    accountsAtRisk: facts.accounts_at_risk.length,
+    newFeedbacks: facts.feedbacks.total,
+  };
+}
+
+/** One sentence under « Bonjour Léa. »: what waits for a decision, then the new feedbacks. */
+export function digestLede(pulse: DigestPulse, first: boolean): string {
+  const sentences: string[] = [];
+  if (pulse.alerts)
+    sentences.push(`${plural(pulse.alerts, "alerte attend", "alertes attendent")} ta décision.`);
+  if (pulse.recommendations)
+    sentences.push(
+      `Signal a ${plural(pulse.recommendations, "recommandation", "recommandations")}.`,
+    );
+  if (pulse.pending)
+    sentences.push(`${plural(pulse.pending, "décision est", "décisions sont")} en attente.`);
+  if (sentences.length === 0) sentences.push("Rien n'attend ta décision.");
+  if (first) sentences.push("C'est le premier digest.");
+  else
+    sentences.push(
+      pulse.newFeedbacks
+        ? `${plural(pulse.newFeedbacks, "nouveau retour", "nouveaux retours")} depuis ta dernière visite.`
+        : "Aucun nouveau retour depuis ta dernière visite.",
+    );
+  return sentences.join(" ");
+}
+
+/** Sections with nothing to show, gathered on one line instead of a title each (SPEC §12.2). */
+export function quietSections(
+  facts: Pick<
+    DigestFacts,
+    "feedbacks" | "emerging" | "new_insights" | "accounts_at_risk" | "ranking"
+  >,
+  inboxEmpty: boolean,
+): string[] {
+  const quiet: string[] = [];
+  if (inboxEmpty) quiet.push("aucune décision en attente");
+  if (facts.emerging.length === 0 && facts.new_insights.length === 0)
+    quiet.push("aucune tendance émergente ni sujet nouveau");
+  if (!facts.ranking.has_history) quiet.push("pas encore d'historique de classement");
+  else if (facts.ranking.moves.length === 0) quiet.push("aucun mouvement dans le classement");
+  if (facts.accounts_at_risk.length === 0) quiet.push("aucun compte à risque");
+  if (facts.feedbacks.total === 0) quiet.push("aucun nouveau retour");
+  return quiet;
+}
+
+/** Evidence ids a text does not already cite, so a row does not show the same id twice. */
+export function evidenceNotInText(evidence: readonly string[], texts: readonly string[]): string[] {
+  const cited = new Set(texts.flatMap((text) => text.match(READABLE_ID) ?? []));
+  return [...new Set(evidence)].filter((id) => !cited.has(id));
+}

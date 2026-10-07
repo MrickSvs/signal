@@ -717,17 +717,20 @@ S'il reste du temps : un bouton « Synchroniser Notion » relit le Statut des pa
 
 ### 12.2 Digest (écran d'accueil)
 
-« Bonjour Léa. Voici ce qui a changé depuis ta dernière visite. »
+« Bonjour Léa. », puis une phrase de synthèse calculée en code (ce qui attend une décision, ce qui a bougé) et une barre de compteurs qui mènent chacun à leur section. L'écran est ordonné par décision, pas par type d'information (ADR-033).
 
-1. **Alertes ouvertes**, avec leur dossier (§10.10). Rien d'autre en tête si une alerte attend.
-2. Nouveaux retours (par canal), en une ligne, dont combien ont simplement confirmé un sujet connu.
-3. **Tendances émergentes** (§8.8, calculées sur 7 jours glissants).
-4. **Comptes à risque** : renouvellement dans moins de 90 jours + signal négatif.
-5. Mouvements dans le classement (au premier run : « pas encore d'historique »).
-6. Décisions en attente : nouveaux insights à valider, éléments du backlog à valider, fusions ou scissions d'insights, overrides dont le contexte a changé.
-7. **Trois recommandations** de Signal maximum, chacune avec ses preuves.
+1. **À traiter** : une seule liste, dans cet ordre.
+   - **Alertes ouvertes** (§10.10), repliées : titre du dossier, recommandation en une phrase, preuves, action proposée, Ignorer, En parler à Signal. Le dossier complet se déplie sous la ligne. Rien ne passe avant une alerte.
+   - **Trois recommandations** de Signal au maximum, chacune avec ses preuves et sa confiance.
+   - **Décisions en attente** : nouveaux insights à valider, éléments du backlog à valider, fusions ou scissions d'insights, overrides dont le contexte a changé.
+2. **Ce qui bouge** : cartes compactes.
+   - **Tendances émergentes** (§8.8, calculées sur 7 jours glissants) et sujets nouveaux.
+   - **Mouvements dans le classement** (au premier run : « pas encore d'historique »).
+   - **Comptes à risque** : renouvellement dans moins de 90 jours + signal négatif, une ligne par compte.
+   - **Nouveaux retours** (par canal), en une ligne, dont combien ont simplement confirmé un sujet connu.
+3. Une section vide ne prend pas de place : les sections sans contenu sont regroupées en une seule ligne (« Rien de neuf : … »).
 
-Les faits sont calculés en code ; Signal rédige. Généré chaque nuit (cron quotidien) et à la demande ; la période couvre depuis le digest précédent, ou depuis la dernière visite de Léa si elle est plus ancienne.
+Les faits sont calculés en code ; Signal rédige les recommandations. Généré chaque nuit (cron quotidien) et à la demande ; la période couvre depuis le digest précédent, ou depuis la dernière visite de Léa si elle est plus ancienne. L'écran montre toujours le dernier digest, avec les alertes ouvertes à l'instant : un ancien digest ne sert à aucune décision. Ce que Signal a écrit et quand reste dans les traces (Langfuse) ; la table `digests` sert au calcul de la période.
 
 ### 12.3 Retours
 
