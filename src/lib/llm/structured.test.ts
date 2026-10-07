@@ -3,7 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { RunCost } from "./cost";
 import { getModel } from "./index";
-import { invokeStructured, StructuredOutputError, toStrictJsonSchema } from "./structured";
+import {
+  invokeStructured,
+  stripJsonLeaks,
+  StructuredOutputError,
+  toStrictJsonSchema,
+} from "./structured";
 
 vi.mock("./index", () => ({ getModel: vi.fn() }));
 
@@ -129,6 +134,23 @@ describe("invokeStructured", () => {
     expect(error.kind).toBe("api");
     expect(error.cause).toBeInstanceOf(Error);
     expect(invoke).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("stripJsonLeaks", () => {
+  it("drops JSON punctuation left after the last sentence of a text field", () => {
+    expect(stripJsonLeaks("pas de découpage nécessaire.}],")).toBe("pas de découpage nécessaire.");
+    expect(stripJsonLeaks('Fin de phrase ! "}]')).toBe("Fin de phrase !");
+    expect(stripJsonLeaks("Voir (T-128)]}")).toBe("Voir (T-128)");
+  });
+
+  it("keeps legitimate endings and walks nested values", () => {
+    expect(stripJsonLeaks("liste [a, b]")).toBe("liste [a, b]");
+    expect(stripJsonLeaks("Phrase.")).toBe("Phrase.");
+    expect(stripJsonLeaks("un, deux,")).toBe("un, deux,");
+    expect(
+      stripJsonLeaks({ items: [{ rationale: "Trois points.}]", points: 3 }], note: null }),
+    ).toEqual({ items: [{ rationale: "Trois points.", points: 3 }], note: null });
   });
 });
 

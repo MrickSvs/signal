@@ -104,7 +104,7 @@ export async function invokeStructured<T>(
     options.runCost?.add(modelId, callUsage);
 
     const text = textOf(message);
-    const result = schema.safeParse(parseJson(text));
+    const result = schema.safeParse(stripJsonLeaks(parseJson(text)));
     if (result.success) {
       return { data: result.data, usage, costEur: costEur(modelId, usage), attempts: attempt };
     }
@@ -182,6 +182,20 @@ function textOf(message: AIMessage): string {
   return message.content
     .map((block) => (block.type === "text" && typeof block.text === "string" ? block.text : ""))
     .join("");
+}
+
+// A text field that ends a sentence and then carries JSON punctuation (« …nécessaire.}], ») has
+// swallowed the end of the structure: the punctuation after the sentence is dropped.
+const LEAKED_JSON_TAIL = /([.!?…»)])\s*(?=[\s"',]*[}\]])[\s"'},\]]+$/;
+
+/** Removes leaked JSON punctuation at the end of every string of a parsed output (pure). */
+export function stripJsonLeaks(value: unknown): unknown {
+  if (typeof value === "string") return value.replace(LEAKED_JSON_TAIL, "$1");
+  if (Array.isArray(value)) return value.map(stripJsonLeaks);
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, stripJsonLeaks(v)]));
+  }
+  return value;
 }
 
 function parseJson(text: string): unknown {
