@@ -33,9 +33,28 @@ export const DEFAULT_MAX_CONCURRENCY = 2;
 const TRIAGE_CONCURRENCY_PER_BATCH = 4;
 
 export type RunFailure = { step: string; id: string | null; error: string };
-export type RunCostTotals = { eur: number; tokensIn: number; tokensOut: number };
+/** `byNode`: € per graph node, shown on the Évals screen (SPEC §12.7). */
+export type RunCostTotals = {
+  eur: number;
+  tokensIn: number;
+  tokensOut: number;
+  byNode: Record<string, number>;
+};
 
-const ZERO_COST: RunCostTotals = { eur: 0, tokensIn: 0, tokensOut: 0 };
+const ZERO_COST: RunCostTotals = { eur: 0, tokensIn: 0, tokensOut: 0, byNode: {} };
+
+export function addCostTotals(a: RunCostTotals, b: RunCostTotals): RunCostTotals {
+  // A checkpoint written before `byNode` existed has none.
+  const byNode = { ...a.byNode };
+  for (const [node, eur] of Object.entries(b.byNode ?? {}))
+    byNode[node] = (byNode[node] ?? 0) + eur;
+  return {
+    eur: a.eur + b.eur,
+    tokensIn: a.tokensIn + b.tokensIn,
+    tokensOut: a.tokensOut + b.tokensOut,
+    byNode,
+  };
+}
 
 export const PipelineState = Annotation.Root({
   runId: Annotation<string>,
@@ -55,11 +74,7 @@ export const PipelineState = Annotation.Root({
     default: () => ({}),
   }),
   cost: Annotation<RunCostTotals>({
-    reducer: (a, b) => ({
-      eur: a.eur + b.eur,
-      tokensIn: a.tokensIn + b.tokensIn,
-      tokensOut: a.tokensOut + b.tokensOut,
-    }),
+    reducer: addCostTotals,
     default: () => ZERO_COST,
   }),
 });
@@ -80,10 +95,11 @@ export type PipelineContext = {
   sleep?: (ms: number) => Promise<void>;
 };
 
-const totals = (cost: RunCost): RunCostTotals => ({
+const totals = (cost: RunCost, node: string): RunCostTotals => ({
   eur: cost.eur,
   tokensIn: cost.tokensIn,
   tokensOut: cost.tokensOut,
+  byNode: { [node]: cost.eur },
 });
 
 export function chunk<T>(items: readonly T[], size: number): T[][] {
@@ -168,7 +184,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
           id: f.feedbackId,
           error: f.error,
         })),
-        cost: totals(runCost),
+        cost: totals(runCost, "triage"),
       };
     });
 
@@ -188,7 +204,10 @@ export function buildPipelineGraph(ctx: PipelineContext) {
     withSpan("pipeline-embed", { runId: state.runId }, async () => {
       const runCost = new RunCost();
       const summary = await runEmbed(db, { runCost, embedFn: ctx.embedFn });
-      return { stats: { embed: { embedded: summary.embedded.length } }, cost: totals(runCost) };
+      return {
+        stats: { embed: { embedded: summary.embedded.length } },
+        cost: totals(runCost, "embed"),
+      };
     });
 
   const cluster = async (state: PipelineStateType): Promise<PipelineUpdate> =>
@@ -237,7 +256,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
             label_calls: summary.labelCalls,
           },
         },
-        cost: totals(runCost),
+        cost: totals(runCost, "cluster"),
       };
     });
 
@@ -257,7 +276,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
             cached: [...estimates.values()].filter((e) => e.cached).length,
           },
         },
-        cost: totals(runCost),
+        cost: totals(runCost, "estimate"),
       };
     });
 
@@ -291,7 +310,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
             context_changed: summary.contextChanged,
           },
         },
-        cost: totals(runCost),
+        cost: totals(runCost, "score"),
       };
     });
 
@@ -327,7 +346,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
       return {
         failures: result.error ? [{ step: "digest", id: result.id, error: result.error }] : [],
         stats: { digest: { id: result.id, writer: result.writer } },
-        cost: totals(runCost),
+        cost: totals(runCost, "digest"),
       };
     });
 

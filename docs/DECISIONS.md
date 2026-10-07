@@ -431,3 +431,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Annotation** `/evals/annotate` et `POST /api/evals/annotations`, absentes en production : une ligne par annotation dans `evals/human-labels/backlog.jsonl`, la dernière ligne d'un élément fait foi.
   - **eval:backlog** : la rédaction est extraite de `draftBacklog` (`composeDraft`, aucune écriture sauf le cache d'estimation) et jouée comme si l'insight n'avait pas de backlog ; type attendu par pattern (SPEC §14.2), puis note du juge sur chaque élément (non estimé un à un, donc sans points).
 - **Conséquences** : un badge coûte un appel Opus par élément au lieu d'un par rédaction (~0,04 € l'élément). Le sujet manuel technique d'`eval:backlog` n'existe pas encore en base : le cas est signalé non mesuré (ou `--manual I-xx`). La calibration attend l'annotation du PO (~1 h).
+
+## ADR-030 — Écran Évals : lu dans eval_runs et decisions, coût du pipeline réparti par nœud
+
+- **Date** : 2026-10-06
+- **Statut** : acceptée
+- **Contexte** : étape 6.4 (SPEC §12.7, §14.4). Les runners d'evals écrivent déjà `eval_runs.metrics` (mesures, cibles, `met`, jeu, notes) ; le coût d'un run complet n'était enregistré qu'en total.
+- **Décision** :
+  - **Types partagés** : `EvalName`, `Metric`, `EvalSummary`, le catalogue `EVALS` et `StoredEvalRun` passent dans `src/lib/evals/` ; `scripts/evals/lib` les réexporte. `src` ne lit toujours rien sous `evals/` (règle 4).
+  - **Statut d'une carte**, calculé en code sur les mesures qui ont une cible : vert si toutes sont atteintes, orange si une partie, rouge si aucune. Les cibles manquées sont nommées sur la carte. Tendance : la mesure principale (la première avec une cible) de chaque run terminé.
+  - **Métrique de production** (`src/lib/evals/production.ts`, pure) : backlog validé sans modification = éléments avec une validation de `status` par le PO et aucune décision `modification` ; MoSCoW retenus = insights validés ou dont le PO a changé le MoSCoW, sans override MoSCoW en vigueur (dernier override annulé = retenu) ; désaccords = décisions `desaccord`.
+  - **Coût par nœud** : le canal `cost` du graphe porte `byNode` (€ par nœud, additionnés par le reducer `addCostTotals`, tolérant aux checkpoints antérieurs) ; `pipeline:run` l'écrit dans `pipeline_runs.stats.cost_by_node`. Pas de migration : `stats` est en jsonb.
+  - **Comparatif Haiku / Sonnet** : coût mesuré pour 100 retours × nombre de retours du jeu de démo, calculé en code.
+- **Conséquences** : un run complet enregistré avant cette étape affiche son total seul, avec un renvoi vers sa trace Langfuse ; la répartition apparaît au prochain `pnpm pipeline:run`.

@@ -3,7 +3,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { describe, expect, it, vi } from "vitest";
 import { loadContextPack } from "@/lib/context";
 import { fakeEmbed, fakeEstimateFn, fakeInvoke, memoryDb, NOW, SKILLS, world } from "./fake-world";
-import { chunk, compilePipeline, runPipeline, type PipelineContext } from "./graph";
+import { addCostTotals, chunk, compilePipeline, runPipeline, type PipelineContext } from "./graph";
 
 const pack = await loadContextPack();
 
@@ -37,6 +37,22 @@ describe("chunk", () => {
   });
 });
 
+describe("addCostTotals", () => {
+  it("sums the totals and the cost of each node, even from a checkpoint without byNode", () => {
+    const legacy = { eur: 1, tokensIn: 10, tokensOut: 2 } as never;
+    const sum = addCostTotals(legacy, {
+      eur: 0.5,
+      tokensIn: 5,
+      tokensOut: 1,
+      byNode: { triage: 0.5 },
+    });
+    expect(sum).toEqual({ eur: 1.5, tokensIn: 15, tokensOut: 3, byNode: { triage: 0.5 } });
+    expect(
+      addCostTotals(sum, { eur: 0.25, tokensIn: 0, tokensOut: 0, byNode: { triage: 0.25 } }).byNode,
+    ).toEqual({ triage: 0.75 });
+  });
+});
+
 describe("pipeline graph (in-memory database, simulated models)", () => {
   it("runs end to end: triage fan-out, clustering, estimate, score; no alert on a first run", async () => {
     const tables = world();
@@ -66,6 +82,10 @@ describe("pipeline graph (in-memory database, simulated models)", () => {
       alert: { skipped: "premier run" },
     });
     expect(tables.alerts).toEqual([]);
+    // Évals screen: the cost of the run, split by node, adds up to the total.
+    const byNode = Object.values(state.cost.byNode).reduce((a, b) => a + b, 0);
+    expect(byNode).toBeCloseTo(state.cost.eur, 10);
+    expect(Object.keys(state.cost.byNode)).toContain("triage");
   });
 
   it("records a failed feedback without stopping the run (CL-11)", async () => {

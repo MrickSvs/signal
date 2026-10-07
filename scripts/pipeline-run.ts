@@ -181,6 +181,13 @@ async function main() {
             mode: "full",
             ...state.stats,
             failures: state.failures,
+            // Évals screen (SPEC §12.7): what each node cost, rounded like cost_eur.
+            cost_by_node: Object.fromEntries(
+              Object.entries(state.cost.byNode ?? {}).map(([node, eur]) => [
+                node,
+                Number(eur.toFixed(4)),
+              ]),
+            ),
             // A resumed run adds the durations of its attempts.
             duration_s: Math.round(seconds) + (args.resume ? (before.duration_s ?? 0) : 0),
           } as unknown as Json,
