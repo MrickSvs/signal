@@ -3,6 +3,7 @@ import {
   activeFilterCount,
   containsPattern,
   filtersToQuery,
+  neighbors,
   pageCount,
   parseFeedbackFilters,
   periodStart,
@@ -79,5 +80,27 @@ describe("helpers", () => {
     expect(pageCount(0)).toBe(1);
     expect(pageCount(25)).toBe(1);
     expect(pageCount(26)).toBe(2);
+  });
+});
+
+describe("churn filter", () => {
+  it("reads and writes the churn flag", () => {
+    const filters = parseFeedbackFilters({ churn: "1" });
+    expect(filters.churn).toBe(true);
+    expect(filtersToQuery(filters)).toBe("?churn=1");
+    expect(parseFeedbackFilters({ churn: "oui" }).churn).toBeUndefined();
+  });
+});
+
+describe("neighbors", () => {
+  const ids = ["R-050", "R-163", "R-124"];
+  it("gives the previous and next feedbacks and the position", () => {
+    expect(neighbors(ids, "R-163")).toEqual({ previous: "R-050", next: "R-124", position: 2 });
+    expect(neighbors(ids, "R-050")).toEqual({ previous: null, next: "R-163", position: 1 });
+    expect(neighbors(ids, "R-124")).toEqual({ previous: "R-163", next: null, position: 3 });
+  });
+  it("is null when the feedback is not listed", () => {
+    expect(neighbors(ids, "R-999")).toBeNull();
+    expect(neighbors(ids, undefined)).toBeNull();
   });
 });

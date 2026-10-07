@@ -6,11 +6,18 @@ import { AddFeedbackDialog } from "@/components/feedbacks/add-feedback-dialog";
 import { DetailSheet } from "@/components/feedbacks/detail-sheet";
 import { FeedbackDetail } from "@/components/feedbacks/feedback-detail";
 import { FilterBar } from "@/components/feedbacks/filter-bar";
-import { InboxTable } from "@/components/feedbacks/inbox-table";
+import { FeedbackList } from "@/components/feedbacks/feedback-list";
 import { loadContextPack } from "@/lib/context";
 import { getDb } from "@/lib/db/client";
 import { getDemoNow } from "@/lib/demo-now";
-import { activeFilterCount, filtersToQuery, parseFeedbackFilters } from "@/lib/feedbacks/filters";
+import {
+  INBOX_PAGE_SIZE,
+  activeFilterCount,
+  filtersToQuery,
+  neighbors,
+  parseFeedbackFilters,
+} from "@/lib/feedbacks/filters";
+import { formatNumber } from "@/lib/format";
 import { FEEDBACK_ID } from "@/server/queries/evidence";
 import { getFeedbackDetail, listFeedbackInbox, listInboxOptions } from "@/server/queries/feedbacks";
 
@@ -34,13 +41,22 @@ export default async function FeedbacksPage({ searchParams }: PageProps<"/retour
   }
   const insightTitles = new Map(options.insights.map((i) => [i.id, i.title]));
   const filtered = activeFilterCount(filters) > 0;
+  const around = neighbors(
+    rows.map((r) => r.id),
+    selected,
+  );
+  const stepHref = (id: string | null) =>
+    id ? `/retours${filtersToQuery(filters, { retour: id })}` : null;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-5 px-8 py-6">
-      <header className="flex items-start justify-between gap-4">
-        <p className="max-w-2xl leading-relaxed text-muted-foreground">
-          Tous les retours clients, du plus récent au plus ancien. Clique un retour pour voir son
-          verbatim, son analyse et pourquoi Signal l&apos;a classé ainsi.
+    <div className="@container mx-auto flex max-w-6xl flex-col gap-4 px-8 py-6">
+      <header className="flex items-center justify-between gap-4">
+        <p className="flex items-baseline gap-2">
+          <span className="text-xl font-semibold tabular-nums">{formatNumber(total)}</span>
+          <span className="text-muted-foreground">
+            {total > 1 ? "retours" : "retour"}
+            {filtered ? " avec ces filtres" : ", du plus récent au plus ancien"}
+          </span>
         </p>
         <AddFeedbackDialog customers={options.customers} />
       </header>
@@ -69,7 +85,7 @@ export default async function FeedbacksPage({ searchParams }: PageProps<"/retour
           </EmptyState>
         )
       ) : (
-        <InboxTable
+        <FeedbackList
           rows={rows}
           total={total}
           filters={filters}
@@ -80,7 +96,17 @@ export default async function FeedbacksPage({ searchParams }: PageProps<"/retour
       )}
 
       {askedId && (
-        <DetailSheet id={askedId} closeHref={`/retours${filtersToQuery(filters)}`}>
+        <DetailSheet
+          id={askedId}
+          closeHref={`/retours${filtersToQuery(filters)}`}
+          steps={
+            around && {
+              previousHref: stepHref(around.previous),
+              nextHref: stepHref(around.next),
+              label: `${formatNumber((filters.page - 1) * INBOX_PAGE_SIZE + around.position)} sur ${formatNumber(total)}`,
+            }
+          }
+        >
           {detail && pack ? (
             <FeedbackDetail
               feedback={detail}

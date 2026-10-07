@@ -734,7 +734,7 @@ Les faits sont calculés en code ; Signal rédige les recommandations. Généré
 
 ### 12.3 Retours
 
-Tableau filtrable (canal, plan, segment, type, domaine, insight, période, suspicion d'injection). Panneau de détail : verbatim, compte, analyse, « pourquoi ce classement », insight rattaché. Bouton **« Ajouter un retour »** : coller un texte → pipeline incrémental → résultat en quelques secondes.
+Liste des retours, du plus récent au plus ancien, une ligne par retour : le résumé d'abord, les signaux à droite (churn, injection suspectée, échec d'analyse…), puis l'ID, le canal, la date, le compte, le type et le domaine, et l'insight rattaché. Recherche, période (tout, 7 jours, 30 jours) et signaux (churn, injection suspectée, échec d'analyse, fonctionnalité existante) sont à portée de clic ; les autres filtres (canal, plan, segment, type, domaine, insight) se déplient et restent visibles en puces quand ils sont actifs. Panneau de détail : signaux, verbatim, sujets et leur insight avec « pourquoi ce classement », compte, analyse ; on passe au retour précédent ou suivant de la liste sans le fermer (boutons ou flèches ← →). Bouton **« Ajouter un retour »** : coller un texte → pipeline incrémental → résultat en quelques secondes (ADR-034).
 
 ### 12.4 Insights
 

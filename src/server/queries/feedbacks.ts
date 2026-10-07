@@ -36,6 +36,7 @@ export async function listFeedbackInbox(
   if (filters.insight) query = query.contains("insight_ids", [filters.insight]);
   const start = periodStart(filters.periode, now);
   if (start) query = query.gte("received_at", start.toISOString());
+  if (filters.churn) query = query.eq("churn_signal", true);
   if (filters.injection) query = query.eq("injection_suspected", true);
   if (filters.existante) query = query.eq("existing_feature", true);
   if (filters.echec) query = query.eq("analysis_status", "failed");

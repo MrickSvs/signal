@@ -509,3 +509,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Décision** : `PIPELINE_TRIAGE_MODEL = "sonnet"` (`src/pipeline/nodes/triage.ts`) pour le run complet, le mode incrémental et `pipeline:triage` ; le triage Sonnet passe par le rôle `reasoning` (pensée adaptative, sans température). Le rôle `triage` garde Haiku pour que `eval:triage --compare` mesure toujours les deux.
 - **Alternatives écartées** : changer l'identifiant du rôle `triage` (la comparaison perdrait Haiku et sa grille de prix) ; Opus (environ deux fois le prix de Sonnet, gain attendu marginal sur un classement).
 - **Conséquences** : coût du triage ~0,90 € pour 100 retours au lieu de 0,15 € (run complet de la démo ~3,10 € au lieu de ~1,50 €) ; ~1,5 s de plus par retour collé en direct (latence médiane 4,3 s contre 2,8 s).
+
+## ADR-034 — Écran Retours : une liste à lire, des filtres repliés, un détail qu'on parcourt
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : SPEC §12.3 décrivait un tableau filtrable. À 1 280 × 800 avec le chat ouvert, sept listes et trois cases occupaient la moitié du premier écran, le résumé (l'information principale) était coupé dans une colonne étroite, on voyait trois retours, et lire le suivant obligeait à fermer le panneau.
+- **Décision** :
+  - **Liste** d'une ligne par retour : résumé en tête sur toute la largeur, signaux à droite, puis une ligne de contexte (ID, canal, date, compte et plan en texte, type et domaine) et l'insight rattaché. Toute la ligne ouvre le détail.
+  - **Couleurs** réservées aux signaux, comme dans le Digest (ADR-033) : ambre pour le churn, rouge pour ce qui demande une vérification (injection, échec d'analyse), neutre pour le reste. Le plan et le canal passent en texte dans la liste.
+  - **Filtres** : recherche, période en trois choix et signaux en puces sur deux lignes ; canal, plan, segment, type, domaine et insight dans un panneau replié, rappelés en puces retirables quand ils sont actifs. Nouveau filtre **Churn** (`churn_signal` existe déjà dans la vue `feedback_inbox`, pas de migration).
+  - **Détail** : signaux en tête, sujets et insights avant le compte, navigation précédent / suivant dans la page courante de la liste (boutons, flèches ← →) avec la position (« 2 sur 7 »), croix de fermeture dans cette barre.
+  - Le texte d'introduction disparaît au profit du nombre de retours.
+- **Conséquences** : la navigation du détail s'arrête aux bords de la page affichée (25 retours) ; un lien direct vers un retour absent de la page ouvre le détail sans navigation.

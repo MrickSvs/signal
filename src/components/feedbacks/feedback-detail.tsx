@@ -65,6 +65,7 @@ export function FeedbackDetail({
             {formatRelative(feedback.received_at, now)}
           </span>
         </div>
+        <FeedbackSignals flags={signalFlags(feedback)} max={6} />
         {feedback.subject && <p className="font-semibold">{feedback.subject}</p>}
         {feedback.author_name && (
           <p className="text-muted-foreground">
@@ -90,94 +91,14 @@ export function FeedbackDetail({
         )}
       </Section>
 
-      <Section title="Compte">
-        {customer ? (
-          <>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="font-semibold">{customer.name}</span>
-              <span className="font-mono text-muted-foreground">{customer.id}</span>
-              {customer.status === "prospect" ? (
-                <Pill className="border-border text-muted-foreground">Prospect</Pill>
-              ) : (
-                <PlanBadge plan={customer.plan} />
-              )}
-              <HealthBadge health={customer.health} />
-            </div>
-            <dl className="grid grid-cols-3 gap-3">
-              <Fact label="Segment">{SEGMENT_LABELS[customer.segment]}</Fact>
-              <Fact label="MRR">{formatEur(customer.mrr_eur)}</Fact>
-              <Fact label="Renouvellement">
-                {customer.renewal_date ? (
-                  <span title={formatDate(customer.renewal_date)}>
-                    {formatDaysUntil(customer.renewal_date, now)}
-                  </span>
-                ) : (
-                  "—"
-                )}
-              </Fact>
-            </dl>
-          </>
-        ) : (
-          <p className="text-muted-foreground">
-            Compte non identifié : compté pour un compte, sans extrapolation, dans le Reach.
-          </p>
-        )}
-      </Section>
-
-      <Section title="Analyse du retour">
-        {!analysis ? (
-          <p className="text-muted-foreground">
-            Pas encore analysé : le retour attend le prochain run.
-          </p>
-        ) : analysis.status === "failed" ? (
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <FeedbackSignals flags={{ ...signalFlags(feedback), analysis_status: "failed" }} />
-              <ModelBadge model={analysis.model} />
-            </div>
-            <p className="leading-relaxed text-muted-foreground">
-              Le triage a échoué après les nouvelles tentatives (CL-11). Le retour sera repris par{" "}
-              <code className="font-mono text-[13px]">pnpm pipeline:triage --retry-failed</code> ou
-              le prochain run.
-            </p>
-            {analysis.error && (
-              <p className="rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px] break-words">
-                {analysis.error}
-              </p>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <ModelBadge model={analysis.model} />
-              <FeedbackSignals flags={signalFlags(feedback)} max={6} />
-            </div>
-            <dl className="grid grid-cols-4 gap-3">
-              <Fact label="Sentiment">
-                {analysis.sentiment !== null ? sentimentLabel(analysis.sentiment) : "—"}
-              </Fact>
-              <Fact label="Urgence">
-                {analysis.urgency ? URGENCY_LABELS[analysis.urgency] : "—"}
-              </Fact>
-              <Fact label="Langue">
-                {feedback.language ? languageLabel(feedback.language) : "—"}
-              </Fact>
-              <Fact label="Confiance">
-                {analysis.confidence !== null ? formatPercent(analysis.confidence) : "—"}
-              </Fact>
-            </dl>
-            {analysis.injection_suspected && (
-              <p className="leading-relaxed text-muted-foreground">
-                Le texte contient une instruction visant l&apos;IA. Signal l&apos;a classé sur son
-                contenu réel et ne l&apos;a pas exécutée.
-              </p>
-            )}
-          </>
-        )}
-      </Section>
-
       {feedback.items.length > 0 && (
-        <Section title={feedback.items.length > 1 ? `${feedback.items.length} sujets` : "Sujet"}>
+        <Section
+          title={
+            feedback.items.length > 1
+              ? `${feedback.items.length} sujets et leurs insights`
+              : "Sujet et insight"
+          }
+        >
           <ol className="flex flex-col gap-3">
             {feedback.items.map((item) => (
               <li key={item.id} className="flex flex-col gap-2 rounded-lg border px-4 py-3">
@@ -225,6 +146,89 @@ export function FeedbackDetail({
           </ol>
         </Section>
       )}
+      <Section title="Compte">
+        {customer ? (
+          <>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="font-semibold">{customer.name}</span>
+              <span className="font-mono text-muted-foreground">{customer.id}</span>
+              {customer.status === "prospect" ? (
+                <Pill className="border-border text-muted-foreground">Prospect</Pill>
+              ) : (
+                <PlanBadge plan={customer.plan} />
+              )}
+              <HealthBadge health={customer.health} />
+            </div>
+            <dl className="grid grid-cols-3 gap-3">
+              <Fact label="Segment">{SEGMENT_LABELS[customer.segment]}</Fact>
+              <Fact label="MRR">{formatEur(customer.mrr_eur)}</Fact>
+              <Fact label="Renouvellement">
+                {customer.renewal_date ? (
+                  <span title={formatDate(customer.renewal_date)}>
+                    {formatDaysUntil(customer.renewal_date, now)}
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </Fact>
+            </dl>
+          </>
+        ) : (
+          <p className="text-muted-foreground">
+            Compte non identifié : compté pour un compte, sans extrapolation, dans le Reach.
+          </p>
+        )}
+      </Section>
+
+      <Section title="Analyse du retour">
+        {!analysis ? (
+          <p className="text-muted-foreground">
+            Pas encore analysé : le retour attend le prochain run.
+          </p>
+        ) : analysis.status === "failed" ? (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <ModelBadge model={analysis.model} />
+            </div>
+            <p className="leading-relaxed text-muted-foreground">
+              Le triage a échoué après les nouvelles tentatives (CL-11). Le retour sera repris par{" "}
+              <code className="font-mono text-[13px]">pnpm pipeline:triage --retry-failed</code> ou
+              le prochain run.
+            </p>
+            {analysis.error && (
+              <p className="rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px] break-words">
+                {analysis.error}
+              </p>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <ModelBadge model={analysis.model} />
+            </div>
+            <dl className="grid grid-cols-4 gap-3">
+              <Fact label="Sentiment">
+                {analysis.sentiment !== null ? sentimentLabel(analysis.sentiment) : "—"}
+              </Fact>
+              <Fact label="Urgence">
+                {analysis.urgency ? URGENCY_LABELS[analysis.urgency] : "—"}
+              </Fact>
+              <Fact label="Langue">
+                {feedback.language ? languageLabel(feedback.language) : "—"}
+              </Fact>
+              <Fact label="Confiance">
+                {analysis.confidence !== null ? formatPercent(analysis.confidence) : "—"}
+              </Fact>
+            </dl>
+            {analysis.injection_suspected && (
+              <p className="leading-relaxed text-muted-foreground">
+                Le texte contient une instruction visant l&apos;IA. Signal l&apos;a classé sur son
+                contenu réel et ne l&apos;a pas exécutée.
+              </p>
+            )}
+          </>
+        )}
+      </Section>
     </div>
   );
 }

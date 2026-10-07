@@ -25,6 +25,7 @@ export type FeedbackFilters = {
   domaine?: Enums["product_area"];
   insight?: string;
   periode?: Period;
+  churn?: true;
   injection?: true;
   existante?: true;
   echec?: true;
@@ -55,6 +56,7 @@ export function parseFeedbackFilters(params: SearchParams): FeedbackFilters {
     domaine: oneOf(enums.product_area, first(params.domaine)),
     insight: insight && /^I-\d{2,}$/.test(insight) ? insight : undefined,
     periode: oneOf(Object.keys(PERIODS) as Period[], first(params.periode)),
+    churn: flag("churn"),
     injection: flag("injection"),
     existante: flag("existante"),
     echec: flag("echec"),
@@ -98,4 +100,18 @@ export function containsPattern(query: string): string {
 
 export function pageCount(total: number): number {
   return Math.max(1, Math.ceil(total / INBOX_PAGE_SIZE));
+}
+
+/** The feedbacks before and after `id` in the listed order, to step through them in the panel. */
+export function neighbors(
+  ids: readonly string[],
+  id: string | undefined,
+): { previous: string | null; next: string | null; position: number } | null {
+  const index = id ? ids.indexOf(id) : -1;
+  if (index < 0) return null;
+  return {
+    previous: ids[index - 1] ?? null,
+    next: ids[index + 1] ?? null,
+    position: index + 1,
+  };
 }

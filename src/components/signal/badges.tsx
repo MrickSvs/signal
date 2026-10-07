@@ -49,7 +49,7 @@ export function Pill({
   );
 }
 
-const CHANNEL_ICONS: Record<Enums["feedback_channel"], LucideIcon> = {
+export const CHANNEL_ICONS: Record<Enums["feedback_channel"], LucideIcon> = {
   email_client: Mail,
   ticket_support: Ticket,
   commentaire_in_app: MessageSquare,
