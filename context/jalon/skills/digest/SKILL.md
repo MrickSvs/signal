@@ -32,6 +32,7 @@ Une section vide s'écrit en une ligne (« Aucune alerte ouverte. ») ou dispara
 7. **Aucune date absolue ni jour de la semaine** : « depuis ta dernière visite », « J+38 », « ces 7 derniers jours ».
 8. **Premier run, sans historique** : pas de section « mouvements » chiffrée, écris « Pas encore d'historique : c'est le premier classement. » ; tous les insights sont nouveaux et proposés, la section « Décisions en attente » invite à la revue en lot dans l'écran Insights.
 9. **Fusions et scissions** d'insights sont toujours signalées (quel ID a absorbé lequel).
+10. **Recommandations déjà traitées** : Léa a marqué certaines recommandations « fait » ou « écartée ». Ne les propose plus, même reformulées, sauf si un fait nouveau les justifie (un retour, une alerte ou un insight absent de leurs preuves) ; dis alors ce qui a changé. Une recommandation écartée avec une raison respecte cette raison.
 10. **Longueur** : 25 lignes au plus hors dossiers d'alerte.
 
 ## Gabarit

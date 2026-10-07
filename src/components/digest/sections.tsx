@@ -25,9 +25,11 @@ import { formatDateTime, formatEur, formatNumber } from "@/lib/format";
 import { CHANNEL_LABELS, HEALTH_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { DigestFacts } from "@/pipeline/nodes/digest";
+import type { RecommendationAnswered } from "@/server/queries/digest";
 import type { OpenAlert } from "@/server/queries/shell";
 import { AlertRow } from "./alert-row";
 import { IdText } from "./id-text";
+import { RecommendationActions } from "./recommendation-actions";
 import { InboxGroup, InboxMeta, InboxRow, TONES, type InboxTone } from "./inbox";
 import { Sparkline } from "./sparkline";
 
@@ -175,20 +177,41 @@ function Evidence({ ids }: { ids: string[] }) {
   );
 }
 
-function RecommendationRow({ index, r }: { index: number; r: Recommendation }) {
+function RecommendationRow({
+  digestId,
+  index,
+  r,
+  answered,
+}: {
+  digestId: string;
+  index: number;
+  r: Recommendation;
+  answered: RecommendationAnswered | undefined;
+}) {
   const evidence = evidenceNotInText(r.preuves, [r.titre, r.justification]);
   return (
     <InboxRow
       tone="recommendation"
       marker={index + 1}
-      title={<IdText text={r.titre} bare />}
+      title={
+        <span className={cn(answered && "text-muted-foreground line-through decoration-1")}>
+          <IdText text={r.titre} bare />
+        </span>
+      }
       summary={r.justification ? <IdText text={r.justification} bare /> : undefined}
       meta={
         <InboxMeta confidence={r.confiance} label={evidence.length ? "Preuves" : undefined}>
           {evidence.length > 0 && <Evidence ids={evidence} />}
         </InboxMeta>
       }
-      actions={<AskSignalButton size="sm" prompt={recommendationPrompt(r.titre, r.preuves)} />}
+      actions={
+        <div className="flex flex-wrap items-start justify-end gap-1.5">
+          {!answered && (
+            <AskSignalButton size="sm" prompt={recommendationPrompt(r.titre, r.preuves)} />
+          )}
+          <RecommendationActions digestId={digestId} index={index} answered={answered} />
+        </div>
+      }
     />
   );
 }
@@ -237,12 +260,17 @@ function DecisionRow({ row }: { row: PendingDecision }) {
 
 /** Open alerts, then Signal's recommendations, then pending decisions (SPEC §12.2, ADR-033). */
 export function InboxSection({
+  digestId,
   alerts,
   recommendations,
+  answered,
   pending,
 }: {
+  digestId: string;
   alerts: OpenAlert[];
   recommendations: Recommendation[];
+  /** Léa's answers by recommendation index (ADR-036). */
+  answered: Record<number, RecommendationAnswered>;
   pending: DigestFacts["pending"];
 }) {
   const decisions = pendingDecisions(pending);
@@ -269,7 +297,13 @@ export function InboxSection({
             count={recommendations.length}
           >
             {recommendations.map((r, index) => (
-              <RecommendationRow key={index} index={index} r={r} />
+              <RecommendationRow
+                key={index}
+                digestId={digestId}
+                index={index}
+                r={r}
+                answered={answered[index]}
+              />
             ))}
           </InboxGroup>
         )}

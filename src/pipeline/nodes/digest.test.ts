@@ -347,6 +347,36 @@ describe("runDigest (in-memory database, simulated model)", () => {
     expect(tables.digests).toHaveLength(2);
   });
 
+  it("does not propose again a recommendation Léa answered, unless it cites a new id (ADR-036)", async () => {
+    const { tables } = await scenario();
+    const previous = (tables.digests[0].content as { writing: DigestWriting }).writing;
+    const [reco] = previous.recommandations;
+    tables.decisions.push({
+      id: "D-900",
+      entity_type: "recommandation",
+      entity_id: `${tables.digests[0].id}#1`,
+      action: "validation",
+      after: { statut: "fait", titre: reco.titre, preuves: reco.preuves },
+      reason: null,
+      created_at: new Date().toISOString(),
+    });
+    const invoke = fakeInvoke();
+    const result = await runDigest(memoryDb(tables), {
+      runId: null,
+      weighting,
+      skill: SKILLS.digest,
+      now: NOW,
+      clock: new Date(Date.now() + 1000),
+      invoke,
+    });
+    expect(result.writer).toBe("modele");
+    const written = (tables.digests.at(-1)!.content as { writing: DigestWriting }).writing;
+    expect(written.recommandations).toEqual([]);
+    const prompt = JSON.stringify(invoke.mock.calls.at(-1)![2]);
+    expect(prompt).toContain("Recommandations déjà traitées par Léa");
+    expect(prompt).toContain(reco.titre);
+  });
+
   it("falls back on a plain rendering of the facts when the writing fails", async () => {
     const { tables } = await scenario();
     tables.insights[0].title = "[digest-fail] sujet"; // the fake model fails on this marker

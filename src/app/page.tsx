@@ -54,7 +54,9 @@ export default async function DigestPage() {
       facts.accounts_at_risk.map((a) => a.customer_id),
     ),
   ]);
-  const pulse = digestPulse(facts, alerts.length, recommendations.length);
+  // Answered recommendations stay listed (struck through) but no longer count as to do (ADR-036).
+  const openRecommendations = recommendations.length - Object.keys(digest.answered).length;
+  const pulse = digestPulse(facts, alerts.length, openRecommendations);
   const inboxEmpty =
     alerts.length + recommendations.length + pendingDecisions(facts.pending).length === 0;
 
@@ -90,7 +92,13 @@ export default async function DigestPage() {
         <PulseBar pulse={pulse} />
       </header>
 
-      <InboxSection alerts={alerts} recommendations={recommendations} pending={facts.pending} />
+      <InboxSection
+        digestId={digest.id}
+        alerts={alerts}
+        recommendations={recommendations}
+        answered={digest.answered}
+        pending={facts.pending}
+      />
       <RadarSection
         facts={facts}
         weekly={weekly}

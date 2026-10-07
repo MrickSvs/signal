@@ -268,7 +268,12 @@ export function fakeInvoke() {
       }
       case "write-digest": {
         if (body.includes("[digest-fail]")) throw new Error("API indisponible");
-        const facts = JSON.parse(body.slice(body.indexOf("{"), body.lastIndexOf("}") + 1));
+        // The facts come first; answered recommendations (ADR-036) may follow them.
+        const end = body.indexOf("Recommandations déjà traitées");
+        const factsText = end === -1 ? body : body.slice(0, end);
+        const facts = JSON.parse(
+          factsText.slice(factsText.indexOf("{"), factsText.lastIndexOf("}") + 1),
+        );
         const first = facts.feedbacks.ids[0];
         return {
           data: {

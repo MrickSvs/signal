@@ -522,3 +522,14 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Détail** : signaux en tête, sujets et insights avant le compte, navigation précédent / suivant dans la page courante de la liste (boutons, flèches ← →) avec la position (« 2 sur 7 »), croix de fermeture dans cette barre.
   - Le texte d'introduction disparaît au profit du nombre de retours.
 - **Conséquences** : la navigation du détail s'arrête aux bords de la page affichée (25 retours) ; un lien direct vers un retour absent de la page ouvre le détail sans navigation.
+
+## ADR-036 — Recommandations du digest : « Fait » ou « Écarter », journalisé, non reproposé sans fait nouveau
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée ; remplace le point « Alternatives écartées » de l'ADR-033
+- **Contexte** : les recommandations sont réécrites à chaque digest à partir des faits du jour. Une action menée hors de Signal (prévenir un CSM) ne change pas ces faits : la même recommandation revenait chaque jour.
+- **Décision** :
+  - **Deux boutons par recommandation** sur l'écran Digest : « Fait » et « Écarter » (raison facultative). Chaque réponse est une décision (`entity_type` « recommandation », `entity_id` « <digest>#<rang> », action `validation` ou `rejet`, titre et preuves dans `after`). Une recommandation traitée reste listée, barrée, avec son numéro de décision, et ne compte plus dans les choses à traiter.
+  - **Digest suivant** : les réponses des 30 derniers jours lui sont fournies (règle 10 de la skill digest : ne pas reproposer sans fait nouveau). Contrôle en code (`repeatsHandled`) : une recommandation dont toutes les preuves figuraient déjà dans une recommandation traitée est retirée ; un seul ID nouveau (retour, alerte, insight) suffit à la reproposer.
+- **Alternatives écartées** : donner au digest ses recommandations de la veille (il éviterait de rabâcher sans savoir ce que Léa a fait) ; transformer chaque compte à risque en alerte (un compte peut être à risque sans nouveau retour).
+- **Conséquences** : pas de migration (enums de décisions existants). Le reset de démo efface ces décisions avec les autres.

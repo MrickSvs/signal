@@ -2,15 +2,27 @@ import "server-only";
 import type { Db } from "@/lib/db/client";
 import type { Tables } from "@/lib/db/types";
 import { readDigestContent, type DigestContent } from "@/lib/digest/content";
+import {
+  readHandled,
+  RECOMMENDATION_ENTITY,
+  recommendationIndex,
+  recommendationKey,
+  type RecommendationOutcome,
+} from "@/lib/digest/handled";
 import { MODELS } from "@/lib/llm/models";
 
 // Reads of the Digest screen (SPEC §12.2).
+
+export type RecommendationAnswered = { outcome: RecommendationOutcome; decision_id: string };
 
 export type DigestView = Pick<
   Tables<"digests">,
   "id" | "period_start" | "period_end" | "created_at"
 > &
-  DigestContent;
+  DigestContent & {
+    /** Léa's answers to this digest's recommendations, by 0-based index (ADR-036). */
+    answered: Record<number, RecommendationAnswered>;
+  };
 
 /** The latest digest; null before the first one (ADR-033: older digests are not shown). */
 export async function getDigest(db: Db): Promise<DigestView | null> {
@@ -23,7 +35,25 @@ export async function getDigest(db: Db): Promise<DigestView | null> {
   if (error) throw new Error(`Lecture du dernier digest (${error.message})`);
   if (!data) return null;
   const { content, ...rest } = data;
-  return { ...rest, ...readDigestContent(content, MODELS.reasoning) };
+  const read = readDigestContent(content, MODELS.reasoning);
+  const keys = read.writing.recommandations.map((_, i) => recommendationKey(rest.id, i));
+  const answered: Record<number, RecommendationAnswered> = {};
+  if (keys.length) {
+    const { data: rows, error: decisionsError } = await db
+      .from("decisions")
+      .select("id, entity_id, action, after, reason, created_at")
+      .eq("entity_type", RECOMMENDATION_ENTITY)
+      .in("entity_id", keys);
+    if (decisionsError)
+      throw new Error(`Lecture des recommandations traitées (${decisionsError.message})`);
+    for (const row of rows ?? []) {
+      const index = recommendationIndex(row.entity_id, rest.id);
+      const handled = readHandled(row);
+      if (index !== null && handled)
+        answered[index] = { outcome: handled.outcome, decision_id: handled.decision_id };
+    }
+  }
+  return { ...rest, ...read, answered };
 }
 
 /** Feedbacks per week over the history window (insights.trend.weekly, oldest first, §8.8). */

@@ -19,6 +19,13 @@ import type { RunCost } from "@/lib/llm/cost";
 import { wrapExternal } from "@/lib/llm/data";
 import { MODELS } from "@/lib/llm/models";
 import { invokeStructured } from "@/lib/llm/structured";
+import {
+  HANDLED_WINDOW_DAYS,
+  readHandled,
+  RECOMMENDATION_ENTITY,
+  repeatsHandled,
+  type HandledRecommendation,
+} from "@/lib/digest/handled";
 import { fetchAll } from "@/pipeline/insights";
 import { computeSignals } from "@/pipeline/nodes/enrich";
 
@@ -577,7 +584,27 @@ function instructions(): string {
   ].join("\n");
 }
 
-export function buildDigestMessages(facts: DigestFacts, skill: string): BaseMessage[] {
+/** Recommendations Léa answered (« fait », « écartée ») over the last days (ADR-036). */
+export async function loadHandledRecommendations(
+  db: Db,
+  clock: Date,
+): Promise<HandledRecommendation[]> {
+  const since = new Date(clock.getTime() - HANDLED_WINDOW_DAYS * DAY_MS).toISOString();
+  const { data, error } = await db
+    .from("decisions")
+    .select("id, entity_id, action, after, reason, created_at")
+    .eq("entity_type", RECOMMENDATION_ENTITY)
+    .gte("created_at", since)
+    .order("created_at");
+  if (error) throw new Error(`Digest : lecture des recommandations traitées (${error.message})`);
+  return (data ?? []).flatMap((row) => readHandled(row) ?? []);
+}
+
+export function buildDigestMessages(
+  facts: DigestFacts,
+  skill: string,
+  handled: readonly HandledRecommendation[] = [],
+): BaseMessage[] {
   const system = buildCachedSystem([
     { label: "consigne", text: instructions() },
     { label: "skill: digest", text: skill },
@@ -591,6 +618,25 @@ export function buildDigestMessages(facts: DigestFacts, skill: string): BaseMess
       ...notes,
       "Faits du digest :",
       wrapExternal("faits", JSON.stringify(facts, null, 1)),
+      ...(handled.length
+        ? [
+            "Recommandations déjà traitées par Léa (fait ou écartée) : ne les propose plus, sauf si un fait nouveau (un ID absent de leurs preuves) les justifie.",
+            wrapExternal(
+              "recommandations_traitees",
+              JSON.stringify(
+                handled.map(({ titre, preuves, outcome, reason, at }) => ({
+                  titre,
+                  preuves,
+                  statut: outcome,
+                  raison: reason,
+                  le: at,
+                })),
+                null,
+                1,
+              ),
+            ),
+          ]
+        : []),
       "Rédige les sections et au plus trois recommandations.",
     ].join("\n"),
   );
@@ -717,6 +763,7 @@ export async function runDigest(
     now: options.now,
     clock,
   });
+  const handled = await loadHandledRecommendations(db, clock);
   const invoke = options.invoke ?? invokeStructured;
   let writing: DigestWriting;
   let writer: DigestResult["writer"] = "modele";
@@ -725,14 +772,18 @@ export async function runDigest(
     const { data } = await invoke(
       "reasoning",
       digestWritingSchema(knownIds(facts)),
-      buildDigestMessages(facts, options.skill),
+      buildDigestMessages(facts, options.skill, handled),
       {
         name: DIGEST_GENERATION,
         runCost: options.runCost,
         metadata: options.runId ? { run_id: options.runId } : undefined,
       },
     );
-    writing = data;
+    // Checked in code too: a recommendation whose evidence brings nothing new is not proposed again.
+    writing = {
+      ...data,
+      recommandations: data.recommandations.filter((r) => !repeatsHandled(r.preuves, handled)),
+    };
   } catch (e) {
     writing = fallbackWriting(facts);
     writer = "repli";
