@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { parseTriageArgs } from "./pipeline-triage";
 
 describe("parseTriageArgs", () => {
-  it("defaults to haiku, concurrency 8, no sample", () => {
+  it("defaults to the pipeline model (sonnet), concurrency 8, no sample", () => {
     expect(parseTriageArgs([])).toEqual({
-      model: "haiku",
+      model: "sonnet",
       sample: undefined,
       runId: undefined,
       retryFailed: false,

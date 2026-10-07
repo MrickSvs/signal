@@ -25,8 +25,8 @@ export const SNAPSHOT_TABLES = [
 ] as const;
 export type SnapshotTable = (typeof SNAPSHOT_TABLES)[number];
 
-/** Delete order of a reset: what the pipeline, the PO and the agent produced. Customers, reference
- * tickets, evals and Notion sync state are kept. */
+/** Delete order of a reset: what the pipeline, the PO and the agent produced, chat included (threads
+ * and the unknown ids they cited). Customers, reference tickets and evals are kept. */
 export const RESET_TABLES = [
   ["digests", "id"],
   ["alerts", "id"],
@@ -45,7 +45,9 @@ export const RESET_TABLES = [
   ["feedback_analyses", "feedback_id"],
   ["feedbacks", "id"],
   ["pipeline_runs", "id"],
+  ["id_incidents", "id"],
   ["threads", "id"],
+  ["notion_sync_state", "data_source"],
 ] as const;
 
 /** Column used to order an export, so that two snapshots of the same base are identical. */

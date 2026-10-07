@@ -25,7 +25,7 @@ import {
   runScoring,
   type EstimateRunDeps,
 } from "@/pipeline/nodes/score";
-import { loadFeedbacksToTriage, runTriage } from "@/pipeline/nodes/triage";
+import { loadFeedbacksToTriage, PIPELINE_TRIAGE_MODEL, runTriage } from "@/pipeline/nodes/triage";
 
 export const DEFAULT_TRIAGE_BATCH_SIZE = 10;
 /** Triage batches in flight (graph maxConcurrency) × calls per batch ≈ 8 parallel Haiku calls. */
@@ -161,7 +161,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
       const runCost = new RunCost();
       const summary = await runTriage(db, {
         runId: state.runId,
-        model: "haiku",
+        model: PIPELINE_TRIAGE_MODEL,
         runCost,
         invoke: ctx.invoke,
         sleep: ctx.sleep,

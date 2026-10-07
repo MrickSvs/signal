@@ -29,7 +29,7 @@ import { isClusterable, runEmbed } from "@/pipeline/nodes/embed";
 import { runEnrich } from "@/pipeline/nodes/enrich";
 import { labelInsight, representatives } from "@/pipeline/nodes/label-insights";
 import { parseOkrIds, runScoring, type EstimateRunDeps } from "@/pipeline/nodes/score";
-import { loadFeedbacksToTriage, runTriage } from "@/pipeline/nodes/triage";
+import { loadFeedbacksToTriage, PIPELINE_TRIAGE_MODEL, runTriage } from "@/pipeline/nodes/triage";
 
 export const MAX_INCREMENTAL_FEEDBACKS = 10;
 const enums = Constants.public.Enums;
@@ -376,7 +376,7 @@ async function incrementalSteps(
     );
     return runTriage(db, {
       runId,
-      model: "haiku",
+      model: PIPELINE_TRIAGE_MODEL,
       runCost,
       invoke: ctx.invoke,
       sleep: ctx.sleep,

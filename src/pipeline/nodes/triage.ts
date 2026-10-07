@@ -20,6 +20,9 @@ export const TRIAGE_MODEL_ROLES: Record<TriageModel, ModelRole> = {
   haiku: "triage",
   sonnet: "reasoning",
 };
+/** Model of the pipeline's triage, full and incremental (ADR-035): Haiku missed the type and
+ * domain targets on the holdout set, Sonnet meets them. `eval:triage --compare` still runs both. */
+export const PIPELINE_TRIAGE_MODEL: TriageModel = "sonnet";
 
 const MAX_SUMMARY_WORDS = 20;
 const MAX_TAGS = 3;

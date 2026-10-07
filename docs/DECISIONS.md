@@ -469,6 +469,7 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Reset** (`pnpm demo:reset`, ~17 s, aucun appel de modèle) : pages Notion créées depuis le snapshot mises à la corbeille (celles du snapshot en sont ressorties), suppression de ce que le pipeline, le PO et l'agent ont produit (clients, tickets de référence, evals et état de synchronisation Notion conservés), restauration (clients en upsert, références circulaires recollées à la fin), séquence des retours réalignée. `--empty` s'arrête avant la restauration : l'app vide montre ses états vides.
   - **Dates** : deux décalages. Les dates du scénario (`feedbacks.received_at`, `feedbacks.created_at`, `customers.renewal_date`) avancent d'un nombre entier de jours, arrondi vers le bas (« reçu il y a 2 jours », renouvellement à J+38 restent exacts) ; toutes les autres (runs, revues, décisions, backlog) avancent du temps écoulé depuis le snapshot, donc la préparation reste juste avant la démo, dans son ordre. Aucune date ne dépasse « maintenant ». La date du scénario d'un snapshot est la première insertion de retour.
   - **Digest** : jamais restauré, généré en direct après le reset (`pnpm digest`) ; sans digest précédent, il couvre tout ce que Signal a traité.
+  - **Backlog vide au départ** (révisé le 2026-10-07) : le snapshot de démo est pris avec `--keep-backlog none` ; le backlog est rédigé en direct. Plan B si la rédaction échoue : relancer depuis la fiche insight, puis la vidéo de la démo (SPEC §18). Le reset vide aussi `id_incidents` (ID inventés cités dans les fils supprimés) et `notion_sync_state`.
   - **Retours à coller** : `data/demo/retours-a-coller.md`, dix retours écrits pour la démo (aucun ne vient du jeu réservé), un par comportement : sujet connu, churn Enterprise, anglais, multi-sujets, fonctionnalité existante, injection, sujet inédit, prospect, ironie, réponse automatique. Collés par l'écran Retours (mode incrémental) ; le reset les efface.
   - **Préparation de la base** (`scripts/demo-purge.ts --from R-215`) : retire les retours ajoutés pendant les tests et ce qu'ils ont seuls produit (insights, alertes, décisions, runs), recalcule en code les agrégats des insights touchés et les re-score avec leur jugement stocké.
 - **Alternatives écartées** : régénérer le digest dans le reset (on veut le montrer en direct) ; reconstruire la base par un run complet (~1,60 € et une nouvelle revue du PO) ; dump SQL (exige un accès Postgres direct, le JSON passe par le client de service) ; un seul décalage de dates (soit la préparation passe dans le futur, soit le scénario vieillit et S7 sort de la fenêtre de 7 jours).
@@ -489,7 +490,7 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Alternatives écartées** : écarter une recommandation depuis l'écran (demande un stockage et une décision journalisée pour une liste régénérée chaque jour).
 - **Conséquences** : PLAN 3.2 (« lien vers le digest précédent ») est remplacé par cette décision. `digests.markdown` reste écrit pour la CLI `pnpm digest`.
 
-## ADR-033 — Pénalité entre domaines au regroupement, moment d'apparition gardé au triage
+## ADR-034 — Pénalité entre domaines au regroupement, moment d'apparition gardé au triage
 
 - **Date** : 2026-10-07
 - **Statut** : acceptée
@@ -499,3 +500,12 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Skill triage-taxonomy**, règles 11 et 12 : le moment d'apparition cité par le client (« depuis la dernière mise à jour ») reste dans le problème sous-jacent et le résumé, jamais inventé ; une demande d'aide (« comment on… ? ») est une `question` même si elle décrit une gêne.
 - **Alternatives écartées** : contrainte stricte « jamais deux domaines dans un insight » (casse les sujets légitimement transverses, S2b et S3 mêlent partage et export) ; ajouter le domaine au texte vectorisé (impose de tout revectoriser et rend le seuil de 0,28 à recalibrer).
 - **Conséquences** : un run complet est nécessaire pour en profiter (la base de démo est reconstruite). Le seuil de 0,28 n'est pas re-calibré : la pénalité ne change pas la distance entre items d'un même domaine.
+
+## ADR-035 — Le pipeline trie avec Sonnet
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : `eval:triage --compare` (même échantillon de 60 retours réservés) : Haiku 89 % de types justes et 0,75 de macro-F1 du domaine, sous les cibles (90 %, 0,85) ; Sonnet 95 % et 0,90 ; injection 100 % pour les deux. Le regroupement s'appuie désormais sur le domaine (ADR-034) : un domaine faux y coûte plus qu'avant.
+- **Décision** : `PIPELINE_TRIAGE_MODEL = "sonnet"` (`src/pipeline/nodes/triage.ts`) pour le run complet, le mode incrémental et `pipeline:triage` ; le triage Sonnet passe par le rôle `reasoning` (pensée adaptative, sans température). Le rôle `triage` garde Haiku pour que `eval:triage --compare` mesure toujours les deux.
+- **Alternatives écartées** : changer l'identifiant du rôle `triage` (la comparaison perdrait Haiku et sa grille de prix) ; Opus (environ deux fois le prix de Sonnet, gain attendu marginal sur un classement).
+- **Conséquences** : coût du triage ~0,90 € pour 100 retours au lieu de 0,15 € (run complet de la démo ~3,10 € au lieu de ~1,50 €) ; ~1,5 s de plus par retour collé en direct (latence médiane 4,3 s contre 2,8 s).

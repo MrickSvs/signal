@@ -1,5 +1,5 @@
 // Triage CLI (PLAN 2.1): classifies the feedbacks not analyzed yet and splits them into items.
-// Usage: pnpm pipeline:triage [--model haiku|sonnet] [--sample N] [--run-id X] [--retry-failed]
+// Usage: pnpm pipeline:triage [--model haiku|sonnet, sonnet par défaut] [--sample N] [--run-id X] [--retry-failed]
 //        [--concurrency N]
 // Cost: ~0.002 € per feedback with Haiku (full run of ~215 feedbacks: well under 1 €).
 import { randomUUID } from "node:crypto";
@@ -19,6 +19,7 @@ import {
   DEFAULT_TRIAGE_CONCURRENCY,
   loadFeedbacksToTriage,
   runTriage,
+  PIPELINE_TRIAGE_MODEL,
   TRIAGE_MODEL_ROLES,
   type TriageModel,
   type TriageSummary,
@@ -50,7 +51,7 @@ export function parseTriageArgs(argv: string[]): TriageArgs {
     return n;
   };
 
-  const model = value("--model") ?? "haiku";
+  const model = value("--model") ?? PIPELINE_TRIAGE_MODEL;
   if (!(model in TRIAGE_MODEL_ROLES)) throw new Error("--model attend haiku ou sonnet");
   const runId = value("--run-id");
   if (runId !== undefined && !UUID.test(runId)) throw new Error("--run-id attend un UUID");
