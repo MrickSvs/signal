@@ -1190,7 +1190,7 @@ Consulte la doc actuelle du SDK MCP TypeScript et de l'adaptateur MCP pour Next.
 
 ### Étape 8.1 — Mode démo
 
-> **Réalisée avec écarts** (ADR-031, ADR-032) : backlog de secours sur S2b (permissions), pas S3 ; `/status` coupée ; `demo:reset --empty` ajouté ; digest généré en direct après le reset ; dix retours à coller dans `data/demo/retours-a-coller.md` au lieu de deux fichiers.
+> **Réalisée avec écarts** (ADR-031, ADR-032 révisé) : snapshot sans backlog, rédigé en direct (plan B : relance depuis la fiche insight, puis vidéo) au lieu d'un backlog de secours sur S3 ; pas de dossier d'alerte précalculé (plan B : `pnpm investigate --pending`) ; `/status` coupée (CL-43 couvert par le cron) ; `demo:reset --empty` ajouté ; digest généré en direct après le reset (`pnpm digest`) ; dix retours à coller dans `data/demo/retours-a-coller.md` au lieu de deux fichiers. Base de démo reconstruite avec le triage Sonnet et la pénalité entre domaines (ADR-034, ADR-035).
 
 `[Cœur]` · ~1 h 45
 
@@ -1212,8 +1212,8 @@ Consulte la doc actuelle du SDK MCP TypeScript et de l'adaptateur MCP pour Next.
 
 **Test** :
 
-- [ ] Répétition → `pnpm demo:reset` → état identique au snapshot, Notion propre, backlog de secours présent.
-- [ ] `/status` tout vert.
+- [x] Répétition → `pnpm demo:reset` → état identique au snapshot, Notion propre ~~, backlog de secours présent~~ (backlog vide par choix, ADR-032 révisé). Vérifié le 2026-10-07 : 14 à 17 s, chaque table recomptée.
+- [x] ~~`/status` tout vert.~~ Coupée (ADR-031).
 
 **Commit** : `feat(demo): snapshot, reset, fallback backlog and status page`
 
