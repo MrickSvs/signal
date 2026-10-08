@@ -19,6 +19,9 @@ import { formatCost } from "@/lib/format";
 import { PIPELINE_TRIAGE_MODEL } from "@/pipeline/nodes/triage";
 import { getEvalsScreen } from "@/server/queries/evals";
 
+// Read from the base on every request, never prerendered at build time (no database there).
+export const dynamic = "force-dynamic";
+
 const LEGEND: EvalStatus[] = ["vert", "orange", "rouge", "aucun"];
 
 /** The evals grouped by the question they answer, in the order of the pipeline. */

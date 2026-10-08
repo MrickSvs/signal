@@ -13,6 +13,8 @@ import { listOpenAlerts } from "@/server/queries/shell";
 
 // « Régénérer » runs one reasoning call from this page (~15 s).
 export const maxDuration = 60;
+// Read from the base on every request, never prerendered at build time (no database there).
+export const dynamic = "force-dynamic";
 
 /**
  * Digest (SPEC §12.2, ADR-033): the latest digest, ordered by decision. What waits for Léa
