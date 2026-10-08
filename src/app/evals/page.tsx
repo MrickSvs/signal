@@ -95,7 +95,11 @@ export default async function EvalsPage() {
   const measured = cards.filter((c) => c.latest);
   const count = (status: EvalStatus) => measured.filter((c) => c.latest!.status === status).length;
   const unmeasured = cards.length - measured.length;
-  const totalCost = measured.reduce((sum, c) => sum + (c.latest!.costEur ?? 0), 0);
+  // One run counted once: the triage card can show the production half of the comparison run.
+  const costByRun = new Map(measured.map((c) => [c.latest!.runId, c.latest!.costEur ?? 0]));
+  const comparisonRun = compare?.runId;
+  if (comparisonRun) costByRun.set(comparisonRun, compare!.costEur ?? 0);
+  const totalCost = [...costByRun.values()].reduce((sum, eur) => sum + eur, 0);
 
   return (
     <div className="@container mx-auto flex max-w-6xl flex-col gap-8 px-6 py-6">
