@@ -35,6 +35,7 @@ const FIELD_LABELS: Record<string, string> = {
   creation: "Création",
   formulation: "Formulation",
   merged_into: "Fusion",
+  action_lancee: "Action lancée",
 };
 
 /** « Journal des décisions » (SPEC §12.5, rule 6): every choice of the PO, filterable. */

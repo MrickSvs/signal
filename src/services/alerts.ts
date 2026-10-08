@@ -1,6 +1,7 @@
-// Léa's answer to an alert (SPEC §10.10): she opens it (« vue »), does the proposed
+// Léa's answer to an alert (SPEC §10.10): she opens it (« vue »), launches the proposed
 // action (« traitee »: the action itself goes through the chat and its approval card) or ignores
-// it (« ignoree »). Handling and ignoring are journaled in decisions (rule 6).
+// it (« ignoree »). Launching and ignoring are journaled in decisions (rule 6). Launching is not
+// doing: the card may still be refused, so the decision says « action_lancee ».
 import type { Db } from "@/lib/db/create";
 import type { Json, Tables } from "@/lib/db/types";
 
@@ -58,7 +59,7 @@ export async function answerAlert(
       entity_type: "alert",
       entity_id: alertId,
       action: answer.kind === "ignore" ? "rejet" : "validation",
-      field: answer.kind === "ignore" ? "statut" : "action_proposee",
+      field: answer.kind === "ignore" ? "statut" : "action_lancee",
       before: { status: alert.status, kind: alert.kind, insight_id: alert.insight_id } as Json,
       after: (answer.kind === "ignore"
         ? { status }

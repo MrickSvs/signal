@@ -44,7 +44,7 @@ describe("answerAlert", () => {
     });
   });
 
-  it("journals the proposed action Léa chose to do", async () => {
+  it("journals the proposed action Léa launched, not as done: its approval card decides", async () => {
     const tables = world();
     await answerAlert(db(tables), ID, {
       kind: "act",
@@ -53,7 +53,7 @@ describe("answerAlert", () => {
     expect(tables.alerts[0].status).toBe("traitee");
     expect(tables.decisions[0]).toMatchObject({
       action: "validation",
-      field: "action_proposee",
+      field: "action_lancee",
       after: { status: "traitee", action: "prevenir_csm", cible: "C-013" },
     });
   });
