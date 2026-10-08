@@ -762,6 +762,49 @@ export type DigestResult = {
   error: string | null;
 };
 
+/**
+ * What a digest run is doing, step by step, with the figures it has just read: the Digest screen
+ * shows them live while it waits for the writing (ADR-044). Counts only, never a text to render.
+ */
+export type DigestProgress =
+  | { step: "period"; first: boolean; start: string | null; end: string }
+  | {
+      step: "facts";
+      feedbacks: number;
+      channels: number;
+      alerts: number;
+      emerging: number;
+      newInsights: number;
+      moves: number;
+      accountsAtRisk: number;
+      pending: number;
+    }
+  | { step: "memory"; handled: number }
+  | { step: "writing"; model: string }
+  | { step: "written"; writer: "modele" | "repli"; recommendations: number }
+  | { step: "saved"; id: string };
+
+/** The figures of the « facts » step, counted from the facts the writing will read. */
+export function factsProgress(facts: DigestFacts): Extract<DigestProgress, { step: "facts" }> {
+  const p = facts.pending;
+  return {
+    step: "facts",
+    feedbacks: facts.feedbacks.total,
+    channels: Object.keys(facts.feedbacks.by_channel).length,
+    alerts: facts.alerts.length,
+    emerging: facts.emerging.length,
+    newInsights: facts.new_insights.length,
+    moves: facts.ranking.moves.length,
+    accountsAtRisk: facts.accounts_at_risk.length,
+    pending:
+      p.insights_to_validate.length +
+      p.backlog_to_validate.length +
+      p.merges.length +
+      p.splits.length +
+      p.overrides_context_changed.length,
+  };
+}
+
 export async function runDigest(
   db: Db,
   options: {
@@ -779,16 +822,23 @@ export async function runDigest(
     runCost?: RunCost;
     /** Injected in tests: the API is never called there. */
     invoke?: typeof invokeStructured;
+    /** Each step as it ends (the Digest screen's live log). */
+    onProgress?: (event: DigestProgress) => void;
   },
 ): Promise<DigestResult> {
   const clock = options.clock ?? new Date();
+  const progress = options.onProgress ?? (() => {});
   const facts = await loadDigestFacts(db, {
     weighting: options.weighting,
     now: options.now,
     clock,
     since: options.samePeriod ? await currentDigestStart(db) : undefined,
   });
+  progress({ step: "period", first: facts.first, ...facts.period });
+  progress(factsProgress(facts));
   const handled = await loadHandledRecommendations(db, clock);
+  progress({ step: "memory", handled: handled.length });
+  progress({ step: "writing", model: MODELS.reasoning });
   const invoke = options.invoke ?? invokeStructured;
   let writing: DigestWriting;
   let writer: DigestResult["writer"] = "modele";
@@ -814,6 +864,7 @@ export async function runDigest(
     writer = "repli";
     error = e instanceof Error ? e.message : String(e);
   }
+  progress({ step: "written", writer, recommendations: writing.recommandations.length });
   const markdown = renderDigest(facts, writing);
 
   const { data, error: insertError } = await db
@@ -839,5 +890,6 @@ export async function runDigest(
     .update({ last_digest_id: data!.id })
     .eq("id", true);
   if (stateError) throw new Error(`Digest : mise à jour de po_state (${stateError.message})`);
+  progress({ step: "saved", id: data!.id });
   return { id: data!.id, facts, markdown, writer, error };
 }

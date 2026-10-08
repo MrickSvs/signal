@@ -11,7 +11,7 @@ import {
   runIncremental,
   type IncrementalContext,
 } from "@/pipeline/incremental";
-import { runDigest, type DigestResult } from "@/pipeline/nodes/digest";
+import { runDigest, type DigestProgress, type DigestResult } from "@/pipeline/nodes/digest";
 import { loadFeedbacksToTriage } from "@/pipeline/nodes/triage";
 
 export type DigestContext = IncrementalContext & {
@@ -25,7 +25,11 @@ export type DigestContext = IncrementalContext & {
 export async function generateDigest(
   db: Db,
   ctx: DigestContext,
-  options: { clock?: Date; samePeriod?: boolean } = {},
+  options: {
+    clock?: Date;
+    samePeriod?: boolean;
+    onProgress?: (event: DigestProgress) => void;
+  } = {},
 ): Promise<DigestResult & { runId: string; costEur: number }> {
   const started = Date.now();
   const { data: run, error } = await db
@@ -51,6 +55,7 @@ export async function generateDigest(
           now: ctx.now,
           clock: options.clock,
           samePeriod: options.samePeriod,
+          onProgress: options.onProgress,
           runCost,
           invoke: ctx.invoke,
         });

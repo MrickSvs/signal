@@ -16,6 +16,7 @@ import {
   accountsAtRisk,
   digestPeriod,
   digestWritingSchema,
+  factsProgress,
   fallbackWriting,
   hasUnsourcedNumber,
   knownIds,
@@ -24,6 +25,7 @@ import {
   renderDigest,
   runDigest,
   type DigestFacts,
+  type DigestProgress,
   type DigestWriting,
 } from "./digest";
 
@@ -429,6 +431,49 @@ describe("runDigest (in-memory database, simulated model)", () => {
     const prompt = JSON.stringify(invoke.mock.calls.at(-1)![2]);
     expect(prompt).toContain("Recommandations déjà traitées par Léa");
     expect(prompt).toContain(reco.titre);
+  });
+
+  it("reports each step in order with the figures it has read", async () => {
+    const { tables } = await scenario();
+    const events: DigestProgress[] = [];
+    const result = await runDigest(memoryDb(tables), {
+      runId: null,
+      weighting,
+      skill: SKILLS.digest,
+      now: NOW,
+      clock: new Date(Date.now() + 1000),
+      invoke: fakeInvoke(),
+      onProgress: (event) => events.push(event),
+    });
+    expect(events.map((e) => e.step)).toEqual([
+      "period",
+      "facts",
+      "memory",
+      "writing",
+      "written",
+      "saved",
+    ]);
+    expect(events[1]).toEqual(factsProgress(result.facts));
+    expect(events[1]).toMatchObject({ feedbacks: result.facts.feedbacks.total });
+    expect(events.at(-2)).toMatchObject({ writer: "modele" });
+    expect(events.at(-1)).toEqual({ step: "saved", id: result.id });
+  });
+
+  it("reports the fallback when the writing fails", async () => {
+    const { tables } = await scenario();
+    tables.insights[0].title = "[digest-fail] sujet";
+    const events: DigestProgress[] = [];
+    await runDigest(memoryDb(tables), {
+      runId: null,
+      weighting,
+      skill: SKILLS.digest,
+      now: NOW,
+      clock: new Date(Date.now() + 1000),
+      invoke: fakeInvoke(),
+      onProgress: (event) => events.push(event),
+    });
+    expect(events.find((e) => e.step === "written")).toMatchObject({ writer: "repli" });
+    expect(events.at(-1)?.step).toBe("saved");
   });
 
   it("falls back on a plain rendering of the facts when the writing fails", async () => {

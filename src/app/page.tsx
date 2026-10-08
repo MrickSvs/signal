@@ -1,6 +1,10 @@
 import { after } from "next/server";
-import { Newspaper } from "lucide-react";
-import { EmptyState } from "@/components/shell/states";
+import {
+  DigestBody,
+  DigestGenerationProvider,
+  FirstDigest,
+  GenerationPanel,
+} from "@/components/digest/generation";
 import { RegenerateButton } from "@/components/digest/regenerate-button";
 import { InboxSection, PulseBar, QuietLine, RadarSection } from "@/components/digest/sections";
 import { ModelBadge, Pill } from "@/components/signal/badges";
@@ -11,8 +15,6 @@ import { formatDateTime, formatRelative } from "@/lib/format";
 import { getCustomersMrr, getDigest, getWeeklyTrends, markSeen } from "@/server/queries/digest";
 import { listOpenAlerts } from "@/server/queries/shell";
 
-// « Régénérer » runs one reasoning call from this page (~15 s).
-export const maxDuration = 60;
 // Read from the base on every request, never prerendered at build time (no database there).
 export const dynamic = "force-dynamic";
 
@@ -27,17 +29,12 @@ export default async function DigestPage() {
   after(() => markSeen(db, new Date()).catch((error) => console.error(error)));
   const now = getDemoNow();
 
+  // The same provider on both branches: a first generation flows into the digest it wrote.
   if (!digest) {
     return (
-      <EmptyState icon={Newspaper} title="Pas encore de digest">
-        <p className="mb-4">
-          Le premier digest s&apos;écrit après le premier run du pipeline, chaque nuit ou à la
-          demande.
-        </p>
-        <div className="flex justify-center">
-          <RegenerateButton first />
-        </div>
-      </EmptyState>
+      <DigestGenerationProvider first>
+        <FirstDigest />
+      </DigestGenerationProvider>
     );
   }
 
@@ -63,51 +60,56 @@ export default async function DigestPage() {
     alerts.length + recommendations.length + pendingDecisions(facts.pending).length === 0;
 
   return (
-    <div className="@container mx-auto flex max-w-6xl flex-col gap-6 px-8 py-6">
-      <header className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-          <div className="flex min-w-0 flex-col gap-1">
-            <h2 className="text-xl font-semibold tracking-tight">Bonjour Léa.</h2>
-            <p className="text-[15px] leading-relaxed">{digestLede(pulse, facts.first)}</p>
+    <DigestGenerationProvider first={false}>
+      <div className="@container mx-auto flex max-w-6xl flex-col gap-6 px-8 py-6">
+        <header className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 flex-col gap-1">
+              <h2 className="text-xl font-semibold tracking-tight">Bonjour Léa.</h2>
+              <p className="text-[15px] leading-relaxed">{digestLede(pulse, facts.first)}</p>
+            </div>
+            <RegenerateButton />
           </div>
-          <RegenerateButton />
-        </div>
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
-          <span title={`${formatDateTime(digest.created_at)} (heure de Paris)`}>
-            Généré {formatRelative(digest.created_at, now)}
-          </span>
-          <span aria-hidden>·</span>
-          <span>
-            {facts.first ? "premier digest" : `depuis le ${formatDateTime(digest.period_start)}`}
-          </span>
-          {digest.model ? (
-            <ModelBadge model={digest.model} />
-          ) : (
-            <Pill
-              className="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
-              title={digest.error ?? undefined}
-            >
-              Rendu brut des faits
-            </Pill>
-          )}
-        </p>
-        <PulseBar pulse={pulse} />
-      </header>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
+            <span title={`${formatDateTime(digest.created_at)} (heure de Paris)`}>
+              Généré {formatRelative(digest.created_at, now)}
+            </span>
+            <span aria-hidden>·</span>
+            <span>
+              {facts.first ? "premier digest" : `depuis le ${formatDateTime(digest.period_start)}`}
+            </span>
+            {digest.model ? (
+              <ModelBadge model={digest.model} />
+            ) : (
+              <Pill
+                className="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+                title={digest.error ?? undefined}
+              >
+                Rendu brut des faits
+              </Pill>
+            )}
+          </p>
+          <PulseBar pulse={pulse} />
+        </header>
 
-      <InboxSection
-        digestId={digest.id}
-        alerts={alerts}
-        recommendations={recommendations}
-        answered={digest.answered}
-        pending={facts.pending}
-      />
-      <RadarSection
-        facts={facts}
-        weekly={weekly}
-        mrr={mrr}
-        since={facts.first ? null : digest.period_start}
-      />
-      <QuietLine items={quietSections(facts, inboxEmpty)} />
-    </div>
+        <GenerationPanel />
+        <DigestBody>
+          <InboxSection
+            digestId={digest.id}
+            alerts={alerts}
+            recommendations={recommendations}
+            answered={digest.answered}
+            pending={facts.pending}
+          />
+          <RadarSection
+            facts={facts}
+            weekly={weekly}
+            mrr={mrr}
+            since={facts.first ? null : digest.period_start}
+          />
+          <QuietLine items={quietSections(facts, inboxEmpty)} />
+        </DigestBody>
+      </div>
+    </DigestGenerationProvider>
   );
 }

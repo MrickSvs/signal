@@ -615,3 +615,17 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Période suivante** inchangée : depuis la fin du dernier digest (la régénération), ou depuis la dernière visite si elle est plus ancienne.
 - **Alternatives écartées** : mettre à jour la ligne existante (perd la version lue et désaligne les réponses aux recommandations) ; repartir de la visite précédente (stockage en plus dans `po_state`, sans gain).
 - **Conséquences** : l'historique garde chaque version régénérée. Une recommandation traitée sur la version précédente n'est pas barrée sur la nouvelle, mais elle n'est pas reproposée sans fait nouveau (ADR-036).
+
+## ADR-044 — Génération du digest en direct : les étapes réelles, un émetteur qui pulse
+
+- **Date** : 2026-10-08
+- **Statut** : acceptée ; précise SPEC §12.2, complète l'ADR-043
+- **Contexte** : « Générer » et « Régénérer » attendaient une vingtaine de secondes derrière un bouton qui tournait, sans rien dire. Sur la page sans digest, rien ne bougeait. Léa ne savait ni ce que faisait Signal ni sur quoi le digest allait porter.
+- **Décision** :
+  - **Les vraies étapes, avec leurs chiffres.** `runDigest` émet un événement à la fin de chaque étape (`onProgress`) : période, faits relus (comptes non nuls : retours, alertes, sujets émergents, comptes à risque…), recommandations déjà traitées, rédaction par le modèle, rédaction vérifiée ou repli, enregistrement. Aucun texte libre : des comptes, mis en mots dans `lib/digest/generation-log.ts` (testé).
+  - **Un flux NDJSON** : `POST /api/digest` remplace la server action de l'ADR-043. Une server action ne sait pas envoyer d'étapes intermédiaires. Le run se termine côté serveur même si la page est quittée.
+  - **Page sans digest** : un émetteur au repos sur une trame de points ; au clic, il émet (ondes, balayage radar), et le fil des étapes s'écrit dessous. À la fin, la page devient le digest, le panneau reste quelques secondes et se replie.
+  - **Digest existant** : le panneau s'ouvre sous l'en-tête, le digest affiché s'estompe et devient inerte jusqu'à ce que le nouveau soit à l'écran. Une erreur reste affichée avec « Réessayer ».
+  - Les animations s'arrêtent sous `prefers-reduced-motion`.
+- **Alternatives écartées** : des étapes simulées côté client sur un minuteur (elles mentiraient sur ce qui se passe) ; Server-Sent Events comme le chat (plus lourd pour un flux à sens unique de six événements).
+- **Conséquences** : la durée annoncée passe de « 15 secondes » à « une vingtaine de secondes », mesurée sur la base de démo (17 à 21 s).
