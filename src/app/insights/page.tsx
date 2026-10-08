@@ -19,6 +19,7 @@ import {
 } from "@/lib/insights/list";
 import { ITEM_TYPE_LABELS, PRODUCT_AREA_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
+import { getUnsentBacklog } from "@/server/queries/backlog";
 import { getInsightsScreen, listMergeTargets } from "@/server/queries/insights";
 
 // A merge or a rejection re-ranks in code (a few seconds; a model call only for an insight
@@ -50,6 +51,10 @@ export default async function InsightsPage({ searchParams }: PageProps<"/insight
   }
 
   const sections = insightSections(cards, filters);
+  const unsent = await getUnsentBacklog(
+    db,
+    sections.toReview.map((i) => i.id),
+  );
   const filtered = activeInsightFilterCount(filters) > 0;
   const tab = insightTab(filters);
   const tabHref = (patch: Partial<InsightFilters>) =>
@@ -74,7 +79,7 @@ export default async function InsightsPage({ searchParams }: PageProps<"/insight
   return (
     <div className="@container mx-auto flex max-w-6xl flex-col gap-5 px-8 py-6">
       {sections.toReview.length > 0 && tab !== "rejetes" && (
-        <ReviewPanel insights={sections.toReview} targets={targets} />
+        <ReviewPanel insights={sections.toReview} targets={targets} unsent={unsent} />
       )}
 
       <nav aria-label="Vues" className="flex flex-wrap gap-1 border-b">

@@ -181,6 +181,34 @@ async function loadRows(db: Db, ids: readonly string[]): Promise<Map<string, Ite
   return new Map((data ?? []).map((r) => [r.id, r]));
 }
 
+/**
+ * Items whose insight was rejected or merged: they are not sent, with what to do instead. Their
+ * drafts stay in the backlog until Léa rejects them.
+ */
+async function deadInsightRefusals(db: Db, rows: readonly ItemRow[]): Promise<Map<string, string>> {
+  const ids = [...new Set(rows.flatMap((r) => (r.insight_id ? [r.insight_id] : [])))];
+  if (ids.length === 0) return new Map();
+  const { data, error } = await db.from("insights").select("id, status, merged_into").in("id", ids);
+  fail(error, "lecture des insights");
+  const dead = new Map(
+    (data ?? [])
+      .filter((i) => i.status === "rejete" || i.status === "fusionne")
+      .map((i) => [i.id, i]),
+  );
+  const refusals = new Map<string, string>();
+  for (const row of rows) {
+    const insight = row.insight_id ? dead.get(row.insight_id) : undefined;
+    if (!insight) continue;
+    refusals.set(
+      row.id,
+      insight.status === "fusionne" && insight.merged_into
+        ? `${row.id} ne part pas : ${insight.id} est fusionné dans ${insight.merged_into}. Rédige le backlog de ${insight.merged_into}, puis rejette ${row.id}.`
+        : `${row.id} ne part pas : ${insight.id} est rejeté. Rejette ${row.id} dans le Backlog.`,
+    );
+  }
+  return refusals;
+}
+
 /** Items a push targets: listed ids, or every item of an epic still to send (ADR-027). */
 export type PushTarget = { item_ids?: readonly string[]; epic_id?: string };
 
@@ -231,6 +259,7 @@ export async function previewPush(
   baseUrl = process.env.APP_BASE_URL ?? "",
 ): Promise<string> {
   const rows = await loadRows(db, ids);
+  const refusals = await deadInsightRefusals(db, [...rows.values()]);
   const parts = await Promise.all(
     ids.map(async (id) => {
       const row = rows.get(id);
@@ -238,6 +267,8 @@ export async function previewPush(
       if (row.status === "envoye" || row.status === "modifie_notion")
         return `${id} : déjà envoyé (rien ne sera recréé).`;
       if (row.status === "rejete") return `${id} : rejeté, ne sera pas envoyé.`;
+      const refusal = refusals.get(id);
+      if (refusal) return refusal;
       const preview = backlogPagePreview(await loadNotionItem(db, row, baseUrl));
       return row.status === "brouillon" ? `${preview}\n(brouillon : validé par ton clic)` : preview;
     }),
@@ -273,6 +304,8 @@ async function pushOne(
   row: ItemRow,
   deps: PushDeps,
   context: () => { notion: NotionPort; config: NonNullable<PushDeps["config"]> },
+  /** Its insight was rejected or merged (deadInsightRefusals). */
+  refusal: string | undefined,
 ): Promise<PushResult> {
   const base = {
     id: row.id,
@@ -287,6 +320,8 @@ async function pushOne(
   if (row.status === "rejete") {
     return { ...base, ok: false, error: `${row.id} est rejeté : il ne part pas dans Notion.` };
   }
+  // Checked before the validation: a refused draft stays a draft.
+  if (refusal) return { ...base, ok: false, error: refusal };
   let validated = false;
   if (row.status === "brouillon") {
     // Léa's click is her validation (approval card or « Valider et envoyer »): logged as such.
@@ -409,12 +444,13 @@ export async function pushBacklogItems(
   };
   return withLock(async () => {
     const rows = await loadRows(db, ids);
+    const refusals = await deadInsightRefusals(db, [...rows.values()]);
     const results: PushResult[] = [];
     for (const id of [...new Set(ids)]) {
       const row = rows.get(id);
       results.push(
         row
-          ? await pushOne(db, row, deps, context)
+          ? await pushOne(db, row, deps, context, refusals.get(id))
           : {
               id,
               title: null,

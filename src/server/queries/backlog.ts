@@ -2,6 +2,7 @@ import "server-only";
 import type { Scenario } from "@/lib/backlog/draft";
 import type { Db } from "@/lib/db/client";
 import type { Database, Json, Tables } from "@/lib/db/types";
+import type { UnsentBacklog } from "@/lib/insights/review";
 import type { BacklogPlan } from "@/services/backlog";
 
 // Reads of the Backlog screen (SPEC §12.6): per insight, its epic(s) then their items, each with
@@ -73,7 +74,8 @@ export type BacklogViewItem = Pick<
 };
 
 export type BacklogGroup = {
-  insight: { id: string; title: string };
+  /** A rejected or merged insight keeps its items here, but they are no longer sent to Notion. */
+  insight: Pick<Tables<"insights">, "id" | "title" | "status" | "merged_into">;
   plan: BacklogPlan | null;
   epics: (Pick<Tables<"epics">, "id" | "title" | "goal" | "okr_refs"> & { kpis: string[] })[];
   items: BacklogViewItem[];
@@ -142,7 +144,10 @@ export async function getBacklogScreen(
       ? db.from("customers").select("id, plan").in("id", accountIds)
       : Promise.resolve({ data: [], error: null }),
     insightIds.length
-      ? db.from("insights").select("id, title, backlog_plan").in("id", insightIds)
+      ? db
+          .from("insights")
+          .select("id, title, status, merged_into, backlog_plan")
+          .in("id", insightIds)
       : Promise.resolve({ data: [], error: null }),
   ]);
   fail("Lecture des estimations", estimates.error);
@@ -225,7 +230,7 @@ export async function getBacklogScreen(
   const groups: BacklogGroup[] = (insights.data ?? [])
     .filter((i) => !filters.insight || i.id === filters.insight)
     .map((i) => ({
-      insight: { id: i.id, title: i.title },
+      insight: { id: i.id, title: i.title, status: i.status, merged_into: i.merged_into },
       plan: (i.backlog_plan as unknown as BacklogPlan | null) ?? null,
       epics: (epics.data ?? [])
         .filter((e) => e.insight_id === i.id)
@@ -244,4 +249,25 @@ export async function getBacklogScreen(
     // Most recently drafted first.
     .sort((a, b) => (b.plan?.drafted_at ?? "").localeCompare(a.plan?.drafted_at ?? ""));
   return { groups, counts };
+}
+
+/** Items not sent yet, per insight: a rejection or a merge leaves them behind (review dialogs). */
+export async function getUnsentBacklog(
+  db: Db,
+  insightIds: readonly string[],
+): Promise<Record<string, UnsentBacklog>> {
+  if (insightIds.length === 0) return {};
+  const { data, error } = await db
+    .from("backlog_items")
+    .select("insight_id, status")
+    .in("insight_id", [...insightIds])
+    .in("status", ["brouillon", "valide"]);
+  fail("Lecture du backlog des insights", error);
+  const unsent: Record<string, UnsentBacklog> = {};
+  for (const row of data ?? []) {
+    if (!row.insight_id) continue;
+    const counts = (unsent[row.insight_id] ??= { brouillon: 0, valide: 0 });
+    counts[row.status as keyof UnsentBacklog] += 1;
+  }
+  return unsent;
 }

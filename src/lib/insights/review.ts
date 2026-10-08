@@ -37,3 +37,22 @@ export const insightReviewSchema = z.discriminatedUnion("action", [
 ]);
 
 export type InsightReview = z.infer<typeof insightReviewSchema>;
+
+/** Backlog items of an insight not sent yet, by status. */
+export type UnsentBacklog = { brouillon: number; valide: number };
+
+/**
+ * What the reject and merge confirmations say about the insight's backlog (« I-05 a 2
+ * brouillons… »): the items stay, but no longer leave for Notion. Null when there is none.
+ */
+export function unsentBacklogNote(insightId: string, unsent?: UnsentBacklog): string | null {
+  const drafts = unsent?.brouillon ?? 0;
+  const validated = unsent?.valide ?? 0;
+  if (drafts + validated === 0) return null;
+  const parts = [
+    drafts ? `${drafts} brouillon${drafts > 1 ? "s" : ""}` : null,
+    validated ? `${validated} élément${validated > 1 ? "s validés" : " validé"}` : null,
+  ].filter(Boolean);
+  const many = drafts + validated > 1;
+  return `${insightId} a ${parts.join(" et ")} dans le backlog : ${many ? "ils y restent, mais ne partiront plus" : "il y reste, mais ne partira plus"} dans Notion. ${many ? "Rejette-les" : "Rejette-le"} depuis le Backlog.`;
+}

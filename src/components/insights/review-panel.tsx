@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pill } from "@/components/signal/badges";
 import { formatEur, formatNumber } from "@/lib/format";
 import type { InsightCard } from "@/lib/insights/list";
+import type { UnsentBacklog } from "@/lib/insights/review";
 import { MOSCOW_LABELS, PRODUCT_AREA_LABELS } from "@/lib/labels";
 import type { MergeTarget } from "@/server/queries/insights";
 import { ReviewActions, useReview } from "./review-actions";
@@ -18,9 +19,12 @@ import { ReviewActions, useReview } from "./review-actions";
 export function ReviewPanel({
   insights,
   targets,
+  unsent,
 }: {
   insights: InsightCard[];
   targets: MergeTarget[];
+  /** Backlog items not sent yet, per insight (named by the reject and merge confirmations). */
+  unsent: Record<string, UnsentBacklog>;
 }) {
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const batch = useReview();
@@ -120,7 +124,7 @@ export function ReviewPanel({
                     <Pill className="border-border text-muted-foreground">Signal faible</Pill>
                   )}
                 </p>
-                <ReviewActions insight={insight} targets={targets} />
+                <ReviewActions insight={insight} targets={targets} unsent={unsent[insight.id]} />
               </div>
             </div>
           </li>

@@ -267,6 +267,43 @@ describe("pushBacklogItems (SPEC §11.2)", () => {
     expect(fake.pages).toHaveLength(0);
   });
 
+  it("refuses an item whose insight was rejected or merged, before validating it", async () => {
+    const { tables, db } = setup([
+      item({ status: "brouillon" }),
+      item({ id: "US-002", insight_id: "I-05" }),
+      item({ id: "US-003", status: "envoye", notion_page_id: "page-0" }),
+    ]);
+    tables.insights[0].status = "rejete";
+    tables.insights.push({ id: "I-05", status: "fusionne", merged_into: "I-03", title: "Accès" });
+    const fake = fakeNotion();
+    const results = await pushBacklogItems(db, ["US-001", "US-002", "US-003"], {
+      now: NOW,
+      source: "chat",
+      config: CONFIG,
+      notion: fake.notion,
+    });
+    expect(results.map((r) => [r.id, r.ok, r.error])).toEqual([
+      ["US-001", false, "US-001 ne part pas : I-03 est rejeté. Rejette US-001 dans le Backlog."],
+      [
+        "US-002",
+        false,
+        "US-002 ne part pas : I-05 est fusionné dans I-03. Rédige le backlog de I-03, puis rejette US-002.",
+      ],
+      // Already sent before the rejection: still reported as sent.
+      ["US-003", true, null],
+    ]);
+    expect(fake.pages).toHaveLength(0);
+    expect(tables.backlog_items.map((r) => [r.id, r.status, r.push_error])).toEqual([
+      ["US-001", "brouillon", null],
+      ["US-002", "valide", null],
+      ["US-003", "envoye", null],
+    ]);
+    expect(tables.decisions).toEqual([]);
+    expect(await previewPush(db, ["US-001"], "https://signal.test")).toBe(
+      "US-001 ne part pas : I-03 est rejeté. Rejette US-001 dans le Backlog.",
+    );
+  });
+
   it("CL-36: a sent item can no longer be edited in Signal", async () => {
     const { db } = setup([item()]);
     await pushBacklogItems(db, ["US-001"], {

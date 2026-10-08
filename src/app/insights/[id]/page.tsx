@@ -23,6 +23,7 @@ import {
   SEGMENT_LABELS,
 } from "@/lib/labels";
 import { cn } from "@/lib/utils";
+import { getUnsentBacklog } from "@/server/queries/backlog";
 import { INSIGHT_ID } from "@/server/queries/evidence";
 import { getInsightDetail, listMergeTargets, type DetailFeedback } from "@/server/queries/insights";
 
@@ -111,9 +112,10 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
   const db = getDb();
   const now = getDemoNow();
   const pack = await loadContextPack();
-  const [insight, targets] = await Promise.all([
+  const [insight, targets, unsent] = await Promise.all([
     INSIGHT_ID.test(id) ? getInsightDetail(db, id, { weighting: pack.weighting, now }) : null,
     listMergeTargets(db),
+    getUnsentBacklog(db, INSIGHT_ID.test(id) ? [id] : []),
   ]);
 
   if (!insight) {
@@ -226,6 +228,7 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
               insight={insight}
               targets={targets}
               canAccept={insight.status === "propose"}
+              unsent={unsent[insight.id]}
             />
           )}
           {live && <DraftBacklogButton insightId={insight.id} />}

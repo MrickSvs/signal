@@ -1,6 +1,6 @@
 // In-memory stand-in for the Supabase client, for tests only (CLAUDE.md rule 11: tests never
 // call a remote database). It covers the query-builder calls the pipeline and the agent's tools
-// use: select (with an exact count) with eq / in / is / not-is-null / gt / gte / contains / order /
+// use: select (with an exact count) with eq / neq / in / is / not-is-null / gt / gte / contains / order /
 // range / limit / single / maybeSingle, insert (+ select().single()), upsert (onConflict), update,
 // delete, and rpc through handlers given by the test. Column lists are applied when they are plain
 // (no embedded relations).
@@ -48,6 +48,10 @@ class Query implements PromiseLike<Result> {
   }
   eq(column: string, value: unknown) {
     this.filters.push((row) => row[column] === value);
+    return this;
+  }
+  neq(column: string, value: unknown) {
+    this.filters.push((row) => row[column] !== value);
     return this;
   }
   gt(column: string, value: number) {

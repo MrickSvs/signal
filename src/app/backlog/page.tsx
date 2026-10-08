@@ -113,6 +113,7 @@ function Group({
   notion: boolean;
 }) {
   const range = group.plan?.range ?? null;
+  const live = group.insight.status === "propose" || group.insight.status === "actif";
   const card = (item: BacklogGroup["items"][number]) => (
     <BacklogItemCard
       key={item.id}
@@ -132,10 +133,28 @@ function Group({
           <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold">
             <InsightChip id={group.insight.id} />
             <span>{group.insight.title}</span>
+            {!live && (
+              <Pill className={PILL_TONES.risk}>
+                {group.insight.status === "fusionne" ? "Insight fusionné" : "Insight rejeté"}
+              </Pill>
+            )}
           </h3>
+          {!live && (
+            <p role="note" className="flex flex-wrap items-center gap-1 text-[13px]">
+              {group.insight.status === "fusionne" && group.insight.merged_into ? (
+                <>
+                  Fusionné dans <InsightChip id={group.insight.merged_into} /> : ces éléments ne
+                  partiront pas dans Notion. Rédige le backlog de {group.insight.merged_into}, puis
+                  rejette ceux-ci.
+                </>
+              ) : (
+                "Ces éléments ne partiront pas dans Notion : rejette ceux qui restent."
+              )}
+            </p>
+          )}
           <PlanSummary group={group} />
         </div>
-        <DraftBacklogButton insightId={group.insight.id} label="Relancer la rédaction" />
+        {live && <DraftBacklogButton insightId={group.insight.id} label="Relancer la rédaction" />}
       </header>
 
       {group.plan?.discoverability && (

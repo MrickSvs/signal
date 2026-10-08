@@ -15,11 +15,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PILL_TONES } from "@/components/signal/tones";
 import { PRODUCT_AREA_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import { reviewInsightAction } from "@/server/actions/insights";
 import type { MergeTarget } from "@/server/queries/insights";
-import { STATEMENT_MAX, TITLE_MAX, type InsightReview } from "@/lib/insights/review";
+import {
+  STATEMENT_MAX,
+  TITLE_MAX,
+  unsentBacklogNote,
+  type InsightReview,
+  type UnsentBacklog,
+} from "@/lib/insights/review";
 
 export type ReviewableInsight = { id: string; title: string; problem_statement: string };
 
@@ -59,12 +66,15 @@ export function ReviewActions({
   targets,
   size = "sm",
   canAccept = true,
+  unsent,
 }: {
   insight: ReviewableInsight;
   targets: MergeTarget[];
   size?: "sm" | "default";
   /** False for an insight already active: rewording, merging and rejecting stay possible. */
   canAccept?: boolean;
+  /** Its backlog items not sent yet: the reject and merge confirmations name them. */
+  unsent?: UnsentBacklog;
 }) {
   const accept = useReview();
   return (
@@ -84,8 +94,20 @@ export function ReviewActions({
         </Button>
       )}
       <ReviewDialog kind="reformuler" insight={insight} targets={targets} size={size} />
-      <ReviewDialog kind="fusionner" insight={insight} targets={targets} size={size} />
-      <ReviewDialog kind="rejeter" insight={insight} targets={targets} size={size} />
+      <ReviewDialog
+        kind="fusionner"
+        insight={insight}
+        targets={targets}
+        size={size}
+        unsent={unsent}
+      />
+      <ReviewDialog
+        kind="rejeter"
+        insight={insight}
+        targets={targets}
+        size={size}
+        unsent={unsent}
+      />
       {accept.error && (
         <p role="alert" className="w-full text-destructive">
           {accept.error}
@@ -100,11 +122,13 @@ function ReviewDialog({
   insight,
   targets,
   size,
+  unsent,
 }: {
   kind: Kind;
   insight: ReviewableInsight;
   targets: MergeTarget[];
   size: "sm" | "default";
+  unsent?: UnsentBacklog;
 }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(insight.title);
@@ -114,6 +138,7 @@ function ReviewDialog({
   const { pending, error, run, setError } = useReview();
   const { label, icon: Icon } = TRIGGERS[kind];
   const others = targets.filter((t) => t.id !== insight.id);
+  const backlogNote = kind === "reformuler" ? null : unsentBacklogNote(insight.id, unsent);
 
   const review = (): InsightReview => {
     const why = reason.trim() || undefined;
@@ -178,6 +203,11 @@ function ReviewDialog({
               `${insight.id} sort du classement. Il reste consultable et restera rejeté s'il se reforme.`}
           </DialogDescription>
         </DialogHeader>
+        {backlogNote && (
+          <p role="note" className={cn("rounded-lg border px-3 py-2 text-sm", PILL_TONES.risk)}>
+            {backlogNote}
+          </p>
+        )}
         <form
           id={`review-${kind}-${insight.id}`}
           className="flex flex-col gap-3"
