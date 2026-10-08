@@ -16,7 +16,9 @@ import { compilePipeline, runPipeline } from "@/pipeline/graph";
 import type { StoredEstimate } from "@/services/estimate";
 import { getRanking } from "@/services/prioritization";
 import { touchThread, threadTitle } from "../threads";
-import { addFeedbackTool } from "./add-feedback";
+import { MODELS } from "@/lib/llm/models";
+import { PIPELINE_TRIAGE_MODEL, TRIAGE_MODEL_ROLES } from "@/pipeline/nodes/triage";
+import { ADD_FEEDBACK_MODELS, addFeedbackTool } from "./add-feedback";
 import { compactEstimate } from "./estimate-complexity";
 import { compactRanking } from "./get-priority";
 import { loadSkillTool } from "./load-skill";
@@ -278,6 +280,15 @@ describe("add_feedback", () => {
       channel: "email_client",
       source_type: "client_direct",
     });
+  });
+
+  it("shows the models the pipeline really calls: its triage model (ADR-035), then reasoning", async () => {
+    const { deps } = await seeded();
+    expect(ADD_FEEDBACK_MODELS).toContain(TRIAGE_MODEL_ROLES[PIPELINE_TRIAGE_MODEL]);
+    expect(new Set(ADD_FEEDBACK_MODELS).size).toBe(ADD_FEEDBACK_MODELS.length);
+    // The pipeline triages with Sonnet (role reasoning): Haiku, the comparison model, is not shown.
+    expect(addFeedbackTool(deps).models).toEqual(["reasoning"]);
+    expect(addFeedbackTool(deps).models.map((role) => MODELS[role])).not.toContain(MODELS.triage);
   });
 });
 

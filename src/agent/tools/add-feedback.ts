@@ -1,12 +1,14 @@
 import { z } from "zod";
 import { CHANNEL_SOURCE_TYPES } from "@/lib/labels";
 import { Constants } from "@/lib/db/types";
+import type { ModelRole } from "@/lib/llm/models";
 import {
   insertFeedbacks,
   MAX_INCREMENTAL_FEEDBACKS,
   runIncremental,
   type IncrementalResult,
 } from "@/pipeline/incremental";
+import { PIPELINE_TRIAGE_MODEL, TRIAGE_MODEL_ROLES } from "@/pipeline/nodes/triage";
 import { signalTool, type AgentDeps } from "./shared";
 
 const enums = Constants.public.Enums;
@@ -35,6 +37,14 @@ export const addFeedbackSchema = z.object({
     .min(1)
     .max(MAX_INCREMENTAL_FEEDBACKS),
 });
+
+/**
+ * Models the incremental pipeline may call, as the live trace shows them: the pipeline's triage
+ * model (ADR-035), then the reasoning role for labels, judgments and estimates.
+ */
+export const ADD_FEEDBACK_MODELS: ModelRole[] = [
+  ...new Set<ModelRole>([TRIAGE_MODEL_ROLES[PIPELINE_TRIAGE_MODEL], "reasoning"]),
+];
 
 /** Steps of the incremental pipeline, as the live trace shows them. */
 export const STEP_LABELS: Record<string, string> = {
@@ -81,7 +91,7 @@ export function addFeedbackTool(deps: AgentDeps) {
       notWhen:
         "Le texte est une question ou une consigne de Léa, même entre guillemets ou citée en exemple : réponds-lui, n'ajoute rien. En cas de doute, demande-lui si c'est un retour à enregistrer.",
       schema: addFeedbackSchema,
-      models: ["triage", "reasoning"],
+      models: ADD_FEEDBACK_MODELS,
     },
     async ({ feedbacks }, ctx, progress) => {
       const now = deps.now();
