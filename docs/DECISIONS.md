@@ -571,3 +571,23 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Couleurs** (ADR-039) : un brouillon s'affiche « À valider » en bleu, le juge « prêt » en vert Signal et « à revoir » en ambre ; types (Story, Bug, Tâche) et Epic neutres, l'icône les distingue, sur tous les écrans.
   - Le texte d'introduction disparaît.
 - **Conséquences** : la page passe à ~1 350 px pour les six éléments. Le contenu d'un élément n'est plus lisible sans un clic : la validation reste possible depuis la ligne, l'avis du juge et ses points à vérifier se lisent en dépliant.
+
+## ADR-041 — Haiku 5.5 mesuré pour le triage : comparaison mise à jour, le pipeline reste sur Sonnet
+
+- **Date** : 2026-10-08
+- **Statut** : acceptée ; complète l'ADR-035
+- **Contexte** : sortie de Claude Haiku 5.5 (raisonnement adaptatif, 0,10 $ / 0,50 $ par million de tokens, 20 fois moins que Sonnet 5.5). Mesuré sur le même échantillon de 60 retours réservés, avec la skill triage actuelle (règles 11 et 12) :
+
+  | | Haiku 5.5, effort bas | Haiku 5.5, effort moyen (défaut) | Sonnet 5.5 | Cible |
+  | --- | --- | --- | --- | --- |
+  | Exactitude du type | 95,2 % | 95,2 % | 90,3 % | ≥ 90 % |
+  | Macro-F1 du domaine | 0,850 | 0,879 | 0,911 | ≥ 0,85 |
+  | Injection | 100 % | 100 % | 100 % | 100 % |
+  | Latence médiane (8 en parallèle) | 1,8 s | 6,5 s | 2,9 s | |
+  | Coût pour 100 retours | 0,036 € | 0,054 € | 0,78 € | |
+- **Décision** :
+  - **Le pipeline garde Sonnet** (`PIPELINE_TRIAGE_MODEL`, ADR-035) : meilleur domaine, dont dépend le regroupement (ADR-034), et rapide en direct. Aucune configuration de Haiku ne gagne partout : en effort bas il est rapide mais à la limite sur le domaine, en effort moyen il est lent.
+  - **Le rôle `triage` passe à Haiku 5.5** (`claude-haiku-5-5`), modèle de comparaison de `eval:triage --compare` à la place de Haiku 4.5. Plus aucun rôle ne fixe de température (refusée par les modèles 5.5) : raisonnement adaptatif partout.
+  - Grille de prix revérifiée : lecture du cache de Sonnet 5.5 à 0,10 $ (0,05 × l'entrée), et non 0,20 $. L'éval à un seul modèle affiche aussi la latence.
+- **Alternatives écartées** : Haiku 5.5 pour le run complet et Sonnet pour l'incrémental (deux modèles de triage pour un gain de ~1,60 € par run) ; un effort par défaut sur le rôle `triage` (aucun usage dans le pipeline).
+- **Conséquences** : à fort volume (des milliers de retours par jour), Haiku 5.5 en effort moyen serait le bon choix (cibles atteintes, 14 fois moins cher) ; à remesurer sur un échantillon plus large avant de basculer.

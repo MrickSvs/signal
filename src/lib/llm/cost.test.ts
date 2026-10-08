@@ -21,15 +21,15 @@ describe("costUsd / costEur", () => {
       cacheWrite5mTokens: 1_000_000,
       cacheWrite1hTokens: 1_000_000,
     });
-    // 2 + 10 + 0.2 + 2.5 + 4
-    expect(costUsd("claude-sonnet-5-5", u)).toBeCloseTo(18.7, 10);
-    expect(costEur("claude-sonnet-5-5", u)).toBeCloseTo(18.7 * EUR_PER_USD, 10);
+    // 2 + 10 + 0.1 + 2.5 + 4 (cache reads at 0.05x input on Sonnet 5.5)
+    expect(costUsd("claude-sonnet-5-5", u)).toBeCloseTo(18.6, 10);
+    expect(costEur("claude-sonnet-5-5", u)).toBeCloseTo(18.6 * EUR_PER_USD, 10);
   });
 
   it("prices a typical Haiku triage call", () => {
     const u = usage({ inputTokens: 1200, outputTokens: 300, cacheReadTokens: 4000 });
-    // (1200 * 1 + 300 * 5 + 4000 * 0.1) / 1e6
-    expect(costUsd("claude-haiku-4-5-20251001", u)).toBeCloseTo(0.0031, 10);
+    // (1200 * 0.1 + 300 * 0.5 + 4000 * 0.01) / 1e6
+    expect(costUsd("claude-haiku-5-5", u)).toBeCloseTo(0.00031, 10);
   });
 
   it("refuses an unknown model", () => {
@@ -81,11 +81,11 @@ describe("usageFromMessage", () => {
 describe("RunCost", () => {
   it("aggregates calls across models plus extra costs", () => {
     const run = new RunCost();
-    run.add("claude-haiku-4-5-20251001", usage({ inputTokens: 1_000_000 }));
-    run.add("claude-haiku-4-5-20251001", usage({ outputTokens: 1_000_000, cacheReadTokens: 10 }));
+    run.add("claude-haiku-5-5", usage({ inputTokens: 1_000_000 }));
+    run.add("claude-haiku-5-5", usage({ outputTokens: 1_000_000, cacheReadTokens: 10 }));
     run.add("claude-sonnet-5-5", usage({ inputTokens: 500_000 }));
     run.addEur(0.5);
-    expect(run.eur).toBeCloseTo((1 + 5 + 0.000001 + 1) * EUR_PER_USD + 0.5, 10);
+    expect(run.eur).toBeCloseTo((0.1 + 0.5 + 0.0000001 + 1) * EUR_PER_USD + 0.5, 10);
     expect(run.tokensIn).toBe(1_500_010);
     expect(run.tokensOut).toBe(1_000_000);
   });

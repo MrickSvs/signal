@@ -2,13 +2,13 @@
 
 <!-- Fichier généré par scripts/evals (pnpm eval:*) : ne pas modifier à la main. -->
 
-Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 6 oct. 2026, 04:09.
+Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 8 oct. 2026, 16:13.
 
 Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la démo) sert à régler prompts et seuils ; le **jeu réservé** (77 retours, `evals/holdout`) ne sert qu'à mesurer le triage. La détection est réglée et mesurée sur le même jeu : son chiffre est optimiste par construction.
 
 | Éval | Jeu | Résultat |
 | --- | --- | --- |
-| Triage | Jeu réservé (evals/holdout), 60/77 retours, modèle haiku | Exactitude du type : 88,7 % ❌ |
+| Triage | Jeu réservé (evals/holdout), 60/77 retours, modèle haiku | Exactitude du type : 95,2 % ✅ |
 | Triage : cas limites E1 à E8 | Jeu de développement (retours à cas limite), modèle haiku ; E2 et E7 lus en base | Cas limites réussis : 7/8 ✅ |
 | Triage : Haiku contre Sonnet | Jeu réservé (evals/holdout), même échantillon de 60 retours pour les deux modèles | sans cible |
 | Détection des patterns | Jeu de développement (en base), réglé et mesuré sur le même jeu | Patterns détectés : 7/8 ❌ |
@@ -24,13 +24,14 @@ Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la d
 Commande : `pnpm eval:triage`
 
 - **Jeu :** Jeu réservé (evals/holdout), 60/77 retours, modèle haiku
-- **Run :** 6 oct. 2026, 03:04 · commit `b2f27c6-dirty` · 60 cas · 0,09 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvyjkn705otad0ceev3gltw)
+- **Run :** 8 oct. 2026, 16:12 · commit `4b82d8a-dirty` · 60 cas · 0,02 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvyjkn705otad0ceev3gltw)
 
 | Mesure | Valeur | Cible | |
 | --- | --- | --- | --- |
-| Exactitude du type | 88,7 % | ≥ 90 % | ❌ |
-| Macro-F1 du domaine | 0,848 | ≥ 0,85 | ❌ |
+| Exactitude du type | 95,2 % | ≥ 90 % | ✅ |
+| Macro-F1 du domaine | 0,850 | ≥ 0,85 | ❌ |
 | Rappel de la détection d'injection | 100 % | 100 % | ✅ |
+| Latence médiane par retour | 1,8 s (p95 6,6 s) | — | — |
 
 > Un type de acceptable_types compte comme juste ; un item attendu sans item produit compte comme faux (multi-sujets non scindé).
 
@@ -63,20 +64,20 @@ Commande : `pnpm eval:triage --edge`
 Commande : `pnpm eval:triage --compare`
 
 - **Jeu :** Jeu réservé (evals/holdout), même échantillon de 60 retours pour les deux modèles
-- **Run :** 6 oct. 2026, 02:47 · commit `e33df5f-dirty` · 60 cas · 0,63 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvymyea05tgad0cz3rhfm6w)
+- **Run :** 8 oct. 2026, 16:05 · commit `4b82d8a-dirty` · 60 cas · 0,50 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvymyea05tgad0cz3rhfm6w)
 
 | Mesure | Valeur | Cible | |
 | --- | --- | --- | --- |
-| Exactitude du type (Haiku) | 89 % | — | — |
-| Macro-F1 du domaine (Haiku) | 0,75 | — | — |
+| Exactitude du type (Haiku) | 95,2 % | — | — |
+| Macro-F1 du domaine (Haiku) | 0,879 | — | — |
 | Rappel de la détection d'injection (Haiku) | 100 % | — | — |
-| Coût pour 100 retours (haiku) | 0,152 € | — | — |
-| Latence médiane par retour (haiku) | 2,8 s (p95 3,7 s) | — | — |
-| Exactitude du type (Sonnet) | 95 % | — | — |
-| Macro-F1 du domaine (Sonnet) | 0,90 | — | — |
+| Coût pour 100 retours (haiku) | 0,054 € | — | — |
+| Latence médiane par retour (haiku) | 6,5 s (p95 10,4 s) | — | — |
+| Exactitude du type (Sonnet) | 90,3 % | — | — |
+| Macro-F1 du domaine (Sonnet) | 0,911 | — | — |
 | Rappel de la détection d'injection (Sonnet) | 100 % | — | — |
-| Coût pour 100 retours (sonnet) | 0,898 € | — | — |
-| Latence médiane par retour (sonnet) | 4,3 s (p95 8,1 s) | — | — |
+| Coût pour 100 retours (sonnet) | 0,780 € | — | — |
+| Latence médiane par retour (sonnet) | 2,9 s (p95 11,9 s) | — | — |
 
 > Cible : décision documentée (docs/DECISIONS.md). Latence mesurée avec 8 appels en parallèle, file d'attente comprise.
 

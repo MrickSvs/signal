@@ -8,15 +8,16 @@ beforeAll(() => {
 
 describe("getModel", () => {
   it("routes each role to its model", () => {
-    expect(getModel("triage").model).toBe("claude-haiku-4-5-20251001");
+    expect(getModel("triage").model).toBe("claude-haiku-5-5");
     expect(getModel("reasoning").model).toBe("claude-sonnet-5-5");
     expect(getModel("judge").model).toBe("claude-opus-5-5");
   });
 
-  it("sets a temperature only on Haiku and visible adaptive thinking elsewhere", () => {
-    expect(getModel("triage").temperature).toBe(0);
-    const reasoning = getModel("reasoning");
-    expect(reasoning.temperature).toBeUndefined();
-    expect(reasoning.thinking).toEqual({ type: "adaptive", display: "summarized" });
+  it("sets no temperature and visible adaptive thinking on every role (5.5 models)", () => {
+    for (const role of ["triage", "reasoning", "judge"] as const) {
+      const model = getModel(role);
+      expect(model.temperature).toBeUndefined();
+      expect(model.thinking).toEqual({ type: "adaptive", display: "summarized" });
+    }
   });
 });

@@ -3,7 +3,7 @@
 export type ModelRole = "triage" | "reasoning" | "agent" | "judge" | "generation";
 
 export const MODELS = {
-  triage: "claude-haiku-4-5-20251001",
+  triage: "claude-haiku-5-5",
   reasoning: "claude-sonnet-5-5",
   agent: "claude-sonnet-5-5",
   judge: "claude-opus-5-5",
@@ -20,17 +20,19 @@ export type ModelPricing = {
   cacheWrite1h: number;
 };
 
-// USD per million tokens. Verified 2026-10-02 against Anthropic's model pricing
-// (cache writes: 1.25x input for the 5-minute TTL, 2x for the 1-hour TTL).
+// USD per million tokens. Verified 2026-10-08 against Anthropic's model pricing
+// (cache writes: 1.25x input for the 5-minute TTL, 2x for the 1-hour TTL; cache reads 0.1x input,
+// 0.05x on Sonnet 5.5 and Opus 5.5). Haiku 5.5: prices for prompts up to 100k tokens (the triage
+// prompt is far below; above, they are 5x).
 export const PRICING_USD_PER_MTOK: Record<ModelId, ModelPricing> = {
-  "claude-haiku-4-5-20251001": {
-    input: 1,
-    output: 5,
-    cacheRead: 0.1,
-    cacheWrite5m: 1.25,
-    cacheWrite1h: 2,
+  "claude-haiku-5-5": {
+    input: 0.1,
+    output: 0.5,
+    cacheRead: 0.01,
+    cacheWrite5m: 0.125,
+    cacheWrite1h: 0.2,
   },
-  "claude-sonnet-5-5": { input: 2, output: 10, cacheRead: 0.2, cacheWrite5m: 2.5, cacheWrite1h: 4 },
+  "claude-sonnet-5-5": { input: 2, output: 10, cacheRead: 0.1, cacheWrite5m: 2.5, cacheWrite1h: 4 },
   "claude-opus-5-5": { input: 4, output: 20, cacheRead: 0.2, cacheWrite5m: 5, cacheWrite1h: 8 },
 };
 

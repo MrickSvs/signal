@@ -158,7 +158,7 @@ describe("analyzeFeedback", () => {
     expect(result.analysis).toMatchObject({
       feedback_id: "R-042",
       run_id: deps.runId,
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-5-5",
       status: "ok",
       sentiment: -1,
       urgency: "haute",

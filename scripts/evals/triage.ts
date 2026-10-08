@@ -42,7 +42,7 @@ import { loadCustomers, loadEvalSet, loadLiveInsights, toTriageInput } from "./l
 import type { CaseResult, EvalSummary, Metric } from "./lib/types";
 
 export const DEFAULT_SAMPLE = 60; // Langfuse Hobby cap (CL-48)
-const COST_PER_FEEDBACK_EUR: Record<TriageModel, number> = { haiku: 0.002, sonnet: 0.01 };
+const COST_PER_FEEDBACK_EUR: Record<TriageModel, number> = { haiku: 0.0005, sonnet: 0.01 };
 const CONCURRENCY = 8;
 
 // One decimal and three for the F1: a value just under its target must not round up to it.
@@ -460,7 +460,30 @@ async function runHoldout(db: Db, args: EvalArgs, model: TriageModel) {
   score.cases.forEach((c) => recorder.add(c));
   const summary: EvalSummary = {
     dataset: `Jeu réservé (evals/holdout), ${sample.length}/${feedbacks.length} retours, modèle ${model}`,
-    metrics: holdoutMetrics(score),
+    metrics: [
+      ...holdoutMetrics(score),
+      {
+        key: "latency_p50",
+        label: "Latence médiane par retour",
+        value: percentile(
+          cases.map((c) => c.ms),
+          50,
+        ),
+        display: `${dec(
+          percentile(
+            cases.map((c) => c.ms),
+            50,
+          ) / 1000,
+          1,
+        )} s (p95 ${dec(
+          percentile(
+            cases.map((c) => c.ms),
+            95,
+          ) / 1000,
+          1,
+        )} s)`,
+      },
+    ],
     details: {
       confusion: score.confusion,
       failed: score.failed,
