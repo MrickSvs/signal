@@ -342,3 +342,15 @@ _En attente de validation._
   - **Lot C (interface)** : S12, S13, S18, S20.
   - **Plus tard, ou avec une éval** : S5, S15, S16, S19. S10 est écarté.
 - **A1 est à relire** : le prompt système cite bien « estimation » dans sa liste `load_skill`. Seule « rédaction » contredit la description de l'outil.
+
+**Lot A terminé (8 octobre 2026), mergé dans `main` après vérification manuelle :**
+
+- Faits : S1 à S4, S6 à S8, S11, S14 et S17.
+- **`engines.node` fixé à `22.x`**, pour que Vercel utilise la même version que la CI.
+- **F11 abandonné**, car la review se trompait : la période du digest est calculée en heure réelle (ADR-014), donc `markSeen(new Date())` est correct.
+- Dettes relevées sans correction :
+  - `loadBriefingFacts` mélange l'heure du scénario et `last_seen_at` (heure réelle). Cela ne joue que si `DEMO_NOW` est défini, ce qui n'est pas le cas en production.
+  - `touchThread` et `answerAlert` datent en heure réelle.
+  - La CLI `pipeline:cluster` écrit des fusions que le digest ne lit pas.
+  - Le remplacement d'un override de Reach saisi dans l'autre mode n'est pas journalisé.
+- Prochaine étape : lot B (§11, documentation), sur une branche partie de `main`. Il reprend aussi le tableau des modèles de CLAUDE.md (Haiku 5.5) et la ligne « triage · Haiku » d'ARCHITECTURE.md.

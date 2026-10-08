@@ -4,7 +4,7 @@
   "description": "Signal, l'agent IA du Product Owner : retours clients, priorisation RICE et MoSCoW, backlog rédigé et estimé.",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",
