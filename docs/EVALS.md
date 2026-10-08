@@ -2,13 +2,13 @@
 
 <!-- Fichier généré par scripts/evals (pnpm eval:*) : ne pas modifier à la main. -->
 
-Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 8 oct. 2026, 16:13.
+Derniers résultats de chaque éval, face aux cibles de SPEC §14.2. Généré le 8 oct. 2026, 16:21.
 
 Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la démo) sert à régler prompts et seuils ; le **jeu réservé** (77 retours, `evals/holdout`) ne sert qu'à mesurer le triage. La détection est réglée et mesurée sur le même jeu : son chiffre est optimiste par construction.
 
 | Éval | Jeu | Résultat |
 | --- | --- | --- |
-| Triage | Jeu réservé (evals/holdout), 60/77 retours, modèle haiku | Exactitude du type : 95,2 % ✅ |
+| Triage | Jeu réservé (evals/holdout), même échantillon de 60 retours pour les deux modèles : partie sonnet du comparatif | Exactitude du type : 90,3 % ✅ |
 | Triage : cas limites E1 à E8 | Jeu de développement (retours à cas limite), modèle haiku ; E2 et E7 lus en base | Cas limites réussis : 7/8 ✅ |
 | Triage : Haiku contre Sonnet | Jeu réservé (evals/holdout), même échantillon de 60 retours pour les deux modèles | sans cible |
 | Détection des patterns | Jeu de développement (en base), réglé et mesuré sur le même jeu | Patterns détectés : 7/8 ❌ |
@@ -23,17 +23,18 @@ Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la d
 
 Commande : `pnpm eval:triage`
 
-- **Jeu :** Jeu réservé (evals/holdout), 60/77 retours, modèle haiku
-- **Run :** 8 oct. 2026, 16:12 · commit `4b82d8a-dirty` · 60 cas · 0,02 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvyjkn705otad0ceev3gltw)
+- **Jeu :** Jeu réservé (evals/holdout), même échantillon de 60 retours pour les deux modèles : partie sonnet du comparatif
+- **Run :** 8 oct. 2026, 16:05 · commit `4b82d8a-dirty` · 60 cas · 0,47 € · [Langfuse](https://cloud.langfuse.com/project/cmurnu5670a7yad0c2jujnau8/datasets/cmuvymyea05tgad0cz3rhfm6w)
 
 | Mesure | Valeur | Cible | |
 | --- | --- | --- | --- |
-| Exactitude du type | 95,2 % | ≥ 90 % | ✅ |
-| Macro-F1 du domaine | 0,850 | ≥ 0,85 | ❌ |
+| Exactitude du type | 90,3 % | ≥ 90 % | ✅ |
+| Macro-F1 du domaine | 0,911 | ≥ 0,85 | ✅ |
 | Rappel de la détection d'injection | 100 % | 100 % | ✅ |
-| Latence médiane par retour | 1,8 s (p95 6,6 s) | — | — |
+| Coût pour 100 retours | 0,780 € | — | — |
+| Latence médiane par retour | 2,9 s (p95 11,9 s) | — | — |
 
-> Un type de acceptable_types compte comme juste ; un item attendu sans item produit compte comme faux (multi-sujets non scindé).
+> Mesuré dans le comparatif (pnpm eval:triage --compare) : modèle sonnet seul.
 
 ## Triage : cas limites E1 à E8
 

@@ -2,6 +2,8 @@ import "server-only";
 import type { Db } from "@/lib/db/client";
 import type { StoredEvalRun } from "@/lib/evals/catalog";
 import { buildEvalCards, type EvalCard } from "@/lib/evals/dashboard";
+import { withProductionTriage } from "@/lib/evals/triage-model";
+import { PIPELINE_TRIAGE_MODEL } from "@/pipeline/nodes/triage";
 import { productionMetric, type DecisionRow, type ProductionMetric } from "@/lib/evals/production";
 
 const MAX_EVAL_RUNS = 500;
@@ -68,7 +70,9 @@ export async function getEvalsScreen(db: Db): Promise<EvalsScreen> {
     cost_by_node?: Record<string, number>;
   };
   return {
-    cards: buildEvalCards((runs.data ?? []) as unknown as StoredEvalRun[]),
+    cards: buildEvalCards(
+      withProductionTriage((runs.data ?? []) as unknown as StoredEvalRun[], PIPELINE_TRIAGE_MODEL),
+    ),
     production: productionMetric((decisions.data ?? []) as DecisionRow[]),
     lastFullRun: run
       ? {

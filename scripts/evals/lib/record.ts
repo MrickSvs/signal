@@ -8,6 +8,8 @@ import type { Db } from "@/lib/db/create";
 import type { Json } from "@/lib/db/types";
 import { isTracingConfigured, shutdownTracing, traceUrl } from "@/lib/llm/tracing";
 import { mapWithConcurrency } from "@/lib/async";
+import { withProductionTriage } from "@/lib/evals/triage-model";
+import { PIPELINE_TRIAGE_MODEL } from "@/pipeline/nodes/triage";
 import { renderEvalsDoc, type StoredEvalRun } from "./evals-doc";
 import type { CaseResult, EvalName, EvalSummary } from "./types";
 
@@ -142,7 +144,10 @@ export async function writeEvalsDoc(db: Db): Promise<void> {
   check(error, "lecture des runs");
   writeFileSync(
     EVALS_DOC,
-    renderEvalsDoc((data ?? []) as unknown as StoredEvalRun[], new Date()) + "\n",
+    renderEvalsDoc(
+      withProductionTriage((data ?? []) as unknown as StoredEvalRun[], PIPELINE_TRIAGE_MODEL),
+      new Date(),
+    ) + "\n",
   );
 }
 

@@ -5,6 +5,7 @@
 //   --edge    on the development set: success per edge case E1 to E8 (§5.3).
 // Usage: pnpm eval:triage [--model haiku|sonnet] [--sample N | --full] [--compare] [--edge] [--yes]
 // Cost: ~0.002 € per feedback with Haiku, ~0.01 € with Sonnet (sample of 60: ~0.12 € / ~0.6 €).
+import { TRIAGE_TARGETS } from "@/lib/evals/triage-model";
 import { pathToFileURL } from "node:url";
 import { mapWithConcurrency } from "@/lib/async";
 import { loadContextPack } from "@/lib/context";
@@ -201,16 +202,16 @@ export function holdoutMetrics(score: HoldoutScore, suffix = ""): Metric[] {
       label: `Exactitude du type${tag}`,
       value: score.typeAccuracy,
       display: pct(score.typeAccuracy),
-      target: "≥ 90 %",
-      met: score.typeAccuracy >= 0.9,
+      target: TRIAGE_TARGETS.type_accuracy.target,
+      met: TRIAGE_TARGETS.type_accuracy.met(score.typeAccuracy),
     },
     {
       key: `area_macro_f1${key}`,
       label: `Macro-F1 du domaine${tag}`,
       value: score.areaMacroF1,
       display: dec(score.areaMacroF1, 3),
-      target: "≥ 0,85",
-      met: score.areaMacroF1 >= 0.85,
+      target: TRIAGE_TARGETS.area_macro_f1.target,
+      met: TRIAGE_TARGETS.area_macro_f1.met(score.areaMacroF1),
     },
     {
       key: `injection_recall${key}`,
@@ -220,8 +221,11 @@ export function holdoutMetrics(score: HoldoutScore, suffix = ""): Metric[] {
         score.injectionRecall === null
           ? "aucune injection dans l'échantillon"
           : pct(score.injectionRecall),
-      target: "100 %",
-      met: score.injectionRecall === null ? null : score.injectionRecall === 1,
+      target: TRIAGE_TARGETS.injection_recall.target,
+      met:
+        score.injectionRecall === null
+          ? null
+          : TRIAGE_TARGETS.injection_recall.met(score.injectionRecall),
     },
   ];
 }
