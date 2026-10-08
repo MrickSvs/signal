@@ -100,7 +100,7 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
           {screen.pending.map((p) => (
             <span key={p.id} className="inline-flex items-center gap-1">
               <InsightChip id={p.id} />
-              <span>({p.missing === "jugement" ? "jugement" : "estimation"} manquant)</span>
+              <span>({p.missing === "jugement" ? "jugement manquant" : "estimation manquante"})</span>
             </span>
           ))}
         </div>

@@ -186,6 +186,9 @@ function ItemLine({ item }: { item: ItemOutcome }) {
         <>
           <span>rattaché à</span>
           <InsightChip id={item.insight_id} title={item.insight_title} />
+          {item.insight_status === "rejete" && (
+            <span className="text-muted-foreground">rejeté : hors classement</span>
+          )}
           {item.similarity !== null && (
             <span className="text-muted-foreground">
               (similarité {formatNumber(item.similarity, 2)})

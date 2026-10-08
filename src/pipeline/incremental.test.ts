@@ -165,6 +165,35 @@ describe("describeFeedback", () => {
   });
 });
 
+describe("describeFeedback for a rejected topic", () => {
+  it("says that the topic joined is rejected, out of the ranking (CL-53)", () => {
+    const item = {
+      id: "R-302.1",
+      type: "bug" as const,
+      outcome: "rattache" as const,
+      insight_id: "I-02",
+      insight_title: "Export Excel",
+      similarity: 0.8,
+    };
+    expect(
+      describeFeedback({
+        id: "R-302",
+        status: "ok",
+        error: null,
+        items: [{ ...item, insight_status: "rejete" }],
+      }),
+    ).toBe("R-302 : rejoint I-02 « Export Excel », rejeté : hors classement.");
+    expect(
+      describeFeedback({
+        id: "R-303",
+        status: "ok",
+        error: null,
+        items: [{ ...item, insight_status: "actif" }],
+      }),
+    ).toBe("R-303 : confirme un sujet connu : I-02 « Export Excel ».");
+  });
+});
+
 // ---------------------------------------------------------------------------
 
 /** A base after a first full run: I-01 (notifications, ranked, scored), I-02 (weak signal). */
@@ -228,6 +257,20 @@ describe("runIncremental (in-memory database, simulated models)", () => {
     // Each step is announced as it starts (the chat's live trace shows it).
     expect(steps).toEqual(expect.arrayContaining(["triage", "enrich", "embed", "match", "score"]));
     expect(steps.every((step) => step in STEP_LABELS)).toBe(true);
+  });
+
+  it("says it when a feedback joins a rejected topic, which stays out of the ranking (CL-53)", async () => {
+    const { tables, add } = await seededWorld();
+    const i1 = tables.insights.find((i) => i.id === "I-01")!;
+    Object.assign(i1, { status: "rejete", ranked: false });
+    const result = await add([fb("[topic:a] encore une notification ratée")]);
+    expect(result.feedbacks[0].items).toMatchObject([
+      { outcome: "rattache", insight_id: "I-01", insight_status: "rejete" },
+    ]);
+    expect(result.feedbacks[0].summary).toContain("rejoint I-01");
+    expect(result.feedbacks[0].summary).toContain("rejeté : hors classement");
+    expect(result.feedbacks[0].summary).not.toContain("confirme un sujet connu");
+    expect(i1).toMatchObject({ status: "rejete", ranked: false });
   });
 
   it("queues an unknown topic, then proposes an insight at the third close item (CL-16, CL-51)", async () => {

@@ -8,6 +8,7 @@ import type { JournalEntry } from "@/lib/prioritization/journal";
 import { buildRecommendations, type Recommendation } from "@/lib/prioritization/recommendations";
 import { confidenceLevels } from "@/lib/scoring/confidence";
 import type { CapacityReport } from "@/lib/scoring/capacity";
+import { isModeReach } from "@/lib/scoring/overrides";
 import type { RuleFlag } from "@/lib/scoring/moscow-rules";
 import type { ReachMode } from "@/lib/scoring/reach";
 import type { ComputedScore } from "@/pipeline/nodes/score";
@@ -99,6 +100,7 @@ const EFFORT_SOURCES: Record<string, string> = {
 type OverrideRow = {
   insight_id: string;
   param: Enums["override_param"];
+  value: unknown;
   reason: string | null;
   context_changed: boolean;
   created_at: string;
@@ -315,7 +317,7 @@ export async function getPrioritizationScreen(
     getRanking(db, mode, deps),
     db
       .from("overrides")
-      .select("insight_id, param, reason, context_changed, created_at")
+      .select("insight_id, param, value, reason, context_changed, created_at")
       .eq("active", true),
     db
       .from("insight_relations")
@@ -342,6 +344,8 @@ export async function getPrioritizationScreen(
   const insightById = new Map(ranking.insights.map((i) => [i.id, i]));
   const overridesOf = new Map<string, Map<string, OverrideRow>>();
   for (const o of overrides.data ?? []) {
+    // A Reach override holds the mode it was entered in and applies only there (SPEC §8.1).
+    if (o.param === "reach" && isModeReach(o.value) && o.value.mode !== mode) continue;
     const map = overridesOf.get(o.insight_id) ?? new Map<string, OverrideRow>();
     map.set(o.param, o);
     overridesOf.set(o.insight_id, map);

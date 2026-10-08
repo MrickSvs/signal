@@ -182,6 +182,8 @@ export type ItemOutcome = {
   outcome: "rattache" | "nouvel_insight" | "surveille" | "non_regroupe";
   insight_id: string | null;
   insight_title: string | null;
+  /** Status of the insight joined: a rejected one absorbs the item but stays out of the ranking (CL-53). */
+  insight_status?: Tables<"insights">["status"];
   similarity: number | null;
 };
 
@@ -226,7 +228,9 @@ export function describeFeedback(outcome: Omit<FeedbackOutcome, "summary">): str
   const parts = outcome.items.map((item) => {
     switch (item.outcome) {
       case "rattache":
-        return `confirme un sujet connu : ${item.insight_id} « ${item.insight_title} »`;
+        return item.insight_status === "rejete"
+          ? `rejoint ${item.insight_id} « ${item.insight_title} », rejeté : hors classement`
+          : `confirme un sujet connu : ${item.insight_id} « ${item.insight_title} »`;
       case "nouvel_insight":
         return `forme un nouveau sujet à valider : ${item.insight_id} « ${item.insight_title} »`;
       case "surveille":
@@ -639,15 +643,14 @@ async function incrementalSteps(
             }
             if (a || known) {
               const insightId = a?.insightId ?? known!;
+              const previous = state.previous.find((x) => x.id === insightId);
               return {
                 id: item.id,
                 type: item.type,
                 outcome: "rattache",
                 insight_id: insightId,
-                insight_title:
-                  title.get(insightId) ??
-                  state.previous.find((x) => x.id === insightId)?.title ??
-                  null,
+                insight_title: title.get(insightId) ?? previous?.title ?? null,
+                ...(previous ? { insight_status: previous.status } : {}),
                 similarity: a ? Math.round(a.similarity * 1000) / 1000 : null,
               };
             }
