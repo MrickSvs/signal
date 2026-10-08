@@ -11,6 +11,7 @@ import {
   estimateNeed,
   estimateSchema,
   EstimationError,
+  loadCachedInsightEstimates,
   loadEstimationContext,
   problemHash,
   type EstimateOutput,
@@ -259,6 +260,55 @@ describe("estimateInsight", () => {
     const changed = await estimateInsight(db, "I-07", {}, d);
     expect(changed.cached).toBe(false);
     expect(d.invoke).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps a reworded insight's latest estimate for reading only, marked stale (F1)", async () => {
+    const { db, tables } = memoryDb();
+    const d = deps(output(), PERMISSIONS_NEED);
+    const first = await estimateInsight(db, "I-07", {}, d);
+    const insight = () =>
+      tables.insights[0] as { id: string; title: string; problem_statement: string };
+
+    const fresh = await loadCachedInsightEstimates(db, [insight()]);
+    expect(fresh.get("I-07")).toMatchObject({ id: first.id, cached: true });
+    expect(fresh.get("I-07")).not.toHaveProperty("stale");
+
+    tables.insights[0].problem_statement = "Un énoncé reformulé par le PO.";
+    const reworded = await loadCachedInsightEstimates(db, [insight()]);
+    expect(reworded.get("I-07")).toMatchObject({ id: first.id, stale: true });
+    expect(reworded.get("I-07")!.estimate).toMatchObject({ points_min: 13, points_max: 21 });
+
+    // The run estimates the new statement: estimateInsight never serves the stale estimate.
+    const rerun = await estimateInsight(db, "I-07", {}, d);
+    expect(rerun.cached).toBe(false);
+    expect(d.invoke).toHaveBeenCalledTimes(2);
+    expect((await loadCachedInsightEstimates(db, [insight()])).get("I-07")).toEqual(
+      expect.not.objectContaining({ stale: true }),
+    );
+  });
+
+  it("prefers an estimate of the current statement over a newer stale one", async () => {
+    const { db, tables } = memoryDb();
+    const d = deps(output(), PERMISSIONS_NEED);
+    const original = await estimateInsight(db, "I-07", {}, d);
+    tables.insights[0].problem_statement = "Un énoncé reformulé par le PO.";
+    await estimateInsight(db, "I-07", {}, d);
+    // Back to the first wording: its own (older) estimate is the right one, not the latest.
+    tables.insights[0].problem_statement =
+      "Les clients ne peuvent pas être invités sur un seul projet.";
+    const cached = await loadCachedInsightEstimates(db, [
+      tables.insights[0] as { id: string; title: string; problem_statement: string },
+    ]);
+    expect(cached.get("I-07")).toMatchObject({ id: original.id });
+    expect(cached.get("I-07")).not.toHaveProperty("stale");
+  });
+
+  it("has nothing to give for an insight never estimated", async () => {
+    const { db } = memoryDb();
+    const cached = await loadCachedInsightEstimates(db, [
+      { id: "I-07", title: "Ouvrir un projet à un client", problem_statement: null },
+    ]);
+    expect(cached.size).toBe(0);
   });
 
   it("ignores whitespace and case in the problem hash", () => {

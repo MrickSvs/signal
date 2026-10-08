@@ -351,6 +351,11 @@ export type StoredEstimate = {
   id: string;
   cached: boolean;
   estimate: Omit<Estimate, "adjustments"> & { adjustments?: Estimate["adjustments"] };
+  /**
+   * The problem statement changed since this estimate (the PO reworded the insight): kept for
+   * reading until the next run estimates the new statement (loadCachedInsightEstimates).
+   */
+  stale?: true;
 };
 
 function fromRow(row: EstimateRow): StoredEstimate["estimate"] {
@@ -454,8 +459,10 @@ export async function estimateInsight(
 }
 
 /**
- * Cached estimates of several insights, read only (Priorisation screen): an insight whose problem
- * changed since its last estimate is absent, never estimated here.
+ * Cached estimates of several insights, read only (Priorisation screen), never estimated here. An
+ * insight whose problem statement changed since (reworded by the PO) keeps its latest estimate,
+ * marked `stale`, so that it stays in the ranking: the next run estimates the new statement
+ * (estimateInsight only serves an estimate of the current statement).
  */
 export async function loadCachedInsightEstimates(
   db: Db,
@@ -474,10 +481,18 @@ export async function loadCachedInsightEstimates(
   if (error) throw new EstimationError(`Lecture du cache d'estimation (${error.message})`);
   const hashOf = new Map(insights.map((i) => [i.id, problemHash(insightNeed(i).statement)]));
   const result = new Map<string, StoredEstimate>();
+  // Newest first: an estimate of the current statement wins, else the latest one, marked stale.
   for (const row of data) {
     const id = row.insight_id!;
-    if (result.has(id) || row.problem_hash !== hashOf.get(id)) continue;
-    result.set(id, { id: row.id, cached: true, estimate: fromRow(row) });
+    const current = row.problem_hash === hashOf.get(id);
+    const known = result.get(id);
+    if (known && (!known.stale || !current)) continue;
+    result.set(id, {
+      id: row.id,
+      cached: true,
+      estimate: fromRow(row),
+      ...(current ? {} : { stale: true as const }),
+    });
   }
   return result;
 }

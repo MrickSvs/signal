@@ -184,6 +184,8 @@ function cells(
     tshirt_max: string;
     confidence: string;
     rationale: string;
+    /** The statement was reworded since: the next run estimates it again. */
+    stale: boolean;
   } | null,
   scales: { impact: number[]; confidence: number[] },
 ): ParamCell[] {
@@ -275,6 +277,14 @@ function cells(
                 value: `${estimate.points_min}–${estimate.points_max} pts (${estimate.tshirt_min === estimate.tshirt_max ? estimate.tshirt_min : `${estimate.tshirt_min}–${estimate.tshirt_max}`})`,
               },
               { label: "Confiance de l'estimation", value: estimate.confidence },
+              ...(estimate.stale
+                ? [
+                    {
+                      label: "Énoncé modifié depuis l'estimation",
+                      value: "nouvelle estimation au prochain run",
+                    },
+                  ]
+                : []),
             ]
           : []),
         ...(s.effort.low_weeks !== null && s.effort.high_weeks !== null
@@ -343,7 +353,8 @@ export async function getPrioritizationScreen(
     const manual = insight.origin === "manuel";
     const own = overridesOf.get(s.insight_id) ?? new Map<string, OverrideRow>();
     const trend = (insight.trend ?? {}) as Partial<Trend>;
-    const estimate = ranking.estimates.get(s.insight_id)?.estimate ?? null;
+    const stored = ranking.estimates.get(s.insight_id);
+    const estimate = stored ? { ...stored.estimate, stale: stored.stale === true } : null;
     const contextChanged = [...own.values()].some((o) => o.context_changed);
     const moscowOverride = own.get("moscow");
     return {

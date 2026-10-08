@@ -11,7 +11,9 @@ import {
   world,
 } from "@/pipeline/fake-world";
 import { compilePipeline, runPipeline } from "@/pipeline/graph";
+import { insightNeed, problemHash } from "./estimate";
 import { InsightReviewError, insightReviewSchema, reviewInsight } from "./insight-review";
+import { getRanking } from "./prioritization";
 
 const pack = await loadContextPack();
 
@@ -247,5 +249,59 @@ describe("reviewInsight (in-memory database, simulated models)", () => {
       },
     );
     expect(calls).toEqual(["lock", "unlock"]);
+  });
+});
+
+describe("a reworded insight stays in the ranking (F1)", () => {
+  it("keeps the ranked insight in the recomputed ranking, on its last estimate marked stale", async () => {
+    const { tables, db, deps, insight } = await seeded();
+    // The estimate as estimateInsight stores it: cached under the hash of the problem statement.
+    tables.complexity_estimates = [
+      {
+        id: "est-I-01",
+        insight_id: "I-01",
+        item_id: null,
+        problem_hash: problemHash(insightNeed(insight("I-01") as never).statement),
+        components: ["notifications"],
+        points_min: 3,
+        points_max: 5,
+        tshirt_min: "M",
+        tshirt_max: "M",
+        confidence: "moyenne",
+        analogies: [],
+        rationale: "Analogue au ticket des rappels.",
+        risks: [],
+        model: "test",
+        created_at: NOW.toISOString(),
+      },
+    ];
+    const ranked = async () => {
+      const ranking = await getRanking(db, "comptes", deps);
+      return {
+        ids: ranking.scores.map((s) => s.insight_id),
+        pending: ranking.pending.map((p) => p.insight),
+        estimate: ranking.estimates.get("I-01"),
+      };
+    };
+    const before = await ranked();
+    expect(before.ids).toContain("I-01");
+    expect(before.estimate).toMatchObject({ id: "est-I-01" });
+    expect(before.estimate).not.toHaveProperty("stale");
+
+    await reviewInsight(
+      db,
+      {
+        action: "reformuler",
+        insight_id: "I-01",
+        title: "Notifications d'assignation en retard",
+        problem_statement: "Les assignés apprennent trop tard qu'une tâche leur revient.",
+      },
+      deps,
+    );
+
+    const after = await ranked();
+    expect(after.pending).not.toContain("I-01");
+    expect(after.ids).toContain("I-01");
+    expect(after.estimate).toMatchObject({ id: "est-I-01", stale: true });
   });
 });
