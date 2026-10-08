@@ -15,7 +15,6 @@ Tout ce que Signal sait du produit, hors du code. Le pipeline et l'agent lisent 
 | `glossary.md`     | Les termes métier                                                                       | tous les prompts qui en ont besoin       |
 | `weighting.yaml`  | Tous les paramètres et seuils (Reach, Confidence, effort, MoSCoW, clustering, alertes…) | code uniquement (`src/lib/context.ts`)   |
 | `skills/`         | Les savoir-faire métier, un `SKILL.md` par skill                                        | pipeline et agent                        |
-| `prototype-kit/`  | Le kit visuel des prototypes                                                            | génération de prototype                  |
 
 `src/lib/context.ts` charge le pack (`loadContextPack()`) et le valide : un `weighting.yaml` mal formé, une clé inconnue ou un tableau de modules invalide dans `architecture.md` font échouer le chargement avec un message clair.
 

@@ -24,7 +24,7 @@ Signal est l'agent IA du Product Owner de Jalon, un SaaS fictif de gestion de pr
 
 ## Stack
 
-- Un seul projet **Next.js** à la racine (pnpm) : l'agent et son cockpit. Jalon n'a pas de code : il n'existe que comme pack de contexte (`context/jalon/`) et comme kit visuel des prototypes (`context/jalon/prototype-kit/`).
+- Un seul projet **Next.js** à la racine (pnpm) : l'agent et son cockpit. Jalon n'a pas de code : il n'existe que comme pack de contexte (`context/jalon/`).
 - **Next.js** (App Router, TypeScript strict), **Tailwind**, **shadcn/ui**, lucide-react, framer-motion (animations de classement).
 - **Supabase** : Postgres + pgvector + Storage. Accès **uniquement côté serveur** (service role). Aucun client Supabase dans le navigateur.
 - **LangChain v1 / LangGraph.js v1** : `createAgent` pour l'agent, `StateGraph` pour le pipeline, middleware human-in-the-loop, `PostgresSaver` comme checkpointer.
@@ -69,7 +69,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 - **Identifiants lisibles :** retours `R-001` (items `R-001.1`), insights `I-01`, epics `E-01`, stories `US-001`, bugs `BUG-001`, tâches techniques `TT-001`, décisions `D-001`, tickets `T-101`, comptes `C-001`.
 - **Dates :** stockées en UTC, affichées en heure de Paris (`lib/format.ts`), jamais codées en dur : tout le scénario est relatif à `DEMO_NOW`.
 - **Organisation :** lectures de données dans `src/server/queries/`, logique métier dans `src/services/` et `src/lib/`, nœuds du pipeline dans `src/pipeline/nodes/`, outils de l'agent dans `src/agent/tools/` (un fichier par outil), scripts CLI dans `scripts/`.
-- **Outils de l'agent :** quinze outils, chacun conforme à son contrat de SPEC §10.5 (quand l'utiliser, pas quand, entrées, sortie compacte avec ID, effet). Pas de nouvel outil qui recouvre un outil existant : étendre le contrat plutôt que dupliquer.
+- **Outils de l'agent :** quatorze outils construits (plus `generate_prototype`, reporté : ADR-031), chacun conforme à son contrat de SPEC §10.5 (quand l'utiliser, pas quand, entrées, sortie compacte avec ID, effet). Pas de nouvel outil qui recouvre un outil existant : étendre le contrat plutôt que dupliquer.
 - **UI :** sobre, desktop d'abord ; tout chiffre et tout ID sont cliquables vers leur preuve (SPEC §12.1) ; états vides, de chargement et d'erreur systématiques.
 - **Tests :** à côté du code (`*.test.ts`). Tout code déterministe est testé.
 - **Commits :** Conventional Commits, message fourni par `docs/process/PLAN.md`.
@@ -91,6 +91,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 | `pnpm notion:setup`                                                                                                                                                  | Créer la base Backlog dans Notion (si absente) |
 | `pnpm eval:triage` (`--model haiku\|sonnet`, `--edge`, `--compare`) · `eval:detection` · `eval:estimation` · `eval:stability` (`--runs N`) · `eval:guardrails` (`--tools`) · `eval:calibration-set` (jeu à annoter sur `/evals/annotate`, en local) · `eval:judge-calibration` · `eval:backlog` (`--manual I-xx`) | Evals (`--sample N`, `--full`, `--yes` au-delà de 1 € estimé) ; résultats dans `docs/EVALS.md` et `evals/reports/` |
 | `pnpm demo:snapshot --keep-backlog I-xx` · `pnpm demo:reset` (`--empty`) · `pnpm tsx --conditions=react-server scripts/demo-purge.ts --from R-xxx` (`--yes`) | Démo : figer la base, la restaurer (ou la vider) en ~20 s, retirer des retours de test ; retours à coller dans `data/demo/retours-a-coller.md` |
+| `pnpm tsx scripts/build-time.ts` (`[chemin du journal]`) | Temps et coût LLM du build par phase, agrégés depuis `docs/process/BUILD_LOG.md` |
 
 Les commandes sont ajoutées au fil des étapes ; garde ce tableau à jour.
 
@@ -102,7 +103,7 @@ Les commandes sont ajoutées au fil des étapes ; garde ce tableau à jour.
 - **LangGraph :** une interruption exige un checkpointer ; `createReactAgent` est déprécié au profit de `createAgent` (LangChain v1).
 - **Checkpointer et pooler Supabase :** vérifier la compatibilité du client Postgres avec le pooler en mode transaction (requêtes préparées).
 - **Vercel :** 300 s au maximum par fonction sur le plan Hobby avec Fluid compute. Les runs complets du pipeline passent par la CLI, jamais par une route API ; les routes longues déclarent leur `maxDuration`.
-- **Supabase gratuit :** un projet est mis en pause après 7 jours d'inactivité. Le cron quotidien le garde actif ; `/status` le vérifie.
+- **Supabase gratuit :** un projet est mis en pause après 7 jours d'inactivité. Le cron quotidien le garde actif.
 - **Langfuse Hobby :** plafond mensuel strict, sans dépassement, et 30 jours de rétention. Evals en échantillon par défaut.
 - **Embeddings :** la dimension est figée dans la migration ; changer de modèle impose une nouvelle migration.
 - **Voyage sans moyen de paiement :** 3 requêtes/min et 10 000 tokens/min ; un lot de 128 items échoue en 429. Ajouter un moyen de paiement (les 200 M tokens gratuits restent gratuits) ou vectoriser par petits lots espacés.

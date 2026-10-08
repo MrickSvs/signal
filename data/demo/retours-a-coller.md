@@ -54,7 +54,7 @@ Thanks,
 Oliver
 ```
 
-## 4. Deux sujets dans le même message (S4 reporting client + S5b champs personnalisés)
+## 4. Deux sujets dans le même message (S3 reporting client + S5b champs personnalisés)
 
 - **Canal** : E-mail client · **Compte** : Plume & Cie (C-071, Business)
 - **Attendu** : découpé en deux items, chacun rattaché à son insight ; le retour sert de preuve aux deux.

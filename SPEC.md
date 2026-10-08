@@ -2,7 +2,7 @@
 
 > Document de référence produit et technique : il dit **quoi** construire et **pourquoi**.
 > L'ordre de construction est dans `docs/process/PLAN.md`, les règles de travail dans `CLAUDE.md`.
-> Version 1.0 — octobre 2026. Les éléments marqués _(à valider)_ seront revus pendant le build.
+> Version 1.0 — octobre 2026.
 
 ---
 
@@ -58,7 +58,7 @@ Ces principes tranchent les arbitrages pendant le build.
 | Proposer des critères d'acceptation                  | Gherkin « Étant donné / Quand / Alors » (§9)                            | `eval:backlog`                                    |
 | Estimer la complexité | Estimation par analogie : carte d'architecture + tickets de référence (§8.4) | `eval:estimation` (leave-one-out), `eval:backlog` (justification) |
 
-**Au-delà du brief :** rythme continu (alertes ciblées avec enquête préparée par Signal, digest quotidien), envoi du backlog validé dans Notion, prototype visuel d'une story, sujets hors retours (insights manuels), validation des nouveaux insights par le PO, tableau de bord des evals, registre des cas limites (§19), exposition MCP.
+**Au-delà du brief :** rythme continu (alertes ciblées avec enquête préparée par Signal, digest quotidien), envoi du backlog validé dans Notion, prototype visuel d'une story, sujets hors retours (insights manuels), validation des nouveaux insights par le PO, tableau de bord des evals, registre des cas limites (§19). L'exposition MCP (§10.9) et le prototype (§13) étaient prévus et ne sont pas construits (ADR-031).
 
 ---
 
@@ -133,7 +133,7 @@ _(Les J+ et J- sont relatifs à `DEMO_NOW`, voir §16 : aucune date absolue dans
 
 ---
 
-## 5. Scénario maître _(à valider)_
+## 5. Scénario maître
 
 Le jeu de données est généré à partir de ce scénario. Chaque pattern est une **vérité terrain** cachée que Signal doit retrouver. La vérité terrain est stockée dans `evals/ground-truth/`, jamais accessible à l'application.
 
@@ -193,7 +193,7 @@ Sources écrites (e-mails, tickets, commentaires, NPS, notes CSM / sales, Slack)
         │
         ▼
 ① PIPELINE D'INGESTION — un workflow, pas un agent (graphe LangGraph)
-   trier et scinder par sujet (Haiku) → rattacher au compte → vectoriser
+   trier et scinder par sujet (Sonnet) → rattacher au compte → vectoriser
    → regrouper par problème → apparier aux insights existants → nommer (Sonnet)
    → estimer l'effort → scorer → détecter les alertes · digest quotidien
         │
@@ -203,7 +203,7 @@ Sources écrites (e-mails, tickets, commentaires, NPS, notes CSM / sales, Slack)
         │                           │ pack de contexte + skills (context/jalon/)
         ▼                           │
 ② AGENT SIGNAL — un seul cerveau (Sonnet) ⇄ Léa (chat + cockpit)
-   briefing de contexte à chaque tour · 15 outils · enquêtes sur les alertes
+   briefing de contexte à chaque tour · 14 outils · enquêtes sur les alertes
    outils de lecture · simulation · rédaction de brouillons
    └─ actions sensibles (envoi Notion, décision) → pause + validation du PO
         │
@@ -224,7 +224,7 @@ Graphe LangGraph (`src/pipeline/graph.ts`) :
 | Nœud       | Type              | Rôle                                                                                                                                                                                                                                                                    |
 | ---------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ingest`   | code              | Charge les retours non traités ; tronque les textes de plus de 6 000 caractères (début et fin conservés, `truncated = true`)                                                                                                                                            |
-| `triage`   | Haiku, structuré  | Pour le retour : langue, sentiment, urgence, signal de churn, suspicion d'injection, confiance. Puis scission en 1 à 3 **items**, un par sujet : type, domaine, tags, demande exprimée, problème sous-jacent, résumé, fonctionnalité déjà existante. Fan-out parallèle. |
+| `triage`   | Sonnet, structuré (ADR-035) | Pour le retour : langue, sentiment, urgence, signal de churn, suspicion d'injection, confiance. Puis scission en 1 à 3 **items**, un par sujet : type, domaine, tags, demande exprimée, problème sous-jacent, résumé, fonctionnalité déjà existante. Fan-out parallèle. |
 | `enrich`   | code              | Rattachement au compte ou au prospect, signaux business, poids de la source                                                                                                                                                                                             |
 | `embed`    | Voyage            | Vecteur de chaque item : « problème sous-jacent — résumé » (jamais le texte brut)                                                                                                                                                                                       |
 | `cluster`  | code              | Clustering agglomératif cosinus des items, seuil et taille minimale configurables                                                                                                                                                                                       |
@@ -271,7 +271,7 @@ Supabase est la source de vérité ; Notion est l'espace de l'équipe. Signal y 
   - les dépendances entre modules ;
   - la dette connue et les zones à risque : permissions dispersées dans 5 écrans et dans l'export ; kanban non virtualisé ; préférence digest mal lue ; aucune notion d'invité, de dépendance entre tâches ni de date de début ; champs personnalisés limités à 3 types ;
   - un niveau de couplage par module (faible, moyen ou fort).
-- `prototype-kit/` : le kit visuel des prototypes (§13) — `DESIGN.md`, `tokens.css`, `shell.html`, `components.html`.
+- `prototype-kit/` : le kit visuel des prototypes (§13) — `DESIGN.md`, `tokens.css`, `shell.html`, `components.html`. Pas encore créé : le prototype est reporté (ADR-031).
 - `weighting.yaml` : tous les paramètres de pondération et les seuils (§8)
 - `skills/<nom>/SKILL.md` : les savoir-faire métier, chargés à la demande par l'agent **et** par les nœuds du pipeline (une seule source de vérité)
 
@@ -312,11 +312,12 @@ Le PO modifie une skill (par exemple le gabarit de story) : le pipeline et l'age
 │   ├── lib/                     # llm, embeddings, scoring, estimation, clustering, skills, context, judge…
 │   └── components/
 ├── scripts/                     # CLI : génération, seed, pipeline, Notion, evals/, démo
-├── context/jalon/               # pack de contexte (dont architecture.md), skills/, prototype-kit/
+├── context/jalon/               # pack de contexte (dont architecture.md), skills/ (prototype-kit/ : non créé, ADR-031)
 ├── data/                        # scénario, clients, retours, tickets de référence, démo
 ├── evals/                       # ground-truth/, holdout/, human-labels/, reports/ (données uniquement)
 ├── supabase/migrations/
-└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT ; process/ : PLAN, BUILD_LOG
+└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT, img/ (captures)
+    └── process/                 # PLAN, BUILD_LOG, REVIEW_NOTES : la méthode de construction
 ```
 
 ---
@@ -575,7 +576,7 @@ Signal est le binôme analytique du PO. Il prépare, relie, chiffre, rédige et 
 
 | Tâche                                                                 | Modèle                                  | Pourquoi                                                                                      |
 | --------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Triage des retours (volume)                                           | Haiku 4.5 — `claude-haiku-4-5-20251001` | Haute fréquence, sortie structurée. Choix validé par `eval:triage` (comparaison avec Sonnet). |
+| Triage des retours (volume)                                           | Sonnet 5.5 (rôle `reasoning`, ADR-035)  | Haute fréquence, sortie structurée. Choix validé par `eval:triage --compare` : Haiku 4.5 était sous les cibles (ADR-035) ; Haiku 5.5 (`claude-haiku-5-5`, rôle `triage`) reste le modèle de comparaison (ADR-041). |
 | Nommage des insights, paramètres de score, alignement, MoSCoW, estimation, digest | Sonnet 5.5 — `claude-sonnet-5-5` | Jugement |
 | Agent conversationnel, backlog, prototypes | Sonnet 5.5 | Raisonnement et outils |
 | Juge (evals, badge qualité du backlog)                                 | Opus 5.5 — `claude-opus-5-5`            | Un modèle différent du générateur limite l'auto-complaisance                                  |
@@ -589,7 +590,7 @@ Le prompt système contient l'index des skills (nom + description). L'outil `loa
 
 ### 10.5 Outils
 
-Quinze outils, chacun avec un contrat : quand l'utiliser, quand ne pas l'utiliser, ses entrées, sa sortie et ses effets. Les recouvrements sont la première cause de mauvais choix d'outil : chaque besoin a un seul outil. Le choix d'outil est mesuré (`eval:guardrails`, §14.2).
+Quatorze outils construits, plus `generate_prototype`, reporté avec le prototype (ADR-031). Chacun a un contrat : quand l'utiliser, quand ne pas l'utiliser, ses entrées, sa sortie et ses effets. Les recouvrements sont la première cause de mauvais choix d'outil : chaque besoin a un seul outil. Le choix d'outil est mesuré (`eval:guardrails`, §14.2).
 
 **Règles communes.** Schéma zod en entrée. Sortie compacte avec ID, jamais de dump : 10 éléments au plus par liste, 5 verbatims au plus par insight, plus les comptages. Tout texte de retour ou venu de Notion est encapsulé (`wrapExternal`). Une erreur rend un message court et actionnable (« insight I-42 introuvable ; les ID valides commencent à I-01 ») plutôt qu'une trace.
 
@@ -602,16 +603,16 @@ Quinze outils, chacun avec un contrat : quand l'utiliser, quand ne pas l'utilise
 | `query_customers` | Comptes, plans, MRR, renouvellements, santé | Historique financier (churn passé, revenus) : la donnée n'existe pas, Signal le dit | filtres (plan, santé, renouvellement sous N jours, insight) → comptes {nom, plan, MRR, renouvellement, santé, insights} | lecture |
 | `get_priority` | Classement, robustesse, capacité des Must ; « et si… » | Enregistrer un changement (→ `apply_decision`) | `mode` (comptes / MRR), `top?`, `what_if?` [{insight, paramètre, valeur}] → classement, robustesse, capacité ; avec `what_if` : `simulation: true` et mouvements de rang | lecture (la simulation n'écrit rien) |
 | `estimate_complexity` | Effort d'un besoin ou d'un insight | Points d'un élément du backlog (→ `draft_backlog_items`) | `insight_id` ou `besoin`, `force?` → fourchette de points, T-shirt, confiance, composants, 3 analogues {ID, points estimés, réels}, risques ; cache par `problem_hash` | lecture (cache) |
-| `load_skill` | Avant toute tâche couverte par une skill (rédaction, MoSCoW, challenge, estimation, digest) | Skill déjà chargée dans la conversation | `name` → contenu | lecture |
+| `load_skill` | Avant toute tâche couverte par une skill (MoSCoW, challenge, estimation, digest ; pas la rédaction du backlog, dont les outils chargent leurs skills) | Skill déjà chargée dans la conversation | `name` → contenu | lecture |
 | `list_backlog` | État du backlog d'un insight ou d'éléments précis | Rédiger (→ `draft_backlog_items`) | `insight_id?`, `ids?` → epics et éléments {ID, type, titre, points, statut, statut Notion} | lecture |
 | `add_feedback` | Léa colle un ou plusieurs retours clients | Le texte est une question de Léa, pas un retour | 1 à 10 textes, canal, compte? → par retour : ID, type, items, rattachement (insight et similarité) ou file « à surveiller », insight proposé créé, alertes déclenchées | interne |
 | `draft_backlog_items` | Transformer un insight en backlog | Insight de découvrabilité (Signal propose une action d'aide) ; backlog existant sans confirmation | `insight_id`, `consignes?` → format choisi et raison, epic, éléments {ID, type, titre, points}, total face à la fourchette, effort affiné ; `needs_confirmation` si des brouillons existent | interne (brouillons) |
 | `update_backlog_item` | Modifier un brouillon ou changer son type | Élément déjà envoyé (« à modifier dans Notion ») | `id`, `patch` ou `kind` → élément mis à jour | interne |
-| `generate_prototype` | Esquisser l'écran d'une story qui touche une interface, à la demande du PO | Bug, tâche, story sans écran ; jamais de sa propre initiative | `story_id`, `consigne?` → URL du prototype ou message d'échec clair | interne |
+| `generate_prototype` _(non construit, ADR-031)_ | Esquisser l'écran d'une story qui touche une interface, à la demande du PO | Bug, tâche, story sans écran ; jamais de sa propre initiative | `story_id`, `consigne?` → URL du prototype ou message d'échec clair | interne |
 | `apply_decision` | Enregistrer une décision exprimée dans le chat : override, MoSCoW, validation d'un élément, revue d'un insight proposé, sujet manuel | Simulation (→ `get_priority`) | `kind`, `target`, `value`, `reason` → décision journalisée | interne · **validation PO** |
 | `push_to_notion` | Envoyer des éléments du backlog dans le kanban Notion, à la demande du PO ; son clic valide aussi un brouillon | Valider sans envoyer (→ `apply_decision`) ; élément rejeté ; de sa propre initiative | `item_ids` ou `epic_id` (ses éléments pas encore envoyés, résolus en code, 10 au plus) → pages créées (ou déjà envoyées), erreurs par élément | **externe** · **validation PO** |
 
-**Outils disponibles selon l'entrée.** Dans le chat : les quinze. Pendant une enquête sur une alerte (§10.10) : les outils de lecture, `estimate_complexity` et `load_skill` seulement ; aucun outil qui écrit.
+**Outils disponibles selon l'entrée.** Dans le chat : les quatorze. Pendant une enquête sur une alerte (§10.10) : les outils de lecture, `estimate_complexity` et `load_skill` seulement ; aucun outil qui écrit.
 
 ### 10.6 Validation humaine (human-in-the-loop)
 
@@ -634,7 +635,9 @@ Les outils `apply_decision` et `push_to_notion` déclenchent une pause (middlewa
 - Mémoire durable : la base (décisions, overrides, backlog, alertes) et le pack de contexte. Pas de mémoire implicite.
 - **Briefing de contexte.** À chaque tour, le prompt système reçoit un état compact de l'application (environ 1 500 tokens), calculé en code : le top 10 du classement, les décisions en attente, les alertes ouvertes, ce qui a changé depuis la dernière visite de Léa et la page où elle se trouve. L'agent sait où on en est sans appeler d'outil ; il creuse avec ses outils quand il a besoin du détail. Le briefing est placé après les blocs mis en cache, pour ne pas casser le cache.
 
-### 10.9 Exposition MCP _(bonus)_
+### 10.9 Exposition MCP _(bonus, coupé : ADR-031)_
+
+Non construite : aucune route MCP n'existe. Le paragraphe suivant décrit ce qui était prévu.
 
 Serveur MCP (Streamable HTTP, route Next.js protégée par jeton) exposant `signal_top_priorities`, `signal_search_feedback`, `signal_get_insight`, `signal_draft_backlog_items` (brouillons uniquement). Signal devient utilisable depuis Claude ou tout client MCP, et peut devenir un agent parmi d'autres dans une gouvernance multi-agents.
 
@@ -696,7 +699,9 @@ La vue kanban groupée par Statut est créée à la main une fois (guide dans le
 - Les URLs poussées (Lien Signal, Prototype) sont construites à partir de `APP_BASE_URL`.
 - **Après l'envoi, l'élément vit dans Notion** : il n'est plus modifiable dans Signal (« Ouvrir dans Notion » remplace « Modifier »). Comme rien ne peut changer des deux côtés, il n'y a pas de conflit à gérer.
 
-### 11.3 Retour du statut _(bonus, étape 5.2)_
+### 11.3 Retour du statut _(bonus, étape 5.2 : non construit)_
+
+Non construit : aucun statut ne revient de Notion, `notion_status_raw` reste vide et `list_backlog` rend `statut_notion: null`. Ce qui suit décrit le bonus prévu.
 
 S'il reste du temps : un bouton « Synchroniser Notion » relit le Statut des pages envoyées et l'affiche dans Signal (`notion_status_raw`), avec une décision journalisée (actor `po`, source `notion`) pour chaque changement. Un statut que Signal ne connaît pas (une colonne « Bloqué » ajoutée dans Notion) est conservé tel quel et signalé. Rien d'autre ne revient de Notion.
 
@@ -816,7 +821,7 @@ Calculée depuis `decisions` : part des éléments du backlog validés sans modi
 - **Langfuse** (plan Hobby gratuit, plafond mensuel strict, 30 jours de rétention) : une trace par run, par nœud et par tour d'agent ; scores des evals. Les evals tournent en échantillon par défaut pour rester sous le plafond.
 - **Panneau de trace in-app** pour la démo (§12.9).
 - **Coût par run** dans `pipeline_runs`, affiché dans Évals. Le coût d'un run complet est dominé par le triage (volume) et par l'étiquetage et le scoring des insights ; l'estimation, un seul appel structuré mis en cache par insight (§8.4), pèse peu.
-- **Maîtrise des coûts :** prompt caching sur le pack de contexte et les skills, Haiku pour le volume, plafond de dépense dans la console Anthropic. Piste non implémentée : l'API Message Batches pour le triage en masse (asynchrone, moins chère).
+- **Maîtrise des coûts :** prompt caching sur le pack de contexte et les skills, plafond de dépense dans la console Anthropic. Le triage tourne sur Sonnet (ADR-035) ; Haiku 5.5, mesuré moins cher pour un domaine un peu moins juste, est l'option à fort volume (ADR-041). Piste non implémentée : l'API Message Batches pour le triage en masse (asynchrone, moins chère).
 - **Budgets de latence**, vérifiés en répétition : premier token du chat < 3 s ; ajout d'un retour < 15 s ; rédaction du backlog < 30 s ; alerte et dossier d'enquête < 60 s après l'ajout du retour ; prototype < 45 s ; envoi d'un élément dans Notion < 10 s. Au-delà, le chat montre la progression dans la trace plutôt qu'un écran figé.
 
 ---
@@ -830,7 +835,7 @@ Calculée depuis `decisions` : part des éléments du backlog validés sans modi
 Points d'attention d'exploitation :
 
 - **Durée des fonctions Vercel :** 300 s au maximum sur le plan Hobby avec Fluid compute. Les routes de l'agent et de l'incrémental déclarent leur `maxDuration`. Plan B pour la démo : lancer l'app en local.
-- **Mise en pause de Supabase :** un projet gratuit est mis en pause après 7 jours d'inactivité. Le cron quotidien du digest interroge la base et la garde active ; `/status` le vérifie. Point important si le jury teste l'app plusieurs jours après la présentation.
+- **Mise en pause de Supabase :** un projet gratuit est mis en pause après 7 jours d'inactivité. Le cron quotidien du digest interroge la base et la garde active (la page `/status` prévue est coupée, ADR-031). Point important si le jury teste l'app plusieurs jours après la présentation.
 - **Fuseau horaire :** stockage en UTC, affichage en heure de Paris, cron exprimé en UTC. La démo peut être présentée depuis un autre fuseau sans décalage.
 - **Connexion Postgres du checkpointer :** passer par le pooler de Supabase et vérifier sa compatibilité avec le client utilisé (requêtes préparées en mode transaction).
 
@@ -847,10 +852,9 @@ Variables d'environnement :
 | `SITE_PASSWORD`                                                                                         | Protection de l'app déployée (Basic Auth)                                          |
 | `APP_BASE_URL`                                                                                          | URL publique de l'app, pour les liens poussés dans Notion (Lien Signal, Prototype) |
 | `CRON_SECRET`                                                                                           | Protection des routes cron                                                         |
-| `MCP_TOKEN`                                                                                             | Accès au serveur MCP (bonus)                                                       |
 | `DEMO_NOW`                                                                                              | Date de référence du scénario (défaut : maintenant)                                |
 
-Sécurité : données entièrement fictives, clés uniquement côté serveur, app protégée par mot de passe, routes cron et MCP protégées par secret, plafond de dépense API.
+Sécurité : données entièrement fictives, clés uniquement côté serveur, app protégée par mot de passe, routes cron protégées par secret, plafond de dépense API.
 
 ---
 
@@ -897,7 +901,7 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 | 10:00 | Architecture                                     | Schéma, choix agent unique / workflow, routage et coûts, evals, Langfuse.                                                                                                                                                      |
 | 13:00 | Challenges                                       | Non-déterminisme et scoring hybride ; problème vs solution ; validation humaine en serverless ; injection ; évaluer un livrable subjectif (juge calibré).                                                                      |
 
-**Plans B**, détaillés dans `docs/DEMO_SCRIPT.md` : toutes les données de démo sont précalculées ; un backlog déjà rédigé existe sur l'insight S3 si la rédaction en direct est lente ou échoue ; le prototype de la story de démo est pré-généré ; une vidéo de la démo complète est prête ; l'app peut tourner en local.
+**Plans B**, détaillés dans `docs/DEMO_SCRIPT.md` : toutes les données de démo sont précalculées (snapshot) ; le backlog est rédigé en direct, et se relance depuis la fiche insight si la rédaction échoue (pas de backlog de secours dans le snapshot, ADR-032 révisé) ; le dossier d'une alerte se relance par `pnpm investigate --pending` ; une vidéo de la démo complète est prête ; l'app peut tourner en local. Le moment « Visualiser » (7:20) n'existe pas : le prototype est reporté (ADR-031).
 
 ---
 
@@ -976,10 +980,10 @@ Chaque cas a un traitement, une étape du plan qui l'implémente et une façon d
 | ID    | Cas                                                     | Traitement                                                            | Étapes        | Vérifié par           |
 | ----- | ------------------------------------------------------- | --------------------------------------------------------------------- | ------------- | --------------------- |
 | CL-42 | Prototype invalide, trop lourd ou qui appelle le réseau | Nouvelle tentative, puis message clair                                | 7.1           | test                  |
-| CL-43 | Projet Supabase en pause                                | Cron quotidien, `/status`                                             | 2.7, 8.1      | `/status`             |
+| CL-43 | Projet Supabase en pause                                | Cron quotidien du digest (la page `/status` est coupée, ADR-031)      | 2.7, 8.1      | cron en production (BUILD_LOG 2.7) ; vérification manuelle avant la démo |
 | CL-44 | Démo présentée depuis un autre fuseau                   | Affichage en heure de Paris                                           | 3.1, 8.3      | vérification manuelle |
 | CL-45 | Durée maximale des fonctions Vercel                     | Runs longs en CLI, `maxDuration`, plan B en local                     | 2.6, 4.1, 8.3 | répétition            |
-| CL-46 | API lente ou indisponible en direct                     | Données précalculées, backlog de secours, prototype pré-généré, vidéo | 8.1, 8.3      | répétition            |
+| CL-46 | API lente ou indisponible en direct                     | Données précalculées (snapshot), backlog relancé depuis la fiche insight, `pnpm investigate --pending`, vidéo ; pas de prototype (ADR-031) | 8.1, 8.3      | répétition            |
 | CL-47 | Lisibilité en partage d'écran                           | Taille de texte et zoom testés                                        | 3.1, 8.3      | répétition            |
 | CL-48 | Plafond Langfuse, budget API                            | Evals en échantillon, plafond de dépense, coûts dans BUILD_LOG        | 0.3, 6.2      | BUILD_LOG             |
 
@@ -1007,3 +1011,16 @@ Chaque cas a un traitement, une étape du plan qui l'implémente et une façon d
 | CL-56 | Enquête en échec ou au-delà de son budget | Alerte affichée sans dossier, « dossier indisponible » ; coût et trace enregistrés | 4.5 | test |
 | CL-57 | Enquête qui tenterait d'écrire ou d'envoyer | Outils d'écriture absents de l'enquête ; action proposée soumise au clic du PO | 4.5 | `eval:guardrails --tools` |
 | CL-58 | Retour collé qui n'est pas un retour client (question de Léa) | L'agent répond à la question ; `add_feedback` n'est pas appelé | 4.1 | `eval:guardrails --tools` |
+
+### Ajoutés après la revue (`docs/process/REVIEW_NOTES.md` §12.3)
+
+| ID | Cas | Traitement | Étapes | Vérifié par |
+|---|---|---|---|---|
+| CL-59 | Reformulation d'un insight classé (son énoncé change, donc la clé du cache d'estimation) | L'insight garde sa dernière estimation, marquée « énoncé modifié », et reste classé ; le run suivant réestime (F1) | revue, lot A | test |
+| CL-60 | Digest régénéré deux fois de suite | « Régénérer » réécrit le digest affiché sur sa période, au lieu d'en ouvrir une de quelques secondes (F2, ADR-043) | revue, lot C | test |
+| CL-61 | Cron de 04:00 UTC passé entre le reset de démo et la démo | Procédure : reset et digest le matin même, après le cron, ou cron coupé ce jour-là (F3) | 8.2 | `docs/DEMO_SCRIPT.md` |
+| CL-62 | Retour collé qui rejoint un insight rejeté | Absorbé par l'insight rejeté (CL-53) ; le résultat le dit (« rejoint I-xx, rejeté : hors classement ») (F4). Limite connue : aucune alerte quand un sujet rejeté revient | revue, lot A | test |
+| CL-63 | Insight rejeté ou fusionné qui a un backlog | Statut de l'insight dans l'en-tête du groupe ; l'envoi Notion d'un de ses éléments est refusé ; les confirmations de rejet et de fusion de l'écran nomment ses éléments non envoyés (F7). Limites connues : la carte d'approbation du chat ne les nomme pas ; « Valider » sans envoi reste possible | revue, lot C | test |
+| CL-64 | Notion non configuré (évaluateur en local) | « Valider » et « Rejeter » dans l'écran Backlog ; « Valider et envoyer » masqué sans `NOTION_TOKEN` et `NOTION_DS_BACKLOG` (G2) | revue, lot C | test |
+| CL-65 | Rédaction concurrente du même insight (chat et écran en même temps) | Limite connue : la rédaction lit puis insère hors du verrou du pipeline, deux backlogs peuvent coexister | — | — |
+| CL-66 | Alerte ignorée, puis nouveau retour du même compte dans les 24 h | Limite connue, assumée : seules les alertes ouvertes s'enrichissent ; une nouvelle alerte et une nouvelle enquête (0,016 à 0,042 € mesurés par dossier, ADR-025) sont créées | — | — |
