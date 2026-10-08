@@ -38,7 +38,7 @@ Signal est l'agent IA du Product Owner de Jalon, un SaaS fictif de gestion de pr
 
 | Rôle (`getModel(role)`) | Modèle                      | Usage                                                     |
 | ----------------------- | --------------------------- | --------------------------------------------------------- |
-| `triage`                | `claude-haiku-4-5-20251001` | Triage en comparaison seulement (`eval:triage --compare`) : le pipeline trie avec Sonnet, rôle `reasoning` (`PIPELINE_TRIAGE_MODEL`, ADR-035) |
+| `triage`                | `claude-haiku-5-5`          | Triage en comparaison seulement (`eval:triage --compare`, ADR-041) : le pipeline trie avec Sonnet, rôle `reasoning` (`PIPELINE_TRIAGE_MODEL`, ADR-035) |
 | `reasoning`             | `claude-sonnet-5-5`         | Insights, paramètres de score, estimation, alignement, MoSCoW, digest |
 | `agent`                 | `claude-sonnet-5-5`         | Agent Signal, backlog, prototypes |
 | `judge`                 | `claude-opus-5-5`           | Juge des evals et badge qualité                           |
