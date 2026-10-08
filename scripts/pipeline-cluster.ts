@@ -195,7 +195,8 @@ async function main() {
           created: summary.insights.filter((i) => i.isNew).map((i) => i.id),
           relabelled: summary.insights.filter((i) => i.relabelled).map((i) => i.id),
           ranked: summary.insights.filter((i) => i.aggregates?.ranked).map((i) => i.id),
-          // Fusions and splits (CL-15). The digest reports those of full runs only (stats.cluster).
+          // Fusions and splits (CL-15), kept in this run's stats only: the digest reads them from
+          // full pipeline runs (stats.cluster), never from this command.
           events: summary.events,
           merges: summary.merges,
           tensions: summary.tensions.map((t) => [t.a, t.b]),
