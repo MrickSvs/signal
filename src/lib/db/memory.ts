@@ -1,17 +1,21 @@
 // In-memory stand-in for the Supabase client, for tests only (CLAUDE.md rule 11: tests never
-// call a remote database). It covers the query-builder calls the pipeline uses: select with
-// eq / in / is / not-is-null / gt / gte / order / range / single / maybeSingle, insert (+ select().single()),
-// upsert (onConflict), update and delete. Column lists are applied when they are plain (no embedded relations).
+// call a remote database). It covers the query-builder calls the pipeline and the agent's tools
+// use: select (with an exact count) with eq / in / is / not-is-null / gt / gte / contains / order /
+// range / limit / single / maybeSingle, insert (+ select().single()), upsert (onConflict), update,
+// delete, and rpc through handlers given by the test. Column lists are applied when they are plain
+// (no embedded relations).
 import type { Db } from "./create";
 
 type Row = Record<string, unknown>;
-type Result = { data: unknown; error: { message: string } | null };
+type Result = { data: unknown; error: { message: string } | null; count?: number | null };
 
 export type MemoryTables = Record<string, Row[]>;
 
 export type MemoryDbOptions = {
   /** Default values filled on insert, per table (e.g. readable ids). */
   defaults?: Record<string, (row: Row, table: Row[]) => Row>;
+  /** Database functions called with db.rpc(name, args), answered by the test. */
+  rpc?: Record<string, (args: Record<string, unknown>) => unknown>;
 };
 
 class Query implements PromiseLike<Result> {
@@ -21,6 +25,7 @@ class Query implements PromiseLike<Result> {
   private columns: string[] | null = null;
   private wantSingle: "one" | "maybe" | false = false;
   private returning = false;
+  private counted = false;
 
   constructor(
     private readonly tables: MemoryTables,
@@ -34,8 +39,9 @@ class Query implements PromiseLike<Result> {
       | { kind: "delete" },
   ) {}
 
-  select(columns?: string) {
+  select(columns?: string, options: { count?: "exact" } = {}) {
     if (this.action.kind !== "select") this.returning = true;
+    if (options.count === "exact") this.counted = true;
     if (columns && columns.trim() !== "*" && !columns.includes("("))
       this.columns = columns.split(",").map((c) => c.trim());
     return this;
@@ -62,6 +68,14 @@ class Query implements PromiseLike<Result> {
   }
   not(column: string, operator: "is", value: null) {
     this.filters.push((row) => (row[column] ?? null) !== value);
+    return this;
+  }
+  /** Array column holding every one of `values` (Postgres @>). */
+  contains(column: string, values: readonly unknown[]) {
+    this.filters.push((row) => {
+      const cell = row[column];
+      return Array.isArray(cell) && values.every((v) => cell.includes(v));
+    });
     return this;
   }
   order(column: string, options: { ascending?: boolean } = {}) {
@@ -143,6 +157,7 @@ class Query implements PromiseLike<Result> {
         return (x < y ? -1 : x > y ? 1 : 0) * (ascending ? 1 : -1);
       });
     }
+    const count = this.counted ? out.length : undefined;
     if (this.window) out = out.slice(this.window[0], this.window[1] + 1);
     const data = out.map((r) => this.project(r));
     if (this.wantSingle === "maybe" && data.length === 0) return { data: null, error: null };
@@ -151,7 +166,7 @@ class Query implements PromiseLike<Result> {
         ? { data: data[0], error: null }
         : { data: null, error: { message: `${data.length} lignes au lieu d'une` } };
     }
-    return { data, error: null };
+    return count === undefined ? { data, error: null } : { data, error: null, count };
   }
 }
 
@@ -160,8 +175,8 @@ export function createMemoryDb(tables: MemoryTables, options: MemoryDbOptions = 
   const db = {
     from(table: string) {
       return {
-        select: (columns?: string) =>
-          new Query(tables, table, options, { kind: "select" }).select(columns),
+        select: (columns?: string, opts?: { count?: "exact" }) =>
+          new Query(tables, table, options, { kind: "select" }).select(columns, opts),
         insert: (rows: Row | Row[]) =>
           new Query(tables, table, options, {
             kind: "insert",
@@ -176,6 +191,11 @@ export function createMemoryDb(tables: MemoryTables, options: MemoryDbOptions = 
         update: (patch: Row) => new Query(tables, table, options, { kind: "update", patch }),
         delete: () => new Query(tables, table, options, { kind: "delete" }),
       };
+    },
+    async rpc(name: string, args: Record<string, unknown> = {}): Promise<Result> {
+      const handler = options.rpc?.[name];
+      if (!handler) return { data: null, error: { message: `Fonction ${name} inconnue` } };
+      return { data: structuredClone(handler(args)), error: null };
     },
   };
   return db as unknown as Db;
