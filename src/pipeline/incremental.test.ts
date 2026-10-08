@@ -225,7 +225,7 @@ describe("runIncremental (in-memory database, simulated models)", () => {
     ]);
     expect(tables.pipeline_runs.at(-1)).toMatchObject({ kind: "incremental", status: "termine" });
     expect(result.alerts).toEqual({ created: [], enriched: [] });
-    // Each step is announced as it starts (the chat's live trace shows it, PLAN 4.2).
+    // Each step is announced as it starts (the chat's live trace shows it).
     expect(steps).toEqual(expect.arrayContaining(["triage", "enrich", "embed", "match", "score"]));
     expect(steps.every((step) => step in STEP_LABELS)).toBe(true);
   });

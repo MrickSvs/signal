@@ -1,4 +1,4 @@
-// Demo base preparation (PLAN 8.1, ADR-032): removes the feedbacks added while testing (ids from
+// Demo base preparation (ADR-032): removes the feedbacks added while testing (ids from
 // --from on) and everything they alone produced, so that the snapshot holds the scenario only.
 // - insights whose live items all came from those feedbacks: deleted with their backlog, alerts
 //   and decisions (scores, overrides, epics, estimates follow by cascade);

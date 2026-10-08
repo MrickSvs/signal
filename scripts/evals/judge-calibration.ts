@@ -1,4 +1,4 @@
-// eval:judge-calibration (PLAN 6.3, SPEC §14.3): the judge against the PO on the 15 items of the
+// eval:judge-calibration (SPEC §14.3): the judge against the PO on the 15 items of the
 // calibration set (evals/human-labels). Targets: notes ≤ 1 point apart on ≥ 80 % of the notes,
 // Cohen's κ ≥ 0.6 on the verdict « acceptable / à reprendre ». The judge never sees the
 // annotations nor which items were degraded.

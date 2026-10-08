@@ -15,7 +15,7 @@ import { getRanking } from "@/services/prioritization";
 import { loadScoringContext } from "@/server/scoring-context";
 
 // Reads of the Priorisation screen (SPEC §12.5). Every value is computed by lib/scoring on the
-// server and arrives formatted: the client never computes a score (PLAN 3.5).
+// server and arrives formatted: the client never computes a score.
 
 type Enums = Database["public"]["Enums"];
 

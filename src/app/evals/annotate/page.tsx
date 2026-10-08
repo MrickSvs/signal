@@ -6,7 +6,7 @@ import { JUDGE_KINDS, loadRubric, RUBRIC_CRITERIA, rubricFor } from "@/lib/judge
 export const dynamic = "force-dynamic";
 
 /**
- * Annotation of the judge's calibration set by the PO (PLAN 6.3, SPEC §14.3): one item at a time,
+ * Annotation of the judge's calibration set by the PO (SPEC §14.3): one item at a time,
  * the grid of its kind. Local only: the annotations are written into the repo.
  */
 export default async function Page() {

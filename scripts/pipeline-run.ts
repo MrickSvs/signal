@@ -1,4 +1,4 @@
-// Full pipeline CLI (PLAN 2.6): ingest → triage → enrich → embed → cluster → estimate → score →
+// Full pipeline CLI: ingest → triage → enrich → embed → cluster → estimate → score →
 // alert → digest, as a LangGraph graph checkpointed in Postgres (schema « langgraph », out of PostgREST).
 // Usage: pnpm pipeline:run [--resume <run_id>] [--reach-mode comptes|mrr] [--batch-size N]
 // Cost: a run on a reset base (~215 feedbacks) is ~1.5 € (triage ~0.3, labels ~0.25, estimates

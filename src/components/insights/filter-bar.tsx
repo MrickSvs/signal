@@ -12,7 +12,7 @@ const enums = Constants.public.Enums;
 const SELECT = "h-8 max-w-56 rounded-lg border border-input bg-background px-2 text-[13px]";
 const ACTIVE = "border-foreground/40 bg-muted font-medium";
 
-/** Sort and filters of the insight cards, in the URL (PLAN 3.4). */
+/** Sort and filters of the insight cards, in the URL. */
 export function InsightFilterBar({ filters }: { filters: InsightFilters }) {
   const router = useRouter();
   const pathname = usePathname();

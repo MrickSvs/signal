@@ -2,7 +2,7 @@
 // the estimation skill, architecture.md, the closest reference tickets and the team bias computed
 // in code. The model reads the map and the analogues; the code checks its output, corrects the
 // bias, widens the range without a close analogue (CL-20) and derives the T-shirt sizes (P5).
-// estimateNeed is free of any database: the leave-one-out eval (PLAN 6.2) passes its own tickets.
+// estimateNeed is free of any database: eval:estimation (leave-one-out) passes its own tickets.
 import { createHash } from "node:crypto";
 import { HumanMessage, type BaseMessage } from "@langchain/core/messages";
 import { z } from "zod";

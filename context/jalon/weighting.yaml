@@ -54,7 +54,7 @@ effort:
 # §8.4 Estimation par analogie.
 estimation:
   analogues_count: 3 # tickets de référence les plus proches fournis au modèle
-  close_analogue_min_similarity: 0.45 # cosinus voyage-4 (requête « query ») ; confirmé en 2.4 : permissions 0,49-0,59, notifications 0,50-0,56, suivi du temps ≤ 0,37
+  close_analogue_min_similarity: 0.45 # cosinus voyage-4 (requête « query ») ; confirmé sur les tickets de référence (ADR-011) : permissions 0,49-0,59, notifications 0,50-0,56, suivi du temps ≤ 0,37
   no_close_analogue_range_factor: 1.5 # fourchette élargie (min ÷ f, max × f, arrondis Fibonacci) (CL-20)
   bias_min_tickets: 3 # tickets livrés minimum par composant pour corriger le biais
 
@@ -109,11 +109,11 @@ triage:
   max_items_per_feedback: 3 # CL-01
 
 clustering:
-  distance_threshold: 0.28 # distance cosinus, average linkage ; réglé en 2.3 : même partition de 0,27 à 0,29, tout fusionne dès 0,35
-  cross_area_penalty: 0.1 # ajoutée à la distance de deux items de domaines différents ; mesuré en 8.1 sur le jeu de dev : intrus dans les sujets S 13 → 6, aucun sujet perdu (S4 : 4 → 3 items)
+  distance_threshold: 0.28 # distance cosinus, average linkage ; réglé sur le jeu de développement (ADR-010) : même partition de 0,27 à 0,29, tout fusionne dès 0,35
+  cross_area_penalty: 0.1 # ajoutée à la distance de deux items de domaines différents ; mesurée sur le jeu de développement (ADR-034) : intrus dans les sujets S 13 → 6, aucun sujet perdu (S4 : 4 → 3 items)
   min_cluster_size: 2 # en dessous : item isolé, pas d'insight
   run_matching_jaccard: 0.5 # appariement des insights entre deux runs (CL-14)
-  run_matching_centroid_similarity: 0.9 # à défaut de Jaccard : centroïdes très proches (mesuré en 2.3 : groupes distincts ≤ 0,83, même groupe ≥ 0,94)
+  run_matching_centroid_similarity: 0.9 # à défaut de Jaccard : centroïdes très proches (mesuré sur le jeu de développement, ADR-010 : groupes distincts ≤ 0,83, même groupe ≥ 0,94)
   watch_queue_min_items: 3 # file « à surveiller » → insight proposé (CL-16)
 
 # §10.10 Alertes et enquêtes.

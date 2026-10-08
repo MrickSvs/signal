@@ -1,4 +1,4 @@
-// eval:triage (PLAN 6.2, SPEC §14.2). Three modes, never writing to the triage tables:
+// eval:triage (SPEC §14.2). Three modes, never writing to the triage tables:
 //   default   on the HOLDOUT set (CL-49): type accuracy (acceptable_types count as right), domain
 //             macro-F1, injection recall, confusion matrix.
 //   --compare Haiku and Sonnet on the same holdout sample: accuracy, cost, latency.

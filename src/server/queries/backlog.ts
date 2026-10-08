@@ -24,7 +24,7 @@ export type JudgeBadge = {
   verdict: "pret" | "a_revoir";
   points_forts: string;
   a_ameliorer: string[];
-  /** Note per criterion of the grid (calibrated judge, PLAN 6.3); {} for an older badge. */
+  /** Note per criterion of the grid (calibrated judge, lib/judge); {} for an older badge. */
   notes: Record<string, number>;
   provisional: boolean;
 };

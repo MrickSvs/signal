@@ -1,9 +1,8 @@
 // Review of the insights Signal proposes (SPEC §8.10, CL-51, CL-52): the PO accepts, rewords,
-// merges or rejects. Shared by the Insights screen (PLAN 3.4) and the agent's apply_decision
-// (PLAN 4.4). Every choice is logged in `decisions` (rule 6). When the ranking changes (a ranked
-// insight leaves it, or a merge changes an insight's facts), the scores are recomputed in code
-// with the stored judgments, like the incremental mode: no model call unless an insight has no
-// valid judgment yet.
+// merges or rejects. Shared by the Insights screen and the agent's apply_decision. Every choice is
+// logged in `decisions` (rule 6). When the ranking changes (a ranked insight leaves it, or a merge
+// changes an insight's facts), the scores are recomputed in code with the stored judgments, like
+// the incremental mode: no model call unless an insight has no valid judgment yet.
 import { z } from "zod";
 import type { ContextPack } from "@/lib/context";
 import type { Db } from "@/lib/db/create";

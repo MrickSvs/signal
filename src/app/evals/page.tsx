@@ -113,7 +113,7 @@ export default async function EvalsPage() {
               sur un chiffre souligné pour voir le détail de la mesure.
             </p>
           </div>
-          {/* The annotation of the judge's calibration set writes into the repo: local only (PLAN 6.3). */}
+          {/* The annotation of the judge's calibration set writes into the repo: local only. */}
           {process.env.NODE_ENV !== "production" && (
             <Link
               href="/evals/annotate"

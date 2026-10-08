@@ -1,4 +1,4 @@
-// Demo snapshot (PLAN 8.1, ADR-032): exports the business tables of a prepared base (full run,
+// Demo snapshot (ADR-032): exports the business tables of a prepared base (full run,
 // insights reviewed by the PO, fallback backlog) to data/demo-snapshot/, one JSON file per table.
 // Only the backlog of the insights given in --keep-backlog is kept: the rest is rehearsal, left out
 // with its decisions and Notion links. Digests and chat threads are never in the snapshot: the

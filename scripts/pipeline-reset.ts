@@ -1,6 +1,6 @@
-// Resets what the pipeline produced (PLAN 2.6 test: « base remise à zéro, hors clients et
-// tickets »): alerts, digests, insights (and everything hanging from them: items, tensions,
-// scores, overrides, backlog), estimates, feedbacks (with their analyses and items) and runs.
+// Resets what the pipeline produced (« base remise à zéro, hors clients et tickets »): alerts,
+// digests, insights (and everything hanging from them: items, tensions, scores, overrides,
+// backlog), estimates, feedbacks (with their analyses and items) and runs.
 // Customers and reference tickets are kept; `pnpm db:seed` then reinserts the feedbacks.
 // Id sequences are not rewound: ids are never reused (SPEC §7).
 // Usage: pnpm pipeline:reset --yes

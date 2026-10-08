@@ -1,4 +1,4 @@
-// eval:detection (PLAN 6.2, SPEC §14.2): the stored insights against the scenario's patterns.
+// eval:detection (SPEC §14.2): the stored insights against the scenario's patterns.
 // For each pattern (S1, S2a, S2b, S3, S4, S5a, S5b, S7), the insight holding most of its items →
 // recall and purity on the items; detected at ≥ 70 % / ≥ 70 %. Then the S5a / S5b tension, and a
 // check by the judge role that the S3 insight's title states the need, not a solution.

@@ -1,4 +1,4 @@
-// Demo reset (PLAN 8.1, ADR-032, CL-46): puts the base back in the state of data/demo-snapshot/,
+// Demo reset (ADR-032, CL-46): puts the base back in the state of data/demo-snapshot/,
 // dates moved so that the scenario looks fresh, in less than 2 minutes and without any model call.
 // 1. Notion: the Backlog pages created since the snapshot (rehearsals) go to the trash; the pages
 //    of the snapshot are kept, and taken out of the trash on restore.

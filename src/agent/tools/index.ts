@@ -1,5 +1,6 @@
-// The agent's tools (SPEC §10.5). Step 4.1: the nine read tools and add_feedback; 4.3: the backlog
-// drafting and edition; 4.4: apply_decision; 5.1: push_to_notion; the prototype tool comes with 7.1.
+// The agent's tools (SPEC §10.5): the nine read tools and add_feedback, the backlog drafting and
+// edition, apply_decision and push_to_notion. The prototype tool of SPEC §10.5 (generate_prototype)
+// is not built (ADR-031).
 import { addFeedbackTool } from "./add-feedback";
 import { applyDecisionTool } from "./apply-decision";
 import { draftBacklogItemsTool } from "./draft-backlog-items";

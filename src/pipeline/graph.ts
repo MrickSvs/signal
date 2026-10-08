@@ -5,7 +5,7 @@
 // idempotent (it reads what is left to do from the base), so a run interrupted anywhere can be
 // resumed from its checkpoint (`--resume <run_id>`, CL-13), and a failed element is recorded
 // without stopping the run (CL-11). `cluster` covers the match and label steps of SPEC §6.1:
-// they share one plan written after every model call (2.3).
+// they share one plan written after every model call (pipeline/insights.ts).
 import { Annotation, END, Send, START, StateGraph } from "@langchain/langgraph";
 import type { BaseCheckpointSaver } from "@langchain/langgraph";
 import type { ContextPack } from "@/lib/context";
@@ -242,7 +242,7 @@ export function buildPipelineGraph(ctx: PipelineContext) {
           error: f.error,
         })),
         stats: {
-          // Read by the digest (2.7): fusions and splits are reported to the PO (CL-15).
+          // Read by the digest: fusions and splits are reported to the PO (CL-15).
           cluster: {
             threshold: summary.threshold,
             clusters: summary.clusters,

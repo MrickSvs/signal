@@ -1,4 +1,4 @@
-// Enrich CLI (PLAN 2.2): links feedbacks to their account and prints the business signals.
+// Enrich CLI: links feedbacks to their account and prints the business signals.
 // Usage: pnpm pipeline:enrich. No LLM, no cost.
 import { pathToFileURL } from "node:url";
 import { loadContextPack } from "@/lib/context";

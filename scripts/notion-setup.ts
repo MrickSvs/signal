@@ -1,4 +1,4 @@
-// Notion setup (PLAN 5.1, SPEC §11.1, ADR-026): the Backlog base under NOTION_PARENT_PAGE_ID,
+// Notion setup (SPEC §11.1, ADR-026): the Backlog base under NOTION_PARENT_PAGE_ID,
 // with its properties (Type and Statut as selects) and a kanban view grouped by Statut.
 // Idempotent: when NOTION_DS_BACKLOG answers, nothing is created; missing properties are added.
 // Usage: pnpm notion:setup

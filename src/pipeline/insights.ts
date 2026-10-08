@@ -1,7 +1,7 @@
-// Clustering run (PLAN 2.3): cluster → match → label → aggregates → tensions → write.
+// Clustering run: cluster → match → label → aggregates → tensions → write.
 // Every model call happens before the first write; the write phase only applies the plan.
-// Graph wiring (LangGraph) comes in 2.6; this module is what the nodes `cluster`, `match` and
-// `label` of SPEC §6.1 do, in order.
+// In the pipeline's LangGraph (src/pipeline/graph.ts) this run is the single `cluster` node: it
+// does what the nodes `cluster`, `match` and `label` of SPEC §6.1 do, in order.
 import { mapWithConcurrency } from "@/lib/async";
 import { agglomerativeCluster, type Vector } from "@/lib/clustering/agglomerative";
 import type { Commitment, Weighting } from "@/lib/context";

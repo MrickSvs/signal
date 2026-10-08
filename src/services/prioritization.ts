@@ -1,8 +1,8 @@
-// Interactive prioritization (SPEC §8.5, §8.9, §12.5, PLAN 3.5). The ranking is recomputed in code
+// Interactive prioritization (SPEC §8.5, §8.9, §12.5). The ranking is recomputed in code
 // from the stored judgments and the cached estimates, in either Reach mode, without any model
 // call; every write of the PO (override, its cancellation, final MoSCoW, manual topic) is checked
 // by lib/scoring, logged in `decisions` (rule 6), then the scores of the pipeline's Reach mode are
-// written again so that the other screens see the new ranks. Reused by the agent in 4.4.
+// written again so that the other screens see the new ranks. Reused by the agent's apply_decision.
 import { z } from "zod";
 import type { ContextPack, Weighting } from "@/lib/context";
 import type { Db } from "@/lib/db/create";
@@ -223,7 +223,7 @@ function storedValue(
     : { ...base, mrr: request.value };
 }
 
-/** An override from the Priorisation screen (or the chat in 4.4). */
+/** An override from the Priorisation screen (or the chat). */
 export async function applyOverride(
   db: Db,
   input: unknown,

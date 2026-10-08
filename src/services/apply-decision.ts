@@ -1,4 +1,4 @@
-// A decision of the PO taken in the chat (SPEC §10.5, §10.6, PLAN 4.4), applied after the approval
+// A decision of the PO taken in the chat (SPEC §10.5, §10.6), applied after the approval
 // card through the same services as the UI: overrides and MoSCoW (services/prioritization), review
 // of a proposed insight (services/insight-review), validation of a backlog draft
 // (services/backlog). A confirmed challenge also logs Signal's disagreement; a refused card logs

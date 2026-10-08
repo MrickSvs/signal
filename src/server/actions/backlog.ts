@@ -21,7 +21,7 @@ import {
 import { EstimationError } from "@/services/estimate";
 import { pushBacklogItems, type PushResult } from "@/services/notion/push-backlog";
 
-// The Backlog and Insight screens share the agent's service (SPEC §12.6, PLAN 4.3): a drafting
+// The Backlog and Insight screens share the agent's service (SPEC §12.6): a drafting
 // from the « Rédiger le backlog » button, the PO's edits and changes of type (source signal_ui).
 
 export type BacklogActionResult<T> = { ok: true; result: T } | { ok: false; message: string };

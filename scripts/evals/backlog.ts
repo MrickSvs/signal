@@ -1,4 +1,4 @@
-// eval:backlog (PLAN 6.3, SPEC §14.2): drafting on 5 insights (S1, S2b, S3, S7 and a manual
+// eval:backlog (SPEC §14.2): drafting on 5 insights (S1, S2b, S3, S7 and a manual
 // technical topic), as if their backlog were empty. Measures the type chosen against the one
 // expected per pattern (S1 → bugs; S2b → epic + stories; S3 → story or epic; S7 → bug or task;
 // technical topic → task), then the judge's note of every drafted item. Nothing is written but

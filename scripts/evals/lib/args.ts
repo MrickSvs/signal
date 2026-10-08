@@ -1,4 +1,4 @@
-// Command-line options shared by the eval runners (PLAN 6.2, CLAUDE.md rule 13).
+// Command-line options shared by the eval runners (CLAUDE.md rule 13).
 
 export type EvalArgs = {
   sample?: number;

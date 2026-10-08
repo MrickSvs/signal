@@ -1,4 +1,4 @@
-// Alert investigation (SPEC §10.10, PLAN 4.5): when a threshold raises an alert, the same agent
+// Alert investigation (SPEC §10.10): when a threshold raises an alert, the same agent
 // (role « agent ») runs on a dedicated entry, with the read tools, estimate_complexity and
 // load_skill only (no tool that writes, CL-57), and hands back a decision dossier: facts with ids
 // (checked in code), a reading, a recommendation with its confidence and one action from a closed

@@ -1,4 +1,4 @@
-// Scoring CLI (PLAN 2.5): judges every ranked insight (Sonnet: Impact, evidence, alignment,
+// Scoring CLI: judges every ranked insight (Sonnet: Impact, evidence, alignment,
 // MoSCoW recommendation), estimates its effort (cached), then computes RICE, rank, robustness,
 // MoSCoW rules and capacity in code, and writes a new version in scores.
 // Usage: pnpm pipeline:score [--reach-mode comptes|mrr] [--run-id X]

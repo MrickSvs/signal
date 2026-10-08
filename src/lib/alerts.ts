@@ -1,4 +1,4 @@
-// Alerts as Léa handles them (SPEC §10.10, PLAN 4.5): the closed list of actions a dossier may
+// Alerts as Léa handles them (SPEC §10.10): the closed list of actions a dossier may
 // propose, and the chat messages behind « Faire l'action proposée » and « En parler à Signal ».
 // Pure, shared by the investigation (server) and the alert cards (client).
 import { ALERT_KIND_LABELS } from "@/lib/labels";

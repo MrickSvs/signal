@@ -80,7 +80,7 @@ export function createSignalAgent(options: SignalAgentOptions) {
         keep: { messages: SUMMARY_KEEP_MESSAGES },
         summaryPrompt: SUMMARY_PROMPT,
       }),
-      // Conversation history cache (PLAN 4.2): automatic breakpoint on the last block, 5 minutes,
+      // Conversation history cache: automatic breakpoint on the last block, 5 minutes,
       // after the system blocks cached for 1 hour (longer TTL first, as the API requires). The tool
       // rounds of a turn and the next turns read the history instead of paying it again.
       anthropicPromptCachingMiddleware({
@@ -88,9 +88,9 @@ export function createSignalAgent(options: SignalAgentOptions) {
         minMessagesToCache: 1,
         unsupportedModelBehavior: "ignore",
       }),
-      // Validation by the PO (SPEC §10.6): apply_decision (and push_to_notion in 5.2) pause on an
-      // approval card; the run resumes from the checkpointer (resumeTurn). afterModel hooks run
-      // in reverse order: the cost and the tool budget are counted before the pause.
+      // Validation by the PO (SPEC §10.6): apply_decision and push_to_notion pause on an approval
+      // card; the run resumes from the checkpointer (resumeTurn). afterModel hooks run in reverse
+      // order: the cost and the tool budget are counted before the pause.
       humanInTheLoopMiddleware({ interruptOn: approvalConfig(options.deps.pack.weighting) }),
       toolBudgetMiddleware(),
       traceMiddleware(modelsOf),

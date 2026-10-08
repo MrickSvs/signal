@@ -179,7 +179,10 @@ export function textIssues(id: string, text: Written): string[] {
   return issues;
 }
 
-/** Checks of SPEC §8.4 and PLAN 1.3 on the whole set; returns the list of violations. */
+/**
+ * Checks on the whole set: ids T-101 to T-140, components, texts, and the measurable estimation
+ * bias per component that the bias correction of SPEC §8.4 needs; returns the list of violations.
+ */
 export function validateReferenceTickets(
   tickets: ReferenceTicket[],
   moduleIds: string[],

@@ -1,4 +1,4 @@
-// Insights screen (SPEC §12.4, PLAN 3.4): filters in the URL, sorting and sections. Pure code.
+// Insights screen (SPEC §12.4): filters in the URL, sorting and sections. Pure code.
 import { Constants, type Database } from "@/lib/db/types";
 
 type Enums = Database["public"]["Enums"];

@@ -1,4 +1,4 @@
-// HTTP contract of POST /api/agent (SPEC §10, PLAN 4.1): request body and Server-Sent Events.
+// HTTP contract of POST /api/agent (SPEC §10): request body and Server-Sent Events.
 import { z } from "zod";
 import type { AgentEvent } from "./index";
 

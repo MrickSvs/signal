@@ -1,4 +1,4 @@
-// Demo snapshot (PLAN 8.1, ADR-032): which tables it holds, in which order they are restored, what
+// Demo snapshot (ADR-032): which tables it holds, in which order they are restored, what
 // is left out (rehearsal backlog), and how dates are moved so the demo always looks fresh.
 // Pure functions: the scripts demo-snapshot.ts and demo-reset.ts do the I/O.
 

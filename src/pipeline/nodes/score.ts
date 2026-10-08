@@ -743,7 +743,7 @@ export type RunScoringOptions = {
   commitments: readonly Commitment[];
   context: ScoreContext;
   /**
-   * Incremental mode (PLAN 2.6): only these insights are judged again; the others reuse the
+   * Incremental mode: only these insights are judged again; the others reuse the
    * judgment of their current score (judged anyway when it is missing or no longer valid).
    * An empty set judges only the insights without a valid stored judgment.
    * Every ranked insight is still computed, since a rank depends on all the others.

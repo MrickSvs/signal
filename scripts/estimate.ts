@@ -1,4 +1,4 @@
-// Estimation CLI (PLAN 2.4): estimates a free-text need or an insight by analogy (SPEC §8.4).
+// Estimation CLI: estimates a free-text need or an insight by analogy (SPEC §8.4).
 // Usage: pnpm estimate "<besoin>" [--force]   ·   pnpm estimate I-07 [--force]
 // Cost: one Sonnet call (~0.02 €) and one Voyage query; nothing when the estimate is cached.
 import { pathToFileURL } from "node:url";

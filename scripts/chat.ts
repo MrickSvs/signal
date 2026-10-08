@@ -1,4 +1,4 @@
-// Terminal chat with Signal (PLAN 4.1): talk to the agent without the UI.
+// Terminal chat with Signal: talk to the agent without the UI.
 // Usage: pnpm chat [--thread <uuid>] [--page /insights --entity I-07] [-m "<message>"]
 //        pnpm chat --thread <uuid> --resume approve|reject[:raison]
 //   without -m: interactive (empty line or « /quit » to leave), approval cards answered inline

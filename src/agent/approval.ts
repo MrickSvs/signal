@@ -1,4 +1,4 @@
-// Validation by the PO (SPEC §10.6, PLAN 4.4): the tools that write a decision or send to Notion
+// Validation by the PO (SPEC §10.6): the tools that write a decision or send to Notion
 // pause on an approval card (human-in-the-loop middleware of LangChain v1); the run resumes from
 // the checkpointer with Léa's choice (approve, edit, reject) through a Command. Pure helpers here;
 // the resume itself is runTurn's.

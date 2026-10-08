@@ -1,4 +1,4 @@
-// Clustering CLI (PLAN 2.3): embeds the items that have no vector yet, groups them by problem,
+// Clustering CLI: embeds the items that have no vector yet, groups them by problem,
 // matches the existing insights, labels the new or changed ones and detects tensions.
 // Usage: pnpm pipeline:cluster [--threshold X] [--run-id X]
 // Cost: only new or changed insights are labelled (Sonnet). First run ~0.5 €; a run without new
@@ -195,7 +195,7 @@ async function main() {
           created: summary.insights.filter((i) => i.isNew).map((i) => i.id),
           relabelled: summary.insights.filter((i) => i.relabelled).map((i) => i.id),
           ranked: summary.insights.filter((i) => i.aggregates?.ranked).map((i) => i.id),
-          // Read by the digest (2.7): fusions and splits are reported to the PO (CL-15).
+          // Fusions and splits (CL-15). The digest reports those of full runs only (stats.cluster).
           events: summary.events,
           merges: summary.merges,
           tensions: summary.tensions.map((t) => [t.a, t.b]),

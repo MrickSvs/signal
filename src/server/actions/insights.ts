@@ -19,8 +19,8 @@ export type ReviewActionResult =
   { ok: true; result: InsightReviewResult } | { ok: false; message: string };
 
 /**
- * Review of the insights Signal proposes (SPEC §8.10) from the Insights screen: one shared
- * service (also the agent's in 4.4), under the pipeline lock so a run never overwrites it.
+ * Review of the insights Signal proposes (SPEC §8.10) from the Insights screen: one shared service
+ * (also used by the agent's apply_decision), under the pipeline lock so a run never overwrites it.
  */
 export async function reviewInsightAction(review: InsightReview): Promise<ReviewActionResult> {
   after(flushTracing);

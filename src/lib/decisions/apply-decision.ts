@@ -1,4 +1,4 @@
-// Contract of the agent's apply_decision (SPEC §10.5, §10.6, PLAN 4.4): one decision of the PO
+// Contract of the agent's apply_decision (SPEC §10.5, §10.6): one decision of the PO
 // expressed in the chat, proposed by Signal and applied only after the approval card. Pure (zod and
 // lib/scoring only): shared by the tool, the human-in-the-loop predicate, the resume route and the
 // card of the chat panel. Values are checked by lib/scoring/overrides.ts, as in the UI (CL-23).

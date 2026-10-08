@@ -1,4 +1,4 @@
-// Degradations of the calibration set (PLAN 6.3): copies of items drafted by Signal, damaged in
+// Degradations of the calibration set: copies of items drafted by Signal, damaged in
 // code on purpose, so the judge and the PO both meet clearly bad items. Pure.
 
 type Content = Record<string, unknown>;

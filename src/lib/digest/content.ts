@@ -17,8 +17,8 @@ export type DigestContent = {
 type StoredRecommendation = Partial<Recommendation> & { action?: string };
 
 /**
- * Before step 3.2 a recommendation was a single `action` line: it becomes the title, without a
- * separate justification. Digests written before the model was stored get `fallbackModel`.
+ * Older digests stored a recommendation as a single `action` line: it becomes the title, without
+ * a separate justification. Digests written before the model was stored get `fallbackModel`.
  */
 export function readDigestContent(raw: unknown, fallbackModel: string): DigestContent {
   const content = raw as {

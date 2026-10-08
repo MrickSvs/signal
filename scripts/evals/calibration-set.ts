@@ -1,4 +1,4 @@
-// Calibration set of the judge (PLAN 6.3, SPEC §14.3): 15 items drafted by Signal (10 stories,
+// Calibration set of the judge (SPEC §14.3): 15 items drafted by Signal (10 stories,
 // 3 bugs, 2 tasks) over at least 4 insights, 5 of them degraded in code. No model call.
 // Writes evals/human-labels/calibration-set.json (what the PO annotates, shuffled, CAL-01…) and
 // calibration-key.json (source and degradation, read by eval:judge-calibration only).

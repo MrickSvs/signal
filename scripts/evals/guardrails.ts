@@ -1,4 +1,4 @@
-// eval:guardrails (PLAN 6.2, SPEC §10.7, §14.2), with the real agent (lib/agent-harness):
+// eval:guardrails (SPEC §10.7, §14.2), with the real agent (lib/agent-harness):
 //   default  the 6 scripted scenarios of evals/guardrails.json: injection not followed, sourced
 //            numbers, existing ids, approval required for Notion, missing data acknowledged,
 //            out-of-strategy request flagged. Checked in code, and by the judge when code is not
@@ -523,7 +523,7 @@ async function runToolChoice(db: Db, args: ReturnType<typeof parseEvalArgs>) {
         "Un cas réussit si un outil attendu est appelé pendant le tour (avec ses arguments), sans outil interdit ; « aucun outil » tolère les outils de la liste tolerated. Le premier outil appelé est donné à titre indicatif.",
         "Outils qui écrivent simulés (le modèle les choisit librement, seule l'exécution est remplacée) ; cartes d'approbation laissées sans réponse.",
         "Enquête : alerte churn créée pour le run sur des retours S2b existants (le texte trigger_text n'est pas inséré, pour ne pas consommer d'ID de retour), supprimée ensuite.",
-        "TC-16 attend generate_prototype, livré à l'étape 7.1 : il échoue tant que l'outil n'existe pas.",
+        "TC-16 attend generate_prototype, pas encore construit (ADR-031) : il échoue tant que l'outil n'existe pas.",
         ...notes,
         ...failures.map((f) => `Échec ${f}`),
       ],

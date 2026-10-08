@@ -1,4 +1,4 @@
-// The chat panel's three contextual suggestions (PLAN 4.2) and the page context sent to the
+// The chat panel's three contextual suggestions and the page context sent to the
 // agent with each message (SPEC §12.9). Pure.
 
 export type ChatPageContext = { page: string; entity_id: string | null };

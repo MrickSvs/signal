@@ -1,4 +1,4 @@
-// Investigation of alerts (PLAN 4.5, SPEC §10.10): runs the read-only investigation on one alert,
+// Investigation of alerts (SPEC §10.10): runs the read-only investigation on one alert,
 // or on every open alert still waiting for its dossier, and prints the dossier.
 // Usage: pnpm investigate <alert_uuid> | --pending   (≈ 0.05 € per alert)
 import { investigate, investigateAll, pendingInvestigations } from "@/agent/investigate";

@@ -1,4 +1,4 @@
-// Backlog drafting (SPEC §9, §8.4, PLAN 4.3): from an insight to the right format (epic and
+// Backlog drafting (SPEC §9, §8.4): from an insight to the right format (epic and
 // stories, one story, bugs, technical task, or a discoverability action), estimated by analogy and
 // linked to its evidence. One structured call drafts (agent role, skills backlog-format and
 // user-story), then ONE call estimates every item (estimateBacklogItems). The code checks the
@@ -507,8 +507,8 @@ export type DraftOptions = {
 
 /**
  * The drafting itself, without any write but the estimate cache: format proposed in code, one call
- * (role agent), output checked in code. draftBacklog persists it; eval:backlog (PLAN 6.3) measures
- * it on a backlog left empty (facts.backlog = []).
+ * (role agent), output checked in code. draftBacklog persists it; eval:backlog measures it on a
+ * backlog left empty (facts.backlog = []).
  */
 export async function composeDraft(
   db: Db,
@@ -1031,7 +1031,7 @@ export async function patchBacklogItem(
 
 /**
  * Léa validates a draft (brouillon → valide, ready for Notion) or rejects it (→ rejete), from the
- * chat's apply_decision (PLAN 4.4). Only drafts; logged in `decisions`.
+ * chat's apply_decision. Only drafts; logged in `decisions`.
  */
 export async function reviewBacklogItem(
   db: Db,
@@ -1209,7 +1209,7 @@ export async function changeBacklogItemKind(
 }
 
 // ---------------------------------------------------------------------------
-// Quality badge: the calibrated judge (lib/judge, PLAN 6.3), one call per item
+// Quality badge: the calibrated judge (lib/judge), one call per item
 // ---------------------------------------------------------------------------
 
 const JUDGE_CONCURRENCY = 3;

@@ -1,4 +1,4 @@
-// Daily digest (PLAN 2.7, SPEC §12.2, §16): the cron absorbs the feedbacks not processed yet
+// Daily digest (SPEC §12.2, §16): the cron absorbs the feedbacks not processed yet
 // (incremental mode, by batches of 10, within a time budget) then writes the digest. The same
 // request keeps the Supabase project awake (CL-43). The caller holds the pipeline lock.
 import type { Db } from "@/lib/db/create";

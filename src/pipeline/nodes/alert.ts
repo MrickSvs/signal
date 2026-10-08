@@ -1,8 +1,11 @@
 // Alert node (SPEC §10.10): thresholds evaluated in code on the insights touched by a run, values
 // read from weighting.yaml. Anti-noise (CL-55): one alert per subject and kind over 24 h
 // (dedup_key); the next feedbacks enrich the open alert instead of creating another one.
-// Everything else is absorbed silently and waits for the digest. The investigation (dossier)
-// comes in 4.5: until then a new alert is stored with dossier_status = en_cours and no dossier.
+// Everything else is absorbed silently and waits for the digest. A new alert is stored with
+// dossier_status = en_cours; once the run ends, the read-only investigation (agent/investigate.ts,
+// in the background through agent/runtime.ts, or at the end of pipeline:run) writes its
+// dossier, or sets dossier_status = echec (« dossier indisponible ») on failure or beyond its
+// budget (CL-56).
 import type { Commitment, Weighting } from "@/lib/context";
 import type { Db } from "@/lib/db/create";
 import type { Tables } from "@/lib/db/types";

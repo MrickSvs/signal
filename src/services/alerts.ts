@@ -1,4 +1,4 @@
-// Léa's answer to an alert (SPEC §10.10, PLAN 4.5): she opens it (« vue »), does the proposed
+// Léa's answer to an alert (SPEC §10.10): she opens it (« vue »), does the proposed
 // action (« traitee »: the action itself goes through the chat and its approval card) or ignores
 // it (« ignoree »). Handling and ignoring are journaled in decisions (rule 6).
 import type { Db } from "@/lib/db/create";

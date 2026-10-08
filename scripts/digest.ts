@@ -1,4 +1,4 @@
-// Digest CLI (PLAN 2.7): writes a digest on demand (SPEC §12.2) and prints it.
+// Digest CLI: writes a digest on demand (SPEC §12.2) and prints it.
 // Usage: pnpm digest. Cost: one reasoning call (~0.02 to 0.05 €). Does not process pending
 // feedbacks: the cron route does (incremental, then digest).
 import { pathToFileURL } from "node:url";

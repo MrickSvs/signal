@@ -379,7 +379,7 @@ async function generate(
   );
 }
 
-/** Examples to validate before the full generation (PLAN 1.4): 5 S1, 5 S3, 2 E1. */
+/** Examples to validate before the full generation (--preview): 5 S1, 5 S3, 2 E1. */
 export function previewSelection<T extends PlannedFeedback>(planned: T[]): T[] {
   const single = (id: string) =>
     planned.filter(

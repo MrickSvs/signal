@@ -1,4 +1,4 @@
-// Small readings of a turn's live trace (PLAN 4.2). Pure.
+// Small readings of a turn's live trace. Pure.
 
 /** Skills a tool loads by itself (its own prompt), shown in the trace like load_skill's. */
 export const TOOL_SKILLS: Record<string, readonly string[]> = {

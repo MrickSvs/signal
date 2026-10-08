@@ -1,4 +1,4 @@
-// Quality judge of the backlog (SPEC §14.3, PLAN 6.3): role « judge » (Opus), one call per item,
+// Quality judge of the backlog (SPEC §14.3): role « judge » (Opus), one call per item,
 // with the grid of its kind (rubric.md, shared with the human annotation of the calibration set).
 // The model gives a note per criterion and a verdict; the overall note is computed in code (P5).
 import { readFile } from "node:fs/promises";

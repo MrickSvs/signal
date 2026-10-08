@@ -1,4 +1,4 @@
-// Pure metrics of the evals (PLAN 6.2, SPEC §14.2): item pairing, type accuracy, macro-F1,
+// Pure metrics of the evals (SPEC §14.2): item pairing, type accuracy, macro-F1,
 // confusion matrix, pattern recall and purity, Kendall's tau, Fibonacci steps. No I/O here.
 import { nearestFibonacci } from "@/lib/estimation/reference";
 

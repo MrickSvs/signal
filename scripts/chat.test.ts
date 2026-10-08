@@ -42,7 +42,7 @@ describe("parseChatArgs", () => {
     expect(() => parseChatArgs(["--entity", "I-07"], id)).toThrow(/--page/);
   });
 
-  it("answers the pending approval card of a thread (PLAN 4.4)", () => {
+  it("answers the pending approval card of a thread with --resume", () => {
     const thread = "6f1c2b9e-3c1a-4d8e-9f00-1a2b3c4d5e6f";
     expect(parseChatArgs(["--thread", thread, "--resume", "approve"], id).resume).toEqual({
       type: "approve",

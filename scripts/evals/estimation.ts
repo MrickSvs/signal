@@ -1,9 +1,9 @@
-// eval:estimation (PLAN 6.2, SPEC §14.2): leave-one-out on the 40 reference tickets. Each ticket
-// is estimated from the 39 others and architecture.md, without seeing its points, components or
-// team estimate: it is removed from the analogues AND from the bias computation (the engine of
-// 2.4 takes the ticket set as a parameter). Measures: share of actual points inside the range,
-// mean error in Fibonacci steps between the middle of the range and the actual points, and the
-// same error for the team's estimate (estimated_points). Nothing is written to the cache.
+// eval:estimation (SPEC §14.2): leave-one-out on the 40 reference tickets. Each ticket is estimated
+// from the 39 others and architecture.md, without seeing its points, components or team estimate:
+// it is removed from the analogues AND from the bias computation (the estimation engine of
+// services/estimate takes the ticket set as a parameter). Measures: share of actual points inside
+// the range, mean error in Fibonacci steps between the middle of the range and the actual points,
+// and the same error for the team's estimate (estimated_points). Nothing is written to the cache.
 // Usage: pnpm eval:estimation [--sample N] [--yes]   ·   Cost: ~0.025 € per ticket (40: ~1 €).
 import { readFileSync } from "node:fs";
 import path from "node:path";

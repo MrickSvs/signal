@@ -1,4 +1,4 @@
-// eval:stability (PLAN 6.2, SPEC §14.2): replays the model's part of the score (Impact, alignment,
+// eval:stability (SPEC §14.2): replays the model's part of the score (Impact, alignment,
 // MoSCoW) on the top 10 several times, effort from the cache (§8.4), and recomputes the ranking in
 // code each time. Reference: the ranking computed from the stored judgments (what Léa sees).
 // Measures: runs with the same top 3 (same order), mean Kendall's tau on the top 10.

@@ -1,5 +1,5 @@
 // Review decisions on an insight (SPEC §8.10): the input contract shared by the Insights screen,
-// the service (services/insight-review.ts) and, in 4.4, the agent's apply_decision. Pure (zod
+// the service (services/insight-review.ts) and the agent's apply_decision. Pure (zod
 // only): the client components import it.
 import { z } from "zod";
 

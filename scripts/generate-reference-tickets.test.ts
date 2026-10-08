@@ -34,7 +34,7 @@ const placeholder: ReferenceTicket[] = TICKET_PLAN.map((s) => ({
 }));
 
 describe("ticket plan", () => {
-  it("passes every check of SPEC §8.4 and PLAN 1.3", () => {
+  it("passes every check: ids, components, texts, estimation bias (SPEC §8.4)", () => {
     expect(validateReferenceTickets(placeholder, moduleIds)).toEqual([]);
   });
 

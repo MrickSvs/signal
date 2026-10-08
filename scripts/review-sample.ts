@@ -1,4 +1,4 @@
-// Human review of the development set (PLAN 1.4): 30 random feedbacks, then every feedback of
+// Human review of the development set: 30 random feedbacks, then every feedback of
 // the permissions pattern, the injection and the multi-topic edge case, then 30 random
 // ground-truth labels next to their text.
 // Usage: pnpm tsx scripts/review-sample.ts [--seed N]

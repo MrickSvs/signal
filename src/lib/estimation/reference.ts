@@ -1,6 +1,6 @@
 // Estimation by analogy, the deterministic part (SPEC §8.4, P5): nearest reference tickets, team
 // bias, Fibonacci rounding, widened range without a close analogue (CL-20), T-shirt sizes.
-// The ticket set is a parameter: the leave-one-out eval (PLAN 6.2) removes one ticket from it.
+// The ticket set is a parameter: eval:estimation (leave-one-out) removes one ticket from it.
 import { cosineSimilarity, type Vector } from "@/lib/clustering/agglomerative";
 import type { Weighting } from "@/lib/context";
 
