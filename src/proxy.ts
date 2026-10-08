@@ -12,6 +12,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Cron and MCP routes are protected by their own secret.
-  matcher: ["/((?!api/cron|api/mcp|_next/static|_next/image|favicon.ico).*)"],
+  // Cron routes are protected by their own secret.
+  matcher: ["/((?!api/cron|_next/static|_next/image|favicon.ico).*)"],
 };
