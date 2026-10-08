@@ -209,6 +209,9 @@ Trous identifiés : le script de démo, le README, l'ARCHITECTURE de l'agent (ou
 11. **DECISIONS.md** : ADR-037 apparaît avant ADR-036 (ordre).
 12. **Chiffres à recaler** : 214 retours ou 239 (avec les retours à coller), 25 ou 26 insights actifs, 760 tests, coût cumulé.
 13. **PLAN 8.2, point 6** : `scripts/build-time.ts` doit lire `docs/process/BUILD_LOG.md` (nouveau chemin).
+14. **`/status`** : citée dans CLAUDE.md (Pièges connus, Supabase gratuit) et dans SPEC CL-43, alors qu'elle a été coupée (ADR-031). CL-46 cite un « prototype pré-généré » qui n'existe pas.
+15. **Registre des cas limites** : ajouter les cas de §12.3 (CL-59 et suivants) avec leur traitement ou « limite connue ».
+16. **Procédure de démo** : reset et digest le matin même, après le passage du cron (F3) ; ne pas régénérer deux fois tant que F2 n'est pas corrigé.
 
 ---
 
@@ -247,6 +250,78 @@ Ma recommandation : S1 à S4, S6 et S8 sans hésiter. S5 et S9 selon ton avis. S
 
 ---
 
-## 12. Suivi (complété en fin de session)
+## 12. Repasse fonctionnelle (back et front)
+
+Relecture des parcours de bout en bout : pipeline, scoring, revue des insights, priorisation, backlog, Notion, digest, alertes, chat et écrans. Je cherchais les cas limites, les incohérences entre écrans et les fonctionnalités à simplifier. Tout est en lecture seule, sauf un test de reproduction temporaire (non commité) pour F1.
+
+### 12.1 Bugs fonctionnels
+
+| # | Gravité | Scénario | Ce qui se passe | Où | Correction proposée |
+| --- | --- | --- | --- | --- | --- |
+| F1 | 🟠 | Léa **reformule** un insight classé (écran Insights ou chat) | L'insight **sort du classement**. Priorisation l'affiche sous « En attente de score (prochain run) : I-xx (estimation manquant) ». Sa capacité Must et ses recommandations disparaissent, alors que la fiche insight garde l'ancien rang stocké. La cause : le cache d'estimation est indexé sur l'empreinte de l'énoncé, que la reformulation change sans relancer d'estimation. **Reproduit** par un test temporaire sur la base en mémoire : I-01 est classé avant, absent après. La base de démo actuelle n'est pas touchée (ses 9 insights classés ont leur estimation). | `services/insight-review.ts:311`, `services/estimate.ts:460`, `pipeline/nodes/score.ts:997` | Sur le chemin de lecture (`loadCachedInsightEstimates`), retomber sur la dernière estimation de l'insight quand l'empreinte diffère, en la marquant « énoncé modifié » ; le run suivant réestime. Aucun appel de modèle, et un test à ajouter. Autre option : réestimer dans la reformulation (un appel, 5 à 10 s). |
+| F2 | 🟠 | Léa clique **deux fois sur « Régénérer »** dans le Digest | Le second digest couvre « depuis le digest précédent », c'est-à-dire quelques secondes. Tendances, mouvements de rang, nouveaux retours et recommandations disparaissent, et l'écran ne montre que le dernier digest. Le texte du bouton (« relit les faits tels qu'ils sont maintenant ») laisse croire à un simple rafraîchissement. | `pipeline/nodes/digest.ts:46`, `server/actions/digest.ts:23`, `components/digest/regenerate-button.tsx` | « Régénérer » réécrit le digest affiché **sur la même période** (même début) au lieu d'en ouvrir une nouvelle. Alternative minimale : afficher la période (« depuis le … ») et prévenir dans la confirmation. |
+| F3 | 🟠 | **Cron quotidien à 04:00 UTC** en production, après un `demo:reset` + `pnpm digest` la veille | Le cron génère un nouveau digest sur la nuit (presque vide) : même effet que F2 le jour de la démo. | `vercel.json`, `app/api/cron/digest/route.ts` | Faire le reset et le digest **le matin de la démo, après 6 h (heure de Paris)**, ou couper le cron ce jour-là. La correction de F2 ne règle pas F3 : c'est une question de procédure. |
+| F4 | 🟡 | Un retour collé ressemble à un **insight rejeté** | Il est absorbé par l'insight rejeté (CL-53, voulu), mais le résultat annonce « confirme un sujet connu : I-xx », sans dire que le sujet est rejeté. Aucune alerte n'est levée (`alert.ts:92`). Léa croit le retour compté alors qu'il sort du classement. | `pipeline/incremental.ts:119`, `:224` | Ajouter le statut dans la phrase (« rejoint I-xx, **rejeté** : hors classement »). Décision produit à prendre : signaler un sujet rejeté qui revient avec N nouveaux retours. |
+| F5 | 🟡 | Override de **Reach en mode comptes**, puis bascule en **mode MRR** | La cellule affiche la valeur calculée (correct : l'override ne vaut que dans son mode), mais le popover montre « Ta raison… », « Modifier l'override » et « Annuler l'override ». Ce bouton annule l'override du mode comptes depuis l'autre mode. | `server/queries/prioritization.ts:209` | Ne transmettre l'override de Reach que si son mode est celui affiché (lire `value` dans la requête des overrides). |
+| F6 | 🟡 | Clic sur **« Faire l'action proposée »** d'une alerte | L'alerte passe « traitée » et une décision `validation / action_proposee` est journalisée **avant** que le chat exécute l'action. Si Léa refuse ensuite la carte d'approbation, ou si la rédaction échoue, l'alerte reste close et le journal dit « validée ». | `components/alerts/alert-card.tsx:61`, `services/alerts.ts:61` | Journaliser « action lancée » (champ `action_lancee`) plutôt qu'une validation, ou ne clore l'alerte qu'au succès de l'outil. |
+| F7 | 🟡 | Léa **rejette ou fusionne un insight qui a un backlog** | Ses brouillons et éléments validés restent dans l'écran Backlog, sans mention du statut de l'insight, et peuvent toujours être envoyés dans Notion. La rédaction, elle, est refusée sur cet insight. | `server/queries/backlog.ts:115`, `services/insight-review.ts` | Afficher le statut de l'insight dans l'en-tête du groupe. Refuser l'envoi d'un élément dont l'insight n'est plus vivant, ou prévenir au rejet (« I-xx a N brouillons »). |
+| F8 | 🟡 | Rejet d'un élément du backlog (chat) | L'effort de l'insight (somme des points) change, mais le score stocké n'est pas recalculé. Priorisation (calculée en direct) et fiche insight (score stocké) divergent jusqu'à la prochaine écriture. | `services/backlog.ts:1036` | Appeler `refineEffort` après un rejet, comme après une modification de points. |
+| F9 | 🟡 | Jugement d'un insight en échec pendant un run | Son ancien score reste « courant » à côté des nouveaux rangs, ce qui peut produire deux insights au même rang dans `scores`. C'est une dette connue (2.5). L'écran Priorisation (calcul en direct) n'est pas touché. | `pipeline/nodes/score.ts`, `runScoring` | Archiver le score périmé, ou le marquer « en attente ». |
+| F10 | 🟡 | Libellé dans Priorisation | « (estimation manquant) » | `app/priorisation/page.tsx:103` | « manquante » pour l'estimation, « manquant » pour le jugement. |
+| F11 | 🟡 | `DEMO_NOW` défini (pas le cas en production, ADR-032) | `markSeen`, `touchThread` et les `updated_at` prennent l'heure réelle, alors que le scénario suit `getDemoNow()`. Le calcul de la période du digest mélange alors deux horloges. | `app/page.tsx:25` | `markSeen(db, getDemoNow())`. |
+
+### 12.2 Écarts avec la SPEC (fonctionnalités)
+
+| # | Écart | Effet | Proposition |
+| --- | --- | --- | --- |
+| G1 | `apply_decision` ne sait ni **créer un sujet manuel** (listé dans SPEC §10.5), ni **annuler un override** | Dans le chat, « reviens à la recommandation » se traduit par un override égal à la recommandation, qui reste actif, et « ajoute un sujet hors retours » est impossible. | Ajouter `cancel_override` (le service `cancelOverride` existe) ; pour le sujet manuel, corriger la SPEC (8.2) plutôt qu'ajouter un type. |
+| G2 | Écran Backlog : ni **« Rejeter »** ni **« Valider »** sans envoi (seulement « Valider et envoyer ») | Sans Notion configuré (évaluateur en local), on ne peut valider un brouillon que par le chat : « Valider et envoyer » valide, échoue à l'envoi, puis tourne sur « Réessayer ». Un mauvais brouillon ne se rejette que par le chat. | Deux boutons sur `reviewBacklogItem`, qui existe déjà et est journalisé. |
+| G3 | « Synchroniser Notion » (§11.3) et « Visualiser » (§13) absents | Connu : bonus 5.2 non fait, 7.1 reportée. | Liste 8.2. |
+| G4 | Recherche de l'écran Retours **lexicale** (`ilike`), alors que l'agent a la recherche par le sens | « retards de notification » ne trouve pas « je ne reçois rien ». | En option : réutiliser `match_feedback_items` (un appel Voyage par recherche). |
+| G5 | « Ajouter un retour » n'a pas de champ **e-mail de l'auteur** | Le rattachement par domaine e-mail, principal chemin du nœud `enrich`, est impossible depuis l'écran : seul le choix manuel du compte fonctionne (c'est ce que fait la démo). | Champ facultatif « E-mail de l'auteur ». |
+
+### 12.3 Cas limites hors registre (à ajouter en CL-59 et suivants)
+
+- Reformulation d'un insight classé (F1).
+- Digest régénéré deux fois, ou cron passé avant la démo (F2, F3).
+- Retour qui rejoint un insight rejeté (F4).
+- Insight rejeté ou fusionné qui a un backlog (F7).
+- Notion non configuré : validation impossible depuis l'écran (G2).
+- **Rédaction concurrente** du même insight (chat et écran en même temps) : `draftBacklog` lit puis insère hors verrou, donc deux backlogs peuvent coexister. Probabilité faible ; le verrou du pipeline suffirait.
+- Alerte **ignorée** puis nouveau retour du même compte dans les 24 h : une nouvelle alerte et une nouvelle enquête (≈ 0,03 €) sont créées, car seules les alertes ouvertes s'enrichissent (`alert.ts:182`). Comportement à assumer ou à corriger.
+
+### 12.4 Améliorations et simplifications fonctionnelles
+
+| # | Proposition | Gain | Risque |
+| --- | --- | --- | --- |
+| S11 | F1 : repli sur la dernière estimation de l'insight, plus un test | le bug le plus visible en démo disparaît | faible (lecture seule, le run suivant réestime) |
+| S12 | F2 : « Régénérer » réécrit la même période | le Digest ne se vide plus | faible : la fonction `digestPeriod` est pure et testée |
+| S13 | G2 : boutons « Valider » et « Rejeter » dans l'écran Backlog | démo sans Notion possible, chat moins indispensable | faible (service existant et testé) |
+| S14 | F4, F5, F10 : phrase « rejeté », override de Reach limité à son mode, accord « manquante » | moins de confusion à l'écran | nul |
+| S15 | Impact et Confidence saisis par **boutons** (3 · 2 · 1 · 0,5 · 0,25 et 100 · 80 · 50 %) au lieu d'un champ texte libre | supprime un chemin d'erreur ; la validation serveur (CL-23) reste | nul |
+| S16 | Recommandation « écart » (choix du PO ≠ recommandation) affichée **seulement** quand la recommandation vient d'une règle dure (engagement, churn, bug critique) | aujourd'hui, chaque MoSCoW choisi par Léa crée un « challenge » permanent dans le panneau, qui devient du bruit | faible |
+| S17 | F6 : décision « action lancée » au lieu de « validation » | journal fidèle | nul |
+| S18 | F7 : statut de l'insight dans l'en-tête du groupe du backlog, envoi refusé si l'insight n'est plus vivant | cohérence entre écrans | faible |
+| S19 | G1 : `cancel_override` dans `apply_decision` | le chat peut revenir à la recommandation | moyen : nouveau type d'outil, à mesurer avec `eval:guardrails` |
+| S20 | Écrans vides : remplacer « lance `pnpm pipeline:run` » par une phrase pour le PO, avec la commande en note | l'écran s'adresse au PO, pas au développeur | nul |
+
+Ma recommandation avant l'évaluation : S11, S12, S13 et S14 (ce sont des corrections de comportement, chacune avec son test), plus S15 si tu veux. S16 à S20 selon ton avis. F3 est une ligne dans la checklist de démo.
+
+### 12.5 Ce qui tient bien
+
+- Les écritures du PO sont sous verrou, vérifiées par zod puis par `lib/scoring`, et journalisées. L'override égal à l'override actif est refusé. L'override de Reach est lié à son mode (les unités diffèrent). Le sujet manuel est contrôlé avant toute écriture.
+- La fusion conserve la mémoire des items, recalcule les agrégats de la cible et re-classe en code sans appel de modèle. Le rejet archive le score.
+- L'envoi Notion est idempotent (`notion_links`) et un échec reste rattrapable (« Réessayer »). Une page incomplète (blocs non ajoutés) est mise à la corbeille plutôt que laissée dans le kanban.
+- Le chat gère une carte périmée (409), une modification invalide (400, la carte reste affichée), un message écrit à la place d'une réponse à la carte (résultats synthétiques), le double clic (carte retirée avant l'envoi) et un changement de fil pendant une réponse (la réponse se termine côté serveur).
+- La liste Retours gère une page au-delà de la dernière (redirection), et les flèches ← → ne naviguent pas quand le focus est dans un champ.
+- Le chat et l'écran partagent les mêmes services (priorisation, revue, backlog, Notion) : il n'y a pas de double implémentation des règles.
+
+### 12.6 Limites d'échelle (à documenter en 8.2, SPEC §17.2)
+
+`computeStoredRanking` (écran Priorisation, `get_priority`, chaque override) relit à chaque appel tous les retours (texte brut compris), les items, les comptes, les analyses et les overrides. C'est instantané à 214 retours, linéaire au-delà : à 10 000 retours, chaque affichage de Priorisation transférerait des dizaines de Mo. `getInsightsScreen` et `query_customers` lisent aussi des tables entières. Il faudrait des agrégats matérialisés et des signaux stockés.
+
+---
+
+## 13. Suivi (complété en fin de session)
 
 _En attente de validation._
