@@ -41,6 +41,11 @@ export function notionConfig(env: Record<string, string | undefined> = process.e
   };
 }
 
+/** A push can reach Notion: a token and the Backlog data source (`pnpm notion:setup`). */
+export function notionReady(env: Record<string, string | undefined> = process.env): boolean {
+  return Boolean(env.NOTION_TOKEN?.trim() && env.NOTION_DS_BACKLOG?.trim());
+}
+
 /**
  * Spaces the starts of the wrapped calls by `minIntervalMs` at least (pure scheduling: the clock
  * and the sleep are injected in tests).

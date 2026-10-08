@@ -14,8 +14,10 @@ import {
   changeBacklogItemKind,
   draftBacklog,
   patchBacklogItem,
+  reviewBacklogItem,
   type BacklogDeps,
   type DraftResult,
+  type ReviewResult,
   type UpdateResult,
 } from "@/services/backlog";
 import { EstimationError } from "@/services/estimate";
@@ -109,6 +111,28 @@ export async function changeBacklogItemKindAction(
     refresh(null);
     return result;
   }, "Le changement de type a échoué. Réessaie.");
+}
+
+/**
+ * « Valider » / « Rejeter » a draft (SPEC §12.6), without sending it: the dialog is the PO's
+ * decision, logged; a rejection refines the insight's effort (services/backlog).
+ */
+export async function reviewBacklogItemAction(
+  id: string,
+  status: "valide" | "rejete",
+  reason?: string,
+): Promise<BacklogActionResult<ReviewResult>> {
+  if (status !== "valide" && status !== "rejete") return { ok: false, message: "Statut inconnu." };
+  return guarded(
+    async () => {
+      const result = await reviewBacklogItem(getDb(), id, status, await deps(), reason);
+      refresh(null);
+      return result;
+    },
+    status === "valide"
+      ? "La validation n'a pas pu être enregistrée. Réessaie."
+      : "Le rejet n'a pas pu être enregistré. Réessaie.",
+  );
 }
 
 /**

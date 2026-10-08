@@ -1,6 +1,12 @@
 import { APIErrorCode, APIResponseError } from "@notionhq/client";
 import { describe, expect, it } from "vitest";
-import { createLimiter, NotionError, notionConfig, notionErrorMessage } from "./client";
+import {
+  createLimiter,
+  NotionError,
+  notionConfig,
+  notionErrorMessage,
+  notionReady,
+} from "./client";
 
 function apiError(code: APIErrorCode, status: number) {
   return new APIResponseError({
@@ -55,6 +61,13 @@ describe("configuration", () => {
       backlogDataSourceId: "ds",
       appBaseUrl: "http://localhost:3000",
     });
+  });
+
+  it("is ready to push only with a token and the Backlog data source", () => {
+    expect(notionReady({})).toBe(false);
+    expect(notionReady({ NOTION_TOKEN: "ntn_x" })).toBe(false);
+    expect(notionReady({ NOTION_TOKEN: " ", NOTION_DS_BACKLOG: "ds" })).toBe(false);
+    expect(notionReady({ NOTION_TOKEN: "ntn_x", NOTION_DS_BACKLOG: "ds" })).toBe(true);
   });
 });
 

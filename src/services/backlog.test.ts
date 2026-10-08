@@ -22,6 +22,7 @@ import {
   itemFields,
   judgeBacklogItems,
   patchBacklogItem,
+  reviewBacklogItem,
   type BacklogDeps,
 } from "./backlog";
 import { insightNeed, loadEstimationContext, problemHash } from "./estimate";
@@ -447,7 +448,7 @@ describe("draftBacklog (in-memory database, simulated models)", () => {
   });
 });
 
-describe("patchBacklogItem / changeBacklogItemKind", () => {
+describe("patchBacklogItem / changeBacklogItemKind / reviewBacklogItem", () => {
   async function drafted() {
     const s = await seeded({ functional: true });
     const invoke = backlogInvoke((ev) => ({
@@ -554,6 +555,47 @@ describe("patchBacklogItem / changeBacklogItemKind", () => {
       }),
     ]);
     expect(background).toHaveLength(2);
+  });
+
+  it("validates a draft without touching the effort; validated, it can no longer be rejected", async () => {
+    const { tables, db, deps, invoke, effort } = await drafted();
+    const before = { ...effort() };
+    const result = await reviewBacklogItem(db, "US-001", "valide", deps(invoke));
+    expect(result).toMatchObject({ id: "US-001", status: "valide", effort: null });
+    expect(tables.backlog_items[0].status).toBe("valide");
+    expect(effort()).toMatchObject(before);
+    expect(tables.decisions).toEqual([
+      expect.objectContaining({ actor: "po", action: "validation", entity_id: "US-001" }),
+    ]);
+    await expect(reviewBacklogItem(db, "US-001", "rejete", deps(invoke))).rejects.toThrow(
+      "seuls les brouillons",
+    );
+  });
+
+  it("a rejected draft leaves the insight's effort, refined and logged (CL-27)", async () => {
+    const { tables, db, deps, invoke, effort } = await drafted();
+    expect(effort()).toMatchObject({ effort_source: "backlog", effort_weeks: 1 });
+    const result = await reviewBacklogItem(db, "US-001", "rejete", deps(invoke), "Hors périmètre");
+    expect(tables.backlog_items[0].status).toBe("rejete");
+    // No point left in the backlog: the effort comes back to the insight's estimate.
+    expect(effort()).toMatchObject({ effort_source: "estimation_initiale" });
+    expect(tables.decisions).toEqual([
+      expect.objectContaining({
+        actor: "po",
+        action: "rejet",
+        entity_id: "US-001",
+        reason: "Hors périmètre",
+      }),
+      expect.objectContaining({
+        actor: "signal",
+        action: "ajustement",
+        entity_id: "I-01",
+        field: "effort",
+        before: { effort_weeks: 1, effort_source: "backlog" },
+        after: expect.objectContaining({ effort_source: "estimation_initiale" }),
+      }),
+    ]);
+    expect(result.effort).toMatchObject({ before: 1, decision: tables.decisions[1].id });
   });
 });
 

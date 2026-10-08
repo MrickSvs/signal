@@ -7,7 +7,7 @@ import { formatNumber } from "@/lib/format";
 import { BACKLOG_STATUS_LABELS, JUDGE_CRITERION_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { BacklogViewItem, JudgeBadge } from "@/server/queries/backlog";
-import { BacklogItemActions } from "./item-actions";
+import { BacklogItemActions, ReviewDialog } from "./item-actions";
 import { ItemDisclosure } from "./item-disclosure";
 import { NotionLink, PushButton } from "./push-button";
 
@@ -157,10 +157,13 @@ export function BacklogItemCard({
   item,
   range,
   highlighted,
+  notion,
 }: {
   item: BacklogViewItem;
   range: { min: number; max: number } | null;
   highlighted: boolean;
+  /** Notion is configured: « Valider et envoyer » is offered (services/notion/client). */
+  notion: boolean;
 }) {
   const sent = item.status === "envoye" || item.status === "modifie_notion";
   return (
@@ -192,11 +195,23 @@ export function BacklogItemCard({
           <>
             {item.status === "brouillon" && (
               <>
-                <PushButton item={item} />
+                {notion && <PushButton item={item} />}
+                <ReviewDialog item={item} status="valide" notion={notion} />
+                <ReviewDialog item={item} status="rejete" notion={notion} />
                 <BacklogItemActions item={item} />
               </>
             )}
-            {item.status === "valide" && <PushButton item={item} />}
+            {item.status === "valide" &&
+              (notion ? (
+                <PushButton item={item} />
+              ) : (
+                <span
+                  className="text-[13px] text-muted-foreground"
+                  title="NOTION_TOKEN et NOTION_DS_BACKLOG manquent (pnpm notion:setup)."
+                >
+                  Prêt à partir : Notion n&apos;est pas branché.
+                </span>
+              ))}
             {sent && item.notion_page_id && <NotionLink pageId={item.notion_page_id} />}
           </>
         }

@@ -12,6 +12,7 @@ import { getDb } from "@/lib/db/client";
 import { formatDate } from "@/lib/format";
 import { BACKLOG_KIND_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
+import { notionReady } from "@/services/notion/client";
 import {
   BACKLOG_KINDS,
   getBacklogScreen,
@@ -102,7 +103,15 @@ function PlanSummary({ group }: { group: BacklogGroup }) {
   );
 }
 
-function Group({ group, highlighted }: { group: BacklogGroup; highlighted: string | null }) {
+function Group({
+  group,
+  highlighted,
+  notion,
+}: {
+  group: BacklogGroup;
+  highlighted: string | null;
+  notion: boolean;
+}) {
   const range = group.plan?.range ?? null;
   const card = (item: BacklogGroup["items"][number]) => (
     <BacklogItemCard
@@ -110,6 +119,7 @@ function Group({ group, highlighted }: { group: BacklogGroup; highlighted: strin
       item={item}
       range={range}
       highlighted={item.id === highlighted}
+      notion={notion}
     />
   );
   const loose = group.items.filter(
@@ -184,6 +194,7 @@ export default async function BacklogPage({ searchParams }: PageProps<"/backlog"
   const statusParam = one(params.statut);
   const status = statusParam && statusParam in STATUS_FILTERS ? (statusParam as Status) : null;
   const screen = await getBacklogScreen(getDb(), { kind, insight });
+  const notion = notionReady();
   const { counts } = screen;
   const total = counts.story + counts.bug + counts.tache;
   const allItems = screen.groups.flatMap((g) => g.items);
@@ -286,7 +297,7 @@ export default async function BacklogPage({ searchParams }: PageProps<"/backlog"
       ) : (
         <div className="flex flex-col gap-8">
           {groups.map((group) => (
-            <Group key={group.insight.id} group={group} highlighted={element} />
+            <Group key={group.insight.id} group={group} highlighted={element} notion={notion} />
           ))}
         </div>
       )}

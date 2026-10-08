@@ -1029,19 +1029,46 @@ export async function patchBacklogItem(
   };
 }
 
+export type ReviewResult = {
+  id: string;
+  title: string;
+  status: "valide" | "rejete";
+  decision: string;
+  /** A rejection takes the item's points out of the insight's effort (CL-27); null otherwise. */
+  effort: { before: number | null; after: number | null; decision: string | null } | null;
+};
+
+type ReviewDeps = Pick<BacklogDeps, "source" | "now" | "withLock">;
+
 /**
  * Léa validates a draft (brouillon → valide, ready for Notion) or rejects it (→ rejete), from the
- * chat's apply_decision. Only drafts; logged in `decisions`.
+ * Backlog screen or the chat's apply_decision. Only drafts; logged in `decisions`. A rejected item
+ * no longer counts in the insight's points: the effort is refined and logged, like new points
+ * (CL-27). That needs the scoring deps, which a validation alone (Notion push) does not.
  */
 export async function reviewBacklogItem(
   db: Db,
   id: string,
-  status: "valide" | "rejete",
-  deps: Pick<BacklogDeps, "source" | "now" | "withLock">,
+  status: "valide",
+  deps: ReviewDeps,
   reason?: string,
-): Promise<{ id: string; title: string; status: "valide" | "rejete"; decision: string }> {
+): Promise<ReviewResult>;
+export async function reviewBacklogItem(
+  db: Db,
+  id: string,
+  status: "valide" | "rejete",
+  deps: BacklogDeps,
+  reason?: string,
+): Promise<ReviewResult>;
+export async function reviewBacklogItem(
+  db: Db,
+  id: string,
+  status: "valide" | "rejete",
+  deps: ReviewDeps | BacklogDeps,
+  reason?: string,
+): Promise<ReviewResult> {
   const withLock = deps.withLock ?? (<T>(fn: () => Promise<T>) => fn());
-  return withLock(async () => {
+  const { row, decision } = await withLock(async () => {
     const row = await loadItem(db, id);
     editable(row);
     fail(
@@ -1069,8 +1096,19 @@ export async function reviewBacklogItem(
       .select("id")
       .single();
     fail(error, "journalisation de la validation");
-    return { id, title: row.title, status, decision: data!.id };
+    return { row, decision: data!.id };
   });
+  // After the lock is released: refineEffort takes it again.
+  const effort =
+    status === "rejete" && row.insight_id && "pack" in deps
+      ? await refineEffort(
+          db,
+          row.insight_id,
+          deps,
+          `${id} rejeté par le PO : ses points (${row.points ?? "—"}) sortent de l'effort.`,
+        )
+      : null;
+  return { id, title: row.title, status, decision, effort };
 }
 
 /**

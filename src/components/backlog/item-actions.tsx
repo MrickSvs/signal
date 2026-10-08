@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, PenLine, Shuffle } from "lucide-react";
+import { Check, Loader2, PenLine, Shuffle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +17,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatGherkin, parseGherkin, type DraftKind } from "@/lib/backlog/draft";
 import { BACKLOG_KIND_LABELS } from "@/lib/labels";
-import { changeBacklogItemKindAction, patchBacklogItemAction } from "@/server/actions/backlog";
+import {
+  changeBacklogItemKindAction,
+  patchBacklogItemAction,
+  reviewBacklogItemAction,
+} from "@/server/actions/backlog";
 import type { BacklogViewItem } from "@/server/queries/backlog";
 
 const FIELD = "h-9 w-full rounded-lg border border-input bg-background px-2.5 text-sm";
@@ -141,6 +145,84 @@ export function BacklogItemActions({ item }: { item: BacklogViewItem }) {
       <EditDialog item={item} />
       <KindDialog item={item} />
     </div>
+  );
+}
+
+/**
+ * « Valider » and « Rejeter » a draft, without sending it (SPEC §12.6): the dialog is the PO's
+ * decision, logged with an optional reason. `notion`: a validated item can then be sent.
+ */
+export function ReviewDialog({
+  item,
+  status,
+  notion,
+}: {
+  item: BacklogViewItem;
+  status: "valide" | "rejete";
+  notion: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const { pending, error, setError, run } = useRun();
+  const validate = status === "valide";
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (pending) return;
+        setOpen(next);
+        if (next) {
+          setReason("");
+          setError(null);
+        }
+      }}
+    >
+      <DialogTrigger
+        render={<Button size="sm" variant={validate && !notion ? "default" : "outline"} />}
+      >
+        {validate ? <Check aria-hidden /> : <X aria-hidden />}
+        {validate ? "Valider" : "Rejeter"}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {validate ? "Valider" : "Rejeter"} {item.id}
+          </DialogTitle>
+          <DialogDescription>
+            {validate
+              ? `Le brouillon passe en « validé » et ne se modifie plus dans Signal. ${notion ? "Il reste à l'envoyer dans Notion." : "Notion n'est pas branché : il partira quand il le sera."}`
+              : "L'élément sort du backlog : ses points ne comptent plus dans l'effort de l'insight, recalculé aussitôt."}{" "}
+            Ta décision est journalisée.
+          </DialogDescription>
+        </DialogHeader>
+        <p className="font-medium">{item.title}</p>
+        <label className={LABEL}>
+          Raison (facultative)
+          <Input value={reason} onChange={(e) => setReason(e.target.value)} maxLength={300} />
+        </label>
+        {error && (
+          <p role="alert" className="text-destructive">
+            {error}
+          </p>
+        )}
+        <DialogFooter>
+          <Button
+            variant={validate ? "default" : "destructive"}
+            onClick={() =>
+              run(
+                () => reviewBacklogItemAction(item.id, status, reason.trim() || undefined),
+                () => setOpen(false),
+              )
+            }
+            disabled={pending}
+          >
+            {pending && <Loader2 aria-hidden className="animate-spin" />}
+            {pending ? "Enregistrement…" : validate ? "Valider" : "Rejeter"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
