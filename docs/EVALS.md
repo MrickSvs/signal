@@ -19,6 +19,36 @@ Deux jeux de retours : le **jeu de développement** (~214 retours, celui de la d
 | Calibration du juge | Jeu de calibration (evals/human-labels) : 15 éléments annotés par le PO, dont 5 dégradés | Notes à 1 point ou moins de l'humain : 86 % (48/56) ✅ |
 | Backlog : type et note du juge | — | pas encore mesuré |
 
+<!-- Section écrite à la main le 8 octobre 2026 : le prochain `pnpm eval:*` régénère ce fichier depuis `eval_runs` et la supprime. À reporter dans renderEvalsDoc (scripts/evals/lib/evals-doc.ts) avant de relancer une éval. -->
+
+## Lire ces chiffres
+
+**D'où vient ce fichier.** Chaque `pnpm eval:*` le régénère à la fin de son run, depuis la table `eval_runs` de Supabase (`writeEvalsDoc`). Aucune commande ne le reconstruit depuis `evals/reports/` : les rapports JSON portent les mêmes chiffres, un fichier par run, et font foi si la base est vidée.
+
+**Triage : le bon modèle, sauf pour les cas limites.**
+
+- La ligne « Triage » est la moitié Sonnet du comparatif du 8 octobre : c'est le modèle du pipeline (ADR-035). Haiku 5.5 n'est qu'un modèle de comparaison (ADR-041).
+- La ligne « Triage : cas limites E1 à E8 » date du 6 octobre et a été mesurée avec **Haiku 4.5**, alors modèle du rôle `triage` (« modèle haiku » dans le jeu). Le pipeline trie avec Sonnet depuis le 7 octobre : ce 7/8 ne mesure donc pas le modèle en service. Il n'a pas été remesuré ; `pnpm eval:triage --edge --model sonnet` (24 retours, 0,24 € annoncés par le runner, ~0,19 € au coût mesuré de Sonnet) attend l'accord du PO.
+- E2 et E7 se lisent en base : ils datent aussi de la base du 6 octobre.
+
+**Base reconstruite depuis.** Détection, stabilité, garde-fous, E2 et E7 lisent la base de démo telle qu'elle était le 6 octobre. Elle a été reconstruite le 7 (pénalité entre domaines au regroupement, triage Sonnet : ADR-034, ADR-035). Les insights ont changé de numéro : I-27, I-31, I-39… cités plus bas n'existent plus. D'après leurs titres, les patterns sont maintenant S1 → I-55, S2a → I-54, S2b → I-59, S3 → I-56, S4 → I-62, S5a → I-58, S5b → I-60, S7 → I-57. Le BUILD_LOG (8.1, base de démo) note chaque sujet du scénario « pur » après la reconstruction, mais `eval:detection` n'a pas été relancée : le 7/8 (S4 à 67 %) reste le dernier chiffre mesuré.
+
+**Commits marqués `-dirty`.** Le runner ajoute `-dirty` au commit quand l'arbre de travail contient des modifications non commitées au moment du run. Tous les runs de ce fichier ont été lancés pendant la session qui modifiait le code mesuré, avant son commit. Le code mesuré est celui du commit qui ajoute le rapport (vérifié par `git show --stat`) :
+
+| Commit du run | Runs | Commit qui ajoute le rapport |
+| --- | --- | --- |
+| `e33df5f-dirty` | triage, cas limites, comparatif, détection, estimation, stabilité, premier run des garde-fous (6 oct.) | `b2f27c6` (harnais d'evals) |
+| `b2f27c6-dirty` | triage remesuré, garde-fous 6/6 (6 oct.) | `3f1c8c7` (règle 8 de la skill de triage, interdiction des sommes de tête) |
+| `d16713a-dirty` | première calibration du juge | `b4a95e3` |
+| `acadbe9-dirty` | calibrations suivantes, dont la finale (κ 0,71) | `2ddf8ce` (règle du verdict explicitée dans la grille) |
+| `4b82d8a-dirty` | Haiku 5.5 seul et comparatif (8 oct.) | `f9c4a61` (Haiku 5.5 comme modèle de comparaison) |
+
+**Ce qui n'est pas mesuré.**
+
+- **Choix d'outil et enquête** (`pnpm eval:guardrails --tools`, ~1,5 € estimés) : pas lancé, par choix du PO sur le coût, puis faute de crédit Anthropic le 6 octobre. Le cas TC-16 attend `generate_prototype`, qui n'est pas construit (ADR-031) : il échouera par construction, donc 19/20 au mieux (cible ≥ 18/20). La règle « une enquête n'appelle aucun outil qui écrit » (CL-57) est tenue par construction et testée en unitaire : l'enquête n'a pas ces outils.
+- **Backlog** (`pnpm eval:backlog`, ~1,10 € estimés) : pas lancé, par choix du PO. Son cinquième cas demande un sujet manuel technique, absent de la base (`--manual I-xx`). Le juge est calibré et note chaque élément rédigé (badge de l'écran Backlog), mais aucune mesure agrégée n'existe.
+- **Échantillons** : l'estimation porte sur 10 tickets sur 40 (`--full` pour tous) et la stabilité sur 1 run au lieu de 5 (`--runs 5`).
+
 ## Triage
 
 Commande : `pnpm eval:triage`

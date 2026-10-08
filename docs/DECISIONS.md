@@ -1,6 +1,27 @@
 # Décisions d'architecture
 
-Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
+Les ADR sont numérotées dans l'ordre où elles ont été prises pendant le build (ADR-001 à ADR-044). SPEC §6.5 liste douze décisions de principe, numérotées de 001 à 012 **dans sa propre série** : la « ADR 009 » de SPEC (pas de code Jalon) n'est pas l'ADR-009 de ce fichier (rattachement aux comptes). Quand une ADR d'ici cite « l'ADR 010 de SPEC §6.5 », c'est la série de SPEC.
+
+## Décisions de SPEC §6.5 et ADR correspondantes
+
+| SPEC §6.5 | Décision | ADR de ce fichier | État |
+| --- | --- | --- | --- |
+| 001 | Workflow pour le volume, agent unique pour l'interaction | ADR-013 (pipeline en graphe), ADR-021 (agent unique), ADR-025 (même agent pour les enquêtes) | **Pas d'ADR dédiée** : le choix est argumenté dans SPEC §6.1 et §6.2 ; les ADR citées le mettent en œuvre |
+| 002 | Estimation par analogie avec l'historique, pas par lecture de code | ADR-011 | Couverte |
+| 003 | LangGraph.js : validation humaine native, persistance, graphe visualisable | ADR-013 (graphe, `PostgresSaver`), ADR-021 (`createAgent`), ADR-024 (middleware HITL) | **Pas d'ADR dédiée** : aucune ADR ne pèse LangGraph contre une alternative ; les versions et l'usage sont dans les ADR citées |
+| 004 | Scores calculés en code, jamais par le modèle | ADR-012 | Couverte |
+| 005 | Routage Haiku / Sonnet / Opus selon la tâche, validé par les evals | ADR-003 (rôles), ADR-035 et ADR-041 (triage), ADR-029 (juge Opus) | Couverte en plusieurs ADR, sans ADR de synthèse |
+| 006 | Le juge n'est pas le générateur, calibré sur des annotations humaines | ADR-029 | Couverte |
+| 007 | Supabase source de vérité, Notion espace d'équipe, un seul sens | ADR-002 (accès serveur), ADR-026, ADR-027 | Couverte |
+| 008 | Pack de contexte et skills : la connaissance métier hors du code | ADR-004 (pack), ADR-021 (index des skills dans le prompt) | Couverte pour le pack ; le format et le chargement des skills (étape 1.2) n'ont pas d'ADR |
+| 009 | Pas de code Jalon : carte d'architecture et historique de tickets | — (ADR-011 s'appuie dessus) | **Pas d'ADR dédiée** : la raison est écrite dans SPEC §6.5 (« Pourquoi l'ADR 009 ») |
+| 010 | Regroupement sur le problème extrait, pas sur le texte brut | ADR-010 | Couverte |
+| 011 | Un retour se scinde en items | ADR-008 (1 à 3 items par retour), ADR-010 | Couverte |
+| 012 | Un jeu réservé mesure le triage | ADR-007 (jeu réservé, garde-fous), ADR-028 (runners) | Couverte |
+
+## Gabarit
+
+Copier le bloc ci-dessous pour chaque décision.
 
 ## ADR-XXX — Titre
 
@@ -510,6 +531,17 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
 - **Alternatives écartées** : changer l'identifiant du rôle `triage` (la comparaison perdrait Haiku et sa grille de prix) ; Opus (environ deux fois le prix de Sonnet, gain attendu marginal sur un classement).
 - **Conséquences** : coût du triage ~0,90 € pour 100 retours au lieu de 0,15 € (run complet de la démo ~3,10 € au lieu de ~1,50 €) ; ~1,5 s de plus par retour collé en direct (latence médiane 4,3 s contre 2,8 s).
 
+## ADR-036 — Recommandations du digest : « Fait » ou « Écarter », journalisé, non reproposé sans fait nouveau
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée ; remplace le point « Alternatives écartées » de l'ADR-033
+- **Contexte** : les recommandations sont réécrites à chaque digest à partir des faits du jour. Une action menée hors de Signal (prévenir un CSM) ne change pas ces faits : la même recommandation revenait chaque jour.
+- **Décision** :
+  - **Deux boutons par recommandation** sur l'écran Digest : « Fait » et « Écarter » (raison facultative). Chaque réponse est une décision (`entity_type` « recommandation », `entity_id` « <digest>#<rang> », action `validation` ou `rejet`, titre et preuves dans `after`). Une recommandation traitée reste listée, barrée, avec son numéro de décision, et ne compte plus dans les choses à traiter.
+  - **Digest suivant** : les réponses des 30 derniers jours lui sont fournies (règle 10 de la skill digest : ne pas reproposer sans fait nouveau). Contrôle en code (`repeatsHandled`) : une recommandation dont toutes les preuves figuraient déjà dans une recommandation traitée est retirée ; un seul ID nouveau (retour, alerte, insight) suffit à la reproposer.
+- **Alternatives écartées** : donner au digest ses recommandations de la veille (il éviterait de rabâcher sans savoir ce que Léa a fait) ; transformer chaque compte à risque en alerte (un compte peut être à risque sans nouveau retour).
+- **Conséquences** : pas de migration (enums de décisions existants). Le reset de démo efface ces décisions avec les autres.
+
 ## ADR-037 — Écran Retours : une liste à lire, des filtres repliés, un détail qu'on parcourt
 
 - **Date** : 2026-10-07
@@ -522,17 +554,6 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Détail** : signaux en tête, sujets et insights avant le compte, navigation précédent / suivant dans la page courante de la liste (boutons, flèches ← →) avec la position (« 2 sur 7 »), croix de fermeture dans cette barre.
   - Le texte d'introduction disparaît au profit du nombre de retours.
 - **Conséquences** : la navigation du détail s'arrête aux bords de la page affichée (25 retours) ; un lien direct vers un retour absent de la page ouvre le détail sans navigation.
-
-## ADR-036 — Recommandations du digest : « Fait » ou « Écarter », journalisé, non reproposé sans fait nouveau
-
-- **Date** : 2026-10-07
-- **Statut** : acceptée ; remplace le point « Alternatives écartées » de l'ADR-033
-- **Contexte** : les recommandations sont réécrites à chaque digest à partir des faits du jour. Une action menée hors de Signal (prévenir un CSM) ne change pas ces faits : la même recommandation revenait chaque jour.
-- **Décision** :
-  - **Deux boutons par recommandation** sur l'écran Digest : « Fait » et « Écarter » (raison facultative). Chaque réponse est une décision (`entity_type` « recommandation », `entity_id` « <digest>#<rang> », action `validation` ou `rejet`, titre et preuves dans `after`). Une recommandation traitée reste listée, barrée, avec son numéro de décision, et ne compte plus dans les choses à traiter.
-  - **Digest suivant** : les réponses des 30 derniers jours lui sont fournies (règle 10 de la skill digest : ne pas reproposer sans fait nouveau). Contrôle en code (`repeatsHandled`) : une recommandation dont toutes les preuves figuraient déjà dans une recommandation traitée est retirée ; un seul ID nouveau (retour, alerte, insight) suffit à la reproposer.
-- **Alternatives écartées** : donner au digest ses recommandations de la veille (il éviterait de rabâcher sans savoir ce que Léa a fait) ; transformer chaque compte à risque en alerte (un compte peut être à risque sans nouveau retour).
-- **Conséquences** : pas de migration (enums de décisions existants). Le reset de démo efface ces décisions avec les autres.
 
 ## ADR-038 — Écran Insights : le poids des problèmes, pas leur rang
 
