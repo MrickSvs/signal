@@ -114,6 +114,9 @@ describe("getPrioritizationScreen", () => {
     // In MRR, the value is computed: no reason to show, no override to cancel from this mode.
     const inMrr = await params("mrr");
     expect(cell(inMrr, "reach")).toMatchObject({ source: "calcule", override: null });
+    // It is still mentioned where a new value would be typed: saving one here replaces it.
+    expect(cell(inMrr, "reach").input.hint).toContain("Ton override en mode comptes (40)");
+    expect(cell(inAccounts, "reach").input.hint).toBe("S'applique au mode comptes seulement.");
     // An Impact override has no unit: it applies, and shows, in both modes.
     expect(cell(inMrr, "impact").override).toMatchObject({ reason: "Direction" });
   });

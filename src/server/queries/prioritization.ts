@@ -8,7 +8,7 @@ import type { JournalEntry } from "@/lib/prioritization/journal";
 import { buildRecommendations, type Recommendation } from "@/lib/prioritization/recommendations";
 import { confidenceLevels } from "@/lib/scoring/confidence";
 import type { CapacityReport } from "@/lib/scoring/capacity";
-import { isModeReach } from "@/lib/scoring/overrides";
+import { isModeReach, type ModeReach } from "@/lib/scoring/overrides";
 import type { RuleFlag } from "@/lib/scoring/moscow-rules";
 import type { ReachMode } from "@/lib/scoring/reach";
 import type { ComputedScore } from "@/pipeline/nodes/score";
@@ -111,6 +111,8 @@ function reachCell(
   manual: boolean,
   override: OverrideRow | undefined,
   mode: ReachMode,
+  /** The PO's Reach override entered in the other mode: it does not apply here. */
+  elsewhere: ModeReach | null,
 ): ParamCell {
   const mrr = mode === "mrr";
   const fmt = (n: number) => (mrr ? formatEur(n) : formatNumber(n));
@@ -162,7 +164,9 @@ function reachCell(
       unit: mrr ? "€ de MRR" : "comptes",
       hint: manual
         ? "Valeur du sujet manuel."
-        : `S'applique au mode ${mrr ? "MRR" : "comptes"} seulement.`,
+        : elsewhere
+          ? `S'applique au mode ${mrr ? "MRR" : "comptes"} seulement. Ton override en mode ${elsewhere.mode === "mrr" ? `MRR (${formatEur(elsewhere.value)})` : `comptes (${formatNumber(elsewhere.value)})`} ne compte pas ici, et une valeur saisie ici le remplace.`
+          : `S'applique au mode ${mrr ? "MRR" : "comptes"} seulement.`,
     },
     cancellable: !manual,
   };
@@ -190,6 +194,7 @@ function cells(
     stale: boolean;
   } | null,
   scales: { impact: number[]; confidence: number[] },
+  reachElsewhere: ModeReach | null,
 ): ParamCell[] {
   const source = (param: ParamKey, base: CellSource): CellSource =>
     manual && param !== "reach" && overrides.has(param)
@@ -210,7 +215,7 @@ function cells(
     : null;
 
   return [
-    reachCell(s, manual, overrides.get("reach"), mode),
+    reachCell(s, manual, overrides.get("reach"), mode, reachElsewhere),
     {
       param: "impact",
       label: "Impact",
@@ -343,9 +348,14 @@ export async function getPrioritizationScreen(
   };
   const insightById = new Map(ranking.insights.map((i) => [i.id, i]));
   const overridesOf = new Map<string, Map<string, OverrideRow>>();
+  const reachElsewhere = new Map<string, ModeReach>();
   for (const o of overrides.data ?? []) {
-    // A Reach override holds the mode it was entered in and applies only there (SPEC §8.1).
-    if (o.param === "reach" && isModeReach(o.value) && o.value.mode !== mode) continue;
+    // A Reach override holds the mode it was entered in and applies only there (SPEC §8.1). In
+    // the other mode it is only mentioned: saving a Reach override there replaces it.
+    if (o.param === "reach" && isModeReach(o.value) && o.value.mode !== mode) {
+      reachElsewhere.set(o.insight_id, o.value);
+      continue;
+    }
     const map = overridesOf.get(o.insight_id) ?? new Map<string, OverrideRow>();
     map.set(o.param, o);
     overridesOf.set(o.insight_id, map);
@@ -374,7 +384,15 @@ export async function getPrioritizationScreen(
         { label: "× Confidence", value: formatPercent(s.confidence) },
         { label: "÷ Effort (sem.-pers.)", value: formatNumber(s.effort_weeks) },
       ],
-      params: cells(s, manual, own, mode, estimate, scales),
+      params: cells(
+        s,
+        manual,
+        own,
+        mode,
+        estimate,
+        scales,
+        reachElsewhere.get(s.insight_id) ?? null,
+      ),
       robustness: s.robustness,
       robustnessLines:
         "scenarios" in s.robustness_detail
