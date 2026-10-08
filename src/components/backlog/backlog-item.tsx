@@ -1,12 +1,14 @@
 import { BadgeCheck, CircleAlert, Link2, Scale, ThumbsUp } from "lucide-react";
 import { BacklogItemChip, EvidenceChip } from "@/components/signal/chips";
 import { BacklogKindBadge, Pill } from "@/components/signal/badges";
+import { PILL_TONES, TEXT_TONES } from "@/components/signal/tones";
 import { storyPart, type Scenario } from "@/lib/backlog/draft";
 import { formatNumber } from "@/lib/format";
 import { BACKLOG_STATUS_LABELS, JUDGE_CRITERION_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import type { BacklogViewItem, JudgeBadge } from "@/server/queries/backlog";
 import { BacklogItemActions } from "./item-actions";
+import { ItemDisclosure } from "./item-disclosure";
 import { NotionLink, PushButton } from "./push-button";
 
 const SEVERITY_LABELS = { bloquant: "Bloquant", majeur: "Majeur", mineur: "Mineur" } as const;
@@ -40,9 +42,7 @@ export function Gherkin({ scenarios }: { scenarios: Scenario[] }) {
           <p>
             <strong>Scénario :</strong> {s.name}
             {s.edge_case && (
-              <span className="ml-2 font-sans text-[12px] text-amber-700 dark:text-amber-300">
-                cas limite
-              </span>
+              <span className="ml-2 font-sans text-[12px] text-muted-foreground">cas limite</span>
             )}
           </p>
           {s.steps.map((step, j) => (
@@ -70,11 +70,7 @@ function JudgeView({ judge }: { judge: JudgeBadge | null }) {
   const ready = judge.verdict === "pret";
   return (
     <Pill
-      className={
-        ready
-          ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
-          : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
-      }
+      className={ready ? PILL_TONES.signal : PILL_TONES.risk}
       title={judge.provisional ? "Badge provisoire : juge non calibré" : "Note du juge qualité"}
     >
       {ready ? <BadgeCheck aria-hidden /> : <CircleAlert aria-hidden />}
@@ -96,12 +92,7 @@ function JudgePanel({ judge }: { judge: JudgeBadge }) {
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <Scale aria-hidden className="size-3.5 text-muted-foreground" />
         <span className="font-medium">Avis du juge</span>
-        <span
-          className={cn(
-            "font-medium",
-            ready ? "text-emerald-700 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300",
-          )}
-        >
+        <span className={cn("font-medium", ready ? TEXT_TONES.signal : TEXT_TONES.risk)}>
           {ready ? "Prêt" : "À revoir"} · {formatNumber(judge.note)}/5
         </span>
         <span className="text-muted-foreground">
@@ -115,8 +106,7 @@ function JudgePanel({ judge }: { judge: JudgeBadge }) {
               key={criterion}
               className={cn(
                 "rounded-md border bg-background px-2 py-0.5",
-                note <= 2 &&
-                  "border-amber-300 text-amber-800 dark:border-amber-800 dark:text-amber-200",
+                note <= 2 && PILL_TONES.risk,
               )}
             >
               {JUDGE_CRITERION_LABELS[criterion] ?? criterion}{" "}
@@ -145,7 +135,24 @@ function JudgePanel({ judge }: { judge: JudgeBadge }) {
   );
 }
 
-/** One story, bug or technical task, in the format of its type (SPEC §9.1 to §9.3). */
+const STATUS_STYLES: Record<BacklogViewItem["status"], string> = {
+  brouillon: PILL_TONES.po,
+  valide: PILL_TONES.neutral,
+  envoye: PILL_TONES.neutral,
+  modifie_notion: PILL_TONES.neutral,
+  rejete: PILL_TONES.neutral,
+};
+
+const STATUS_LABELS: Record<BacklogViewItem["status"], string> = {
+  ...BACKLOG_STATUS_LABELS,
+  brouillon: "À valider",
+  envoye: "Dans Notion",
+};
+
+/**
+ * One story, bug or technical task (SPEC §9.1 to §9.3, ADR-040): one line with its status and its
+ * actions, the content in the format of its type unfolding below.
+ */
 export function BacklogItemCard({
   item,
   range,
@@ -155,156 +162,180 @@ export function BacklogItemCard({
   range: { min: number; max: number } | null;
   highlighted: boolean;
 }) {
+  const sent = item.status === "envoye" || item.status === "modifie_notion";
   return (
     <article
       id={item.id}
       className={cn(
-        "flex scroll-mt-20 flex-col gap-3 rounded-xl border bg-card p-4",
-        highlighted && "ring-2 ring-signal",
+        "flex scroll-mt-20 flex-col gap-3 rounded-lg border bg-card px-4 py-3",
+        highlighted && "ring-2 ring-blue-500/60",
       )}
     >
-      <header className="flex flex-col gap-1.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <BacklogKindBadge kind={item.kind} />
-          <span className="font-mono font-semibold">{item.id}</span>
-          <Pill className="border-border text-muted-foreground">
-            {BACKLOG_STATUS_LABELS[item.status]}
-          </Pill>
-          <JudgeView judge={item.judge} />
-        </div>
-        <h4 className="font-semibold">{item.title}</h4>
-      </header>
-
-      {item.kind === "story" && (
-        <p className="leading-relaxed">
-          <strong>Afin de</strong> {storyPart("value", item.value)},<br />
-          <strong>en tant que</strong> {storyPart("persona", item.persona)},<br />
-          <strong>je veux</strong> {storyPart("want", item.want)}.
-        </p>
-      )}
-      {item.kind === "bug" && (
-        <>
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span>
-              Sévérité : <strong>{item.severity ? SEVERITY_LABELS[item.severity] : "—"}</strong>
+      <ItemDisclosure
+        id={item.id}
+        defaultOpen={highlighted}
+        summary={
+          <>
+            <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+              <BacklogKindBadge kind={item.kind} />
+              <span className="font-mono font-semibold">{item.id}</span>
+              <Pill className={STATUS_STYLES[item.status]}>{STATUS_LABELS[item.status]}</Pill>
+              <JudgeView judge={item.judge} />
+              <span className="text-muted-foreground tabular-nums">
+                {item.points === null ? "non estimé" : `${item.points} points`}
+              </span>
             </span>
-            <span title={item.affected_accounts.join(", ")}>
-              Comptes touchés : <strong>{item.affected_accounts.length}</strong>
-              {item.enterprise_accounts > 0 && ` dont ${item.enterprise_accounts} Enterprise`}
-            </span>
+            <span className="leading-snug font-medium">{item.title}</span>
+          </>
+        }
+        actions={
+          <>
+            {item.status === "brouillon" && (
+              <>
+                <PushButton item={item} />
+                <BacklogItemActions item={item} />
+              </>
+            )}
+            {item.status === "valide" && <PushButton item={item} />}
+            {sent && item.notion_page_id && <NotionLink pageId={item.notion_page_id} />}
+          </>
+        }
+      >
+        {item.kind === "story" && (
+          <p className="leading-relaxed">
+            <strong>Afin de</strong> {storyPart("value", item.value)},<br />
+            <strong>en tant que</strong> {storyPart("persona", item.persona)},<br />
+            <strong>je veux</strong> {storyPart("want", item.want)}.
           </p>
-          <div className="flex flex-col gap-3">
+        )}
+        {item.kind === "bug" && (
+          <>
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span>
+                Sévérité : <strong>{item.severity ? SEVERITY_LABELS[item.severity] : "—"}</strong>
+              </span>
+              <span title={item.affected_accounts.join(", ")}>
+                Comptes touchés : <strong>{item.affected_accounts.length}</strong>
+                {item.enterprise_accounts > 0 && ` dont ${item.enterprise_accounts} Enterprise`}
+              </span>
+            </p>
             <Block title="Comportement attendu">
               <p>{item.expected_behavior}</p>
             </Block>
             <Block title="Comportement constaté">
               <p>{item.actual_behavior}</p>
             </Block>
-          </div>
-          <Block title="Étapes de reproduction">
-            <Lines items={item.repro_steps} ordered />
-          </Block>
-        </>
-      )}
-      {item.kind === "tache" && (
-        <>
-          <Block title="Objectif">
-            <p>{item.objective}</p>
-          </Block>
-          <Block title="Définition de terminé">
-            <Lines items={item.definition_of_done} />
-          </Block>
-          {item.risks.length > 0 && (
-            <Block title="Risques">
-              <Lines items={item.risks} />
+            <Block title="Étapes de reproduction">
+              <Lines items={item.repro_steps} ordered />
             </Block>
-          )}
-        </>
-      )}
-
-      {item.kind === "story" && item.business_rules.length > 0 && (
-        <Block title="Règles de gestion">
-          <Lines items={item.business_rules} />
-        </Block>
-      )}
-      {item.kind !== "tache" && item.acceptance_criteria.length > 0 && (
-        <Block title="Critères d'acceptation">
-          <Gherkin scenarios={item.acceptance_criteria} />
-        </Block>
-      )}
-      {item.kind === "story" && item.success_kpi && (
-        <p>
-          <span className="text-muted-foreground">KPI de succès :</span> {item.success_kpi}
-        </p>
-      )}
-
-      <div className="flex flex-col gap-1.5 border-t pt-3 text-[13px]">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="font-semibold">
-            {item.points === null ? "Non estimé" : `${item.points} points`}
-          </span>
-          {item.estimate && item.estimate.components.length > 0 && (
-            <span className="text-muted-foreground">
-              — composants :{" "}
-              <span className="font-mono">{item.estimate.components.join(", ")}</span>
-            </span>
-          )}
-          {item.estimate?.analogues.map((a) => (
-            <span key={a.ticket_id} className="text-muted-foreground">
-              · analogue <span className="font-mono">{a.ticket_id}</span> (
-              {a.estimated_points ?? "?"} pts estimés, {a.actual_points ?? "?"} réels
-              {a.close ? "" : ", éloigné"})
-            </span>
-          ))}
-          {range && (
-            <span className="text-muted-foreground">
-              · fourchette de l&apos;insight :{" "}
-              {range.min === range.max ? range.min : `${range.min} à ${range.max}`} points
-            </span>
-          )}
-        </p>
-        {item.estimate?.rationale && (
-          <p className="text-muted-foreground">{item.estimate.rationale}</p>
+          </>
         )}
-        {item.dependencies.length > 0 && (
-          <p className="flex flex-wrap items-center gap-1.5">
-            <Link2 aria-hidden className="size-3.5 text-muted-foreground" />
-            <span className="text-muted-foreground">Dépend de</span>
-            {item.dependencies.map((id) => (
-              <BacklogItemChip key={id} id={id} />
-            ))}
+        {item.kind === "tache" && (
+          <>
+            <Block title="Objectif">
+              <p>{item.objective}</p>
+            </Block>
+            <Block title="Définition de terminé">
+              <Lines items={item.definition_of_done} />
+            </Block>
+            {item.risks.length > 0 && (
+              <Block title="Risques">
+                <Lines items={item.risks} />
+              </Block>
+            )}
+          </>
+        )}
+
+        {item.kind === "story" && item.business_rules.length > 0 && (
+          <Block title="Règles de gestion">
+            <Lines items={item.business_rules} />
+          </Block>
+        )}
+        {item.kind !== "tache" && item.acceptance_criteria.length > 0 && (
+          <Block title="Critères d'acceptation">
+            <Gherkin scenarios={item.acceptance_criteria} />
+          </Block>
+        )}
+        {item.kind === "story" && item.success_kpi && (
+          <p>
+            <span className="text-muted-foreground">KPI de succès :</span> {item.success_kpi}
           </p>
         )}
-        <p className="flex flex-wrap items-center gap-1">
-          <span className="text-muted-foreground">Preuves :</span>
-          {item.evidence.map((id) => (
-            <EvidenceChip key={id} id={id} />
-          ))}
-        </p>
-      </div>
 
-      {item.judge && <JudgePanel judge={item.judge} />}
+        <Block title="Estimation">
+          <div className="flex flex-col gap-1.5 text-[13px]">
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="font-semibold">
+                {item.points === null ? "Non estimé" : `${item.points} points`}
+              </span>
+              {range && (
+                <span className="text-muted-foreground">
+                  · fourchette de l&apos;insight{" "}
+                  {range.min === range.max ? range.min : `${range.min} à ${range.max}`} points
+                </span>
+              )}
+            </p>
+            {item.estimate && item.estimate.components.length > 0 && (
+              <p className="text-muted-foreground">
+                Composants :{" "}
+                <span className="font-mono">{item.estimate.components.join(", ")}</span>
+              </p>
+            )}
+            {item.estimate && item.estimate.analogues.length > 0 && (
+              <ul className="flex flex-wrap gap-1.5">
+                {item.estimate.analogues.map((a) => (
+                  <li
+                    key={a.ticket_id}
+                    className="rounded-md border px-2 py-0.5 text-muted-foreground"
+                  >
+                    <span className="font-mono text-foreground">{a.ticket_id}</span>{" "}
+                    {a.estimated_points ?? "?"} pts estimés, {a.actual_points ?? "?"} réels
+                    {a.close ? "" : ", éloigné"}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {item.estimate?.rationale && (
+              <p className="leading-relaxed text-muted-foreground">{item.estimate.rationale}</p>
+            )}
+          </div>
+        </Block>
+
+        {(item.dependencies.length > 0 || item.evidence.length > 0) && (
+          <div className="flex flex-col gap-1.5 text-[13px]">
+            {item.dependencies.length > 0 && (
+              <p className="flex flex-wrap items-center gap-1.5">
+                <Link2 aria-hidden className="size-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Dépend de</span>
+                {item.dependencies.map((id) => (
+                  <BacklogItemChip key={id} id={id} />
+                ))}
+              </p>
+            )}
+            {item.evidence.length > 0 && (
+              <p className="flex flex-wrap items-center gap-1">
+                <span className="text-muted-foreground">Preuves :</span>
+                {item.evidence.map((id) => (
+                  <EvidenceChip key={id} id={id} />
+                ))}
+              </p>
+            )}
+          </div>
+        )}
+
+        {item.judge && <JudgePanel judge={item.judge} />}
+        {sent && (
+          <p className="text-[13px] text-muted-foreground">
+            Envoyé dans Notion : il se modifie dans Notion.
+          </p>
+        )}
+      </ItemDisclosure>
 
       {item.status === "valide" && item.push_error && (
-        <p role="alert" className="flex items-start gap-1.5 text-[13px] text-destructive">
+        <p role="alert" className="flex items-start gap-1.5 pl-6 text-[13px] text-destructive">
           <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
           Envoi vers Notion en échec : {item.push_error}
         </p>
-      )}
-      {item.status === "brouillon" && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          <PushButton item={item} />
-          <BacklogItemActions item={item} />
-        </div>
-      )}
-      {item.status === "valide" && <PushButton item={item} />}
-      {(item.status === "envoye" || item.status === "modifie_notion") && (
-        <div className="flex flex-wrap items-center gap-2">
-          {item.notion_page_id && <NotionLink pageId={item.notion_page_id} />}
-          <span className="text-[13px] text-muted-foreground">
-            Envoyé dans Notion : il se modifie dans Notion.
-          </span>
-        </div>
       )}
     </article>
   );

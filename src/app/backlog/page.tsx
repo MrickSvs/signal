@@ -6,20 +6,40 @@ import { ScrollToElement } from "@/components/backlog/scroll-to-element";
 import { EmptyState } from "@/components/shell/states";
 import { EvidenceChip, InsightChip } from "@/components/signal/chips";
 import { Pill } from "@/components/signal/badges";
+import { PILL_TONES } from "@/components/signal/tones";
 import { FORMAT_LABELS } from "@/lib/backlog/choose-format";
 import { getDb } from "@/lib/db/client";
 import { formatDate } from "@/lib/format";
 import { BACKLOG_KIND_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
-import { BACKLOG_KINDS, getBacklogScreen, type BacklogGroup } from "@/server/queries/backlog";
+import {
+  BACKLOG_KINDS,
+  getBacklogScreen,
+  type BacklogGroup,
+  type BacklogViewItem,
+} from "@/server/queries/backlog";
 
 // A drafting from this screen (« Relancer ») takes about 30 s: one drafting call, one estimation.
 export const maxDuration = 120;
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
 
-function filterHref(params: { type?: string | null; insight?: string | null }) {
+type Status = "brouillon" | "valide" | "envoye";
+
+/** Status filter (ADR-040): drafts to validate, validated not sent yet, sent to Notion. */
+const STATUS_FILTERS: Record<Status, { label: string; statuses: BacklogViewItem["status"][] }> = {
+  brouillon: { label: "À valider", statuses: ["brouillon"] },
+  valide: { label: "Validés", statuses: ["valide"] },
+  envoye: { label: "Dans Notion", statuses: ["envoye", "modifie_notion"] },
+};
+
+function filterHref(params: {
+  type?: string | null;
+  insight?: string | null;
+  statut?: string | null;
+}) {
   const query = new URLSearchParams();
+  if (params.statut) query.set("statut", params.statut);
   if (params.type) query.set("type", params.type);
   if (params.insight) query.set("insight", params.insight);
   const text = query.toString();
@@ -35,43 +55,49 @@ function PlanSummary({ group }: { group: BacklogGroup }) {
       : `${plan.range.min} à ${plan.range.max}`;
   return (
     <div className="flex flex-col gap-1.5 text-[13px]">
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="font-medium">{FORMAT_LABELS[plan.chosen]}</span>
-        <span className="text-muted-foreground">
-          · fourchette de l&apos;insight {range} points, confiance {plan.confidence}
-        </span>
-        {plan.sum !== null && (
-          <span
-            className={cn(
-              "text-muted-foreground",
-              plan.sum_outside_range && "text-amber-700 dark:text-amber-300",
-            )}
-          >
-            · total des éléments {plan.sum} points
-          </span>
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
+        <span className="font-medium text-foreground">{FORMAT_LABELS[plan.chosen]}</span>
+        <span>· fourchette {range} points</span>
+        <span>· confiance {plan.confidence}</span>
+        {plan.sum !== null && !plan.sum_outside_range && <span>· total {plan.sum} points</span>}
+        {plan.sum !== null && plan.sum_outside_range && (
+          <Pill className={PILL_TONES.risk}>
+            <AlertTriangle aria-hidden />
+            Total {plan.sum} points, hors fourchette
+          </Pill>
         )}
-        <span className="text-muted-foreground">· rédigé le {formatDate(plan.drafted_at)}</span>
+        {plan.no_close_analogue && (
+          <Pill className={PILL_TONES.risk}>
+            <AlertTriangle aria-hidden />
+            Aucun ticket livré proche
+          </Pill>
+        )}
+        <span>· rédigé le {formatDate(plan.drafted_at)}</span>
       </p>
-      {plan.deviation_reason ? (
-        <p className="text-muted-foreground">
-          Signal s&apos;écarte du format proposé par le code (
-          {FORMAT_LABELS[plan.proposed].toLowerCase()}) : {plan.deviation_reason}
-        </p>
-      ) : (
-        <p className="text-muted-foreground">Format proposé par le code : {plan.proposed_reason}</p>
-      )}
-      {plan.no_close_analogue && (
-        <p className="flex items-start gap-1.5 text-amber-800 dark:text-amber-200">
-          <AlertTriangle aria-hidden className="mt-0.5 size-3.5 shrink-0" />
-          Aucun ticket livré proche : fourchette élargie et confiance basse. Les points sont à
-          challenger avec l&apos;équipe.
-        </p>
-      )}
-      {plan.sum_outside_range && plan.range_note && (
-        <p className="text-amber-800 dark:text-amber-200">
-          Écart à la fourchette : {plan.range_note}
-        </p>
-      )}
+      <details className="group">
+        <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+          Pourquoi ce découpage
+        </summary>
+        <div className="mt-1.5 flex flex-col gap-1.5 leading-relaxed text-muted-foreground">
+          {plan.deviation_reason ? (
+            <p>
+              Signal s&apos;écarte du format proposé par le code (
+              {FORMAT_LABELS[plan.proposed].toLowerCase()}) : {plan.deviation_reason}
+            </p>
+          ) : (
+            <p>Format proposé par le code : {plan.proposed_reason}</p>
+          )}
+          {plan.sum_outside_range && plan.range_note && (
+            <p className="text-foreground">Écart à la fourchette : {plan.range_note}</p>
+          )}
+          {plan.no_close_analogue && (
+            <p className="text-foreground">
+              Aucun ticket livré proche : fourchette élargie et confiance basse. Les points sont à
+              challenger avec l&apos;équipe.
+            </p>
+          )}
+        </div>
+      </details>
     </div>
   );
 }
@@ -90,9 +116,9 @@ function Group({ group, highlighted }: { group: BacklogGroup; highlighted: strin
     (i) => !i.epic_id || !group.epics.some((e) => e.id === i.epic_id),
   );
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border bg-muted/20 p-5">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-2">
+    <section className="flex flex-col gap-3">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b pb-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold">
             <InsightChip id={group.insight.id} />
             <span>{group.insight.title}</span>
@@ -124,9 +150,9 @@ function Group({ group, highlighted }: { group: BacklogGroup; highlighted: strin
         if (items.length === 0) return null;
         return (
           <div key={epic.id} id={epic.id} className="flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5 rounded-xl border bg-card p-4">
+            <div className="flex flex-col gap-0.5 rounded-lg bg-muted/50 px-4 py-3">
               <p className="flex flex-wrap items-center gap-2">
-                <Pill className="border-signal/40 bg-signal-soft text-signal">Epic</Pill>
+                <Pill className={PILL_TONES.neutral}>Epic</Pill>
                 <span className="font-mono font-semibold">{epic.id}</span>
                 <span className="font-semibold">{epic.title}</span>
               </p>
@@ -136,26 +162,45 @@ function Group({ group, highlighted }: { group: BacklogGroup; highlighted: strin
                 {epic.kpis.length > 0 && ` · KPI : ${epic.kpis.join(" ; ")}`}
               </p>
             </div>
-            <div className="flex flex-col gap-3 border-l-2 border-signal/30 pl-4">
-              {items.map(card)}
-            </div>
+            <div className="flex flex-col gap-2 border-l-2 pl-4">{items.map(card)}</div>
           </div>
         );
       })}
-      {loose.length > 0 && <div className="flex flex-col gap-3">{loose.map(card)}</div>}
+      {loose.length > 0 && <div className="flex flex-col gap-2">{loose.map(card)}</div>}
     </section>
   );
 }
 
-/** Backlog (SPEC §12.6): what Signal drafted, per insight, in the format of each type. */
+/**
+ * Backlog (SPEC §12.6, ADR-040): what Signal drafted, per insight, one line per item with its
+ * status and actions, filtered by status (drafts to validate first) and kind.
+ */
 export default async function BacklogPage({ searchParams }: PageProps<"/backlog">) {
   const params = await searchParams;
   const typeParam = one(params.type);
   const kind = BACKLOG_KINDS.find((k) => k === typeParam) ?? null;
   const insight = one(params.insight) ?? null;
   const element = one(params.element) ?? null;
-  const { groups, counts } = await getBacklogScreen(getDb(), { kind, insight });
+  const statusParam = one(params.statut);
+  const status = statusParam && statusParam in STATUS_FILTERS ? (statusParam as Status) : null;
+  const screen = await getBacklogScreen(getDb(), { kind, insight });
+  const { counts } = screen;
   const total = counts.story + counts.bug + counts.tache;
+  const allItems = screen.groups.flatMap((g) => g.items);
+  const statusCounts = Object.fromEntries(
+    (Object.keys(STATUS_FILTERS) as Status[]).map((k) => [
+      k,
+      allItems.filter((i) => STATUS_FILTERS[k].statuses.includes(i.status)).length,
+    ]),
+  ) as Record<Status, number>;
+  const groups = status
+    ? screen.groups
+        .map((g) => ({
+          ...g,
+          items: g.items.filter((i) => STATUS_FILTERS[status].statuses.includes(i.status)),
+        }))
+        .filter((g) => g.items.length > 0)
+    : screen.groups;
 
   if (total === 0 && groups.length === 0 && !insight) {
     return (
@@ -169,39 +214,62 @@ export default async function BacklogPage({ searchParams }: PageProps<"/backlog"
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-8 py-6">
+    <div className="mx-auto flex max-w-5xl flex-col gap-5 px-8 py-6">
       {element && <ScrollToElement id={element} />}
-      <p className="max-w-3xl leading-relaxed text-muted-foreground">
-        Epics, stories, bugs et tâches rédigés par Signal à partir des insights, estimés par
-        analogie avec les tickets livrés. Les brouillons se modifient ici ; un élément envoyé se
-        modifie dans Notion.
-      </p>
+      <nav aria-label="Filtrer par statut" className="flex flex-wrap gap-1 border-b">
+        {[null, ...(Object.keys(STATUS_FILTERS) as Status[])].map((k) => {
+          const active = k === status;
+          return (
+            <Link
+              key={k ?? "tous"}
+              href={filterHref({ statut: k, type: kind, insight })}
+              scroll={false}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 font-medium",
+                active
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {k === "brouillon" && statusCounts.brouillon > 0 && (
+                <span aria-hidden className="size-2 rounded-full bg-blue-500" />
+              )}
+              {k ? STATUS_FILTERS[k].label : "Tous"}
+              <span className="text-[13px] font-normal text-muted-foreground tabular-nums">
+                {k ? statusCounts[k] : allItems.length}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
 
-      <nav aria-label="Filtrer par type" className="flex flex-wrap items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         {[null, ...BACKLOG_KINDS].map((k) => (
           <Link
             key={k ?? "tous"}
-            href={filterHref({ type: k, insight })}
+            href={filterHref({ statut: status, type: k, insight })}
+            scroll={false}
             className={cn(
               "rounded-full border px-3 py-1 text-[13px]",
               k === kind
-                ? "border-signal bg-signal-soft font-medium text-signal"
+                ? "border-foreground bg-foreground font-medium text-background"
                 : "text-muted-foreground hover:bg-muted",
             )}
           >
-            {k ? BACKLOG_KIND_LABELS[k] : "Tous"}{" "}
+            {k ? BACKLOG_KIND_LABELS[k] : "Tous les types"}{" "}
             <span className="tabular-nums">{k ? counts[k] : total}</span>
           </Link>
         ))}
         {insight && (
           <Link
-            href={filterHref({ type: kind })}
+            href={filterHref({ statut: status, type: kind })}
             className="ml-2 text-[13px] font-medium text-signal underline-offset-4 hover:underline"
           >
             Voir tous les insights
           </Link>
         )}
-      </nav>
+      </div>
 
       {groups.length === 0 ? (
         <EmptyState icon={SearchX} title="Aucun élément ne correspond">
@@ -216,7 +284,11 @@ export default async function BacklogPage({ searchParams }: PageProps<"/backlog"
           </p>
         </EmptyState>
       ) : (
-        groups.map((group) => <Group key={group.insight.id} group={group} highlighted={element} />)
+        <div className="flex flex-col gap-8">
+          {groups.map((group) => (
+            <Group key={group.insight.id} group={group} highlighted={element} />
+          ))}
+        </div>
       )}
     </div>
   );

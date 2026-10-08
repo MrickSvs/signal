@@ -558,3 +558,16 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Tableau** sur quatre colonnes : rang, insight (titre entier, puis R, I, C, E cliquables, puis alignement, tendance, badges), RICE et robustesse, MoSCoW. La formule passe en info-bulle de l'en-tête. Le MoSCoW n'affiche plus « Should → Should » : la valeur seule, suivie de « reco » tant que le PO n'a pas tranché, barrée puis remplacée quand il a choisi autre chose.
   - **Couleurs communes** (`components/signal/tones.ts`) : bleu pour le PO (à valider, override, MoSCoW choisi), vert Signal pour ce que Signal estime (paramètre estimé, émergent), ambre pour un risque (rang fragile, contexte modifié, capacité), le reste neutre. « Hors stratégie » passe en texte appuyé ; « sensible » devient neutre. S'applique aussi aux popovers de valeurs de tous les écrans (`MetricWithSource`).
 - **Conséquences** : un override se lit désormais en bleu partout (il était en ambre). La re-classification animée est inchangée.
+
+## ADR-040 — Écran Backlog : un élément par ligne, le contenu à la demande, le statut en tête
+
+- **Date** : 2026-10-07
+- **Statut** : acceptée
+- **Contexte** : avec six éléments rédigés, la page faisait près de 9 000 px (environ 11 écrans à 1 280 × 800) : chaque élément déroulait story, Gherkin, estimation détaillée et avis du juge, et ses actions n'apparaissaient qu'en bas. L'en-tête de chaque insight était un bloc de texte ambre de six lignes. « Brouillon » était gris alors que c'est ce qui attend le PO, et le vert servait au type Story, au badge Epic, au juge « prêt » et au filtre actif. Le lien `/backlog?statut=brouillon` du Digest était ignoré.
+- **Décision** :
+  - **Élément replié** : type, ID, statut, juge, points et titre, actions juste dessous ; le contenu complet se déplie au clic. Un élément ciblé par `?element=` s'ouvre déplié.
+  - **Onglets par statut** : Tous, À valider (brouillons), Validés, Dans Notion (`statut=brouillon|valide|envoye`), en plus du filtre par type.
+  - **En-tête d'insight** en une ligne (format, fourchette, confiance, date) ; les risques passent en pastilles (total hors fourchette, aucun ticket livré proche) ; les raisons dans « Pourquoi ce découpage », replié.
+  - **Couleurs** (ADR-039) : un brouillon s'affiche « À valider » en bleu, le juge « prêt » en vert Signal et « à revoir » en ambre ; types (Story, Bug, Tâche) et Epic neutres, l'icône les distingue, sur tous les écrans.
+  - Le texte d'introduction disparaît.
+- **Conséquences** : la page passe à ~1 350 px pour les six éléments. Le contenu d'un élément n'est plus lisible sans un clic : la validation reste possible depuis la ligne, l'avis du juge et ses points à vérifier se lisent en dépliant.

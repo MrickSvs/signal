@@ -748,7 +748,7 @@ Couleurs communes à tous les écrans : bleu pour ce que le PO décide ou a déc
 
 ### 12.6 Backlog
 
-Par insight : l'epic s'il y en a une, puis ses éléments, chacun avec un badge de type (Story, Bug, Tâche) et le format qui lui correspond (§9). Critères Gherkin rendus lisiblement, points avec justification (composants touchés, tickets analogues), fourchette de l'insight, preuves, badge qualité du juge, statut. Actions : Modifier ou changer de type (brouillons uniquement ; un élément envoyé se modifie dans Notion), **Visualiser** (stories uniquement, §13), **Valider et envoyer** (validation humaine), Réessayer l'envoi, Ouvrir dans Notion (élément envoyé), Synchroniser Notion (bonus, §11.3).
+Onglets par statut (Tous, **À valider**, Validés, Dans Notion) et filtre par type (Story, Bug, Tâche). Par insight : son format et sa fourchette en une ligne, les risques en évidence (total hors fourchette, aucun ticket livré proche), « Pourquoi ce découpage » dépliable ; l'epic s'il y en a une, puis ses éléments. Chaque élément tient en une ligne (type, ID, statut, badge qualité du juge, points, titre) avec ses actions juste dessous, et se déplie sur son contenu au format de son type (§9) : critères Gherkin rendus lisiblement, estimation avec composants touchés et tickets analogues, fourchette de l'insight, preuves, avis du juge. Actions : Modifier ou changer de type (brouillons uniquement ; un élément envoyé se modifie dans Notion), **Visualiser** (stories uniquement, §13), **Valider et envoyer** (validation humaine), Réessayer l'envoi, Ouvrir dans Notion (élément envoyé), Synchroniser Notion (bonus, §11.3). Un lien vers un élément (`?element=`) l'ouvre déplié (ADR-040).
 
 ### 12.7 Évals
 

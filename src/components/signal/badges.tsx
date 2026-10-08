@@ -125,11 +125,11 @@ const KIND_ICONS: Record<Enums["backlog_kind"], LucideIcon> = {
   tache: CheckSquare,
 };
 
+// Neutral: the icon tells the kind apart; color is kept for meaning (tones.ts, ADR-039).
 const KIND_STYLES: Record<Enums["backlog_kind"], string> = {
-  story:
-    "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200",
-  bug: "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200",
-  tache: "border-border bg-muted text-foreground",
+  story: "border-border bg-background text-foreground",
+  bug: "border-border bg-background text-foreground",
+  tache: "border-border bg-background text-foreground",
 };
 
 export function BacklogKindBadge({ kind }: { kind: Enums["backlog_kind"] }) {
