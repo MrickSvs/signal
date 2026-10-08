@@ -325,3 +325,20 @@ Ma recommandation avant l'évaluation : S11, S12, S13 et S14 (ce sont des correc
 ## 13. Suivi (complété en fin de session)
 
 _En attente de validation._
+
+**Mise à jour du 8 octobre 2026, après les commits `f9c4a61` à `23b19cc` (Haiku 5.5 comme modèle de comparaison du triage, écran Évals) :**
+
+- **E1 est réglé** : EVALS.md affiche le triage mesuré avec Sonnet (90,3 % ✅, F1 0,911 ✅). On le retire des lots et de la liste 8.2.
+- **Q2 reste valable**, et devient plus visible : le rôle `triage` désigne maintenant Haiku 5.5, alors que le pipeline trie avec Sonnet.
+- **Q1 reste valable** : `src/app/evals/page.tsx` a été réécrite et ne déclare toujours pas `dynamic`.
+- **À ajouter** :
+  - le tableau des modèles de CLAUDE.md indique encore `claude-haiku-4-5-20251001` ;
+  - l'éval « Triage : cas limites E1 à E8 » date du 6 octobre et a été mesurée avec l'ancien Haiku, à relancer sur Sonnet (coût à annoncer) ;
+  - ARCHITECTURE.md indique toujours « triage · Haiku » (§9, point 2).
+- **Numéros de ligne** : ceux de cette note sont périmés pour les fichiers d'evals et de `src/lib/llm`. Retrouver les endroits par nom de fonction ou de constante.
+- **Mise en œuvre** : par lots, chacun sur une branche partie de `main` à jour.
+  - **Lot A (sans risque)** : S1 à S4, S6 à S8, S11, S14, S17, F11.
+  - **Lot B (documentation)** : §11.
+  - **Lot C (interface)** : S12, S13, S18, S20.
+  - **Plus tard, ou avec une éval** : S5, S15, S16, S19. S10 est écarté.
+- **A1 est à relire** : le prompt système cite bien « estimation » dans sa liste `load_skill`. Seule « rédaction » contredit la description de l'outil.
