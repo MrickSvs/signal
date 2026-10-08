@@ -591,3 +591,15 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - Grille de prix revérifiée : lecture du cache de Sonnet 5.5 à 0,10 $ (0,05 × l'entrée), et non 0,20 $. L'éval à un seul modèle affiche aussi la latence.
 - **Alternatives écartées** : Haiku 5.5 pour le run complet et Sonnet pour l'incrémental (deux modèles de triage pour un gain de ~1,60 € par run) ; un effort par défaut sur le rôle `triage` (aucun usage dans le pipeline).
 - **Conséquences** : à fort volume (des milliers de retours par jour), Haiku 5.5 en effort moyen serait le bon choix (cibles atteintes, 14 fois moins cher) ; à remesurer sur un échantillon plus large avant de basculer.
+
+## ADR-042 — Écran Évals : regroupé par question, chaque mesure expliquée en clair
+
+- **Date** : 2026-10-08
+- **Statut** : acceptée ; complète l'ADR-030
+- **Contexte** : dix cartes à plat, des métriques sans définition (macro-F1, κ, τ de Kendall, leave-one-out) et des panneaux de détail en bas de page : un lecteur qui ne connaît pas le projet ne savait ni ce qu'une éval vérifie, ni comment lire son chiffre. Le comparatif marquait aussi « en production » le modèle du rôle `triage` (Haiku) au lieu de celui du pipeline (Sonnet).
+- **Décision** :
+  - **Une question en tête de page** (« Est-ce que Signal fait bien son travail ? ») et une phrase sur la façon de lire : bonne réponse connue, cible fixée à l'avance, chiffre souligné qui ouvre sa preuve.
+  - **Quatre groupes dans l'ordre du pipeline**, chacun avec sa question : comprendre les retours (triage, cas limites, comparatif), regrouper et prioriser (détection, estimation, stabilité), agir sans déraper (garde-fous, choix d'outil), rédiger le backlog (calibration du juge, backlog). Les panneaux de détail rejoignent leur groupe ; une section « En production » finit la page (journal du PO, coût d'un run).
+  - **Chaque carte dit en une phrase ce qu'elle mesure** (`EVALS[].measures`) ; les métriques jargonneuses portent une définition courte (`METRIC_HELP`), sous le chiffre et dans le détail. Le statut est écrit à côté de son point de couleur.
+  - Le modèle « dans le pipeline » vient de `PIPELINE_TRIAGE_MODEL`, dans le comparatif comme dans le coût par nœud.
+- **Conséquences** : textes dans le catalogue (`src/lib/evals/catalog.ts`), partagé avec `docs/EVALS.md` ; aucun calcul déplacé.

@@ -5,7 +5,6 @@ import type { ModelComparisonRow } from "@/lib/evals/dashboard";
 import type { ProductionMetric } from "@/lib/evals/production";
 import type { Metric } from "@/lib/evals/types";
 import { formatCost, formatDateTime, formatNumber, formatPercent } from "@/lib/format";
-import { MODELS } from "@/lib/llm/models";
 import { cn } from "@/lib/utils";
 import type { FullRunCost } from "@/server/queries/evals";
 import { MetricsTable } from "./eval-card";
@@ -48,13 +47,15 @@ export function ModelComparison({
   feedbackCount,
   measuredAt,
   sampleSize,
+  productionModel,
 }: {
   rows: ModelComparisonRow[] | null;
   feedbackCount: number;
   measuredAt: string | null;
   sampleSize: number | null;
+  /** The model the pipeline triages with (PIPELINE_TRIAGE_MODEL). */
+  productionModel: string;
 }) {
-  const inProduction = MODELS.triage.toLowerCase();
   return (
     <Panel
       title="Triage : Haiku ou Sonnet"
@@ -85,8 +86,10 @@ export function ModelComparison({
                 <td className="py-2 pr-3">
                   <span className="flex flex-wrap items-center gap-1.5">
                     <ModelBadge model={row.model} />
-                    {inProduction.includes(row.model) && (
-                      <span className="text-[13px] text-muted-foreground">en production</span>
+                    {row.model === productionModel && (
+                      <span className="rounded-sm bg-signal/10 px-1.5 py-0.5 text-[12px] font-medium text-signal">
+                        dans le pipeline
+                      </span>
                     )}
                   </span>
                 </td>
@@ -113,9 +116,10 @@ export function ModelComparison({
           </tbody>
         </table>
       )}
-      <p className="text-[13px] text-muted-foreground">
+      <p className="text-[13px] leading-relaxed text-muted-foreground">
         Cibles du triage : exactitude ≥ 90 %, macro-F1 ≥ 0,85. Latence mesurée avec 8 appels en
-        parallèle.
+        parallèle. Le pipeline garde Sonnet pour son domaine plus juste, dont dépend le regroupement
+        (ADR-041) ; Haiku, bien moins cher, deviendrait le bon choix à fort volume.
       </p>
     </Panel>
   );
@@ -126,7 +130,7 @@ export function EdgeCases({ cases }: { cases: Metric[] | null }) {
   return (
     <Panel
       title="Cas limites du triage"
-      subtitle="Réussi quand au moins 75 % de ses retours le passent"
+      subtitle="Les situations piégeuses, une par une · réussie quand au moins 75 % de ses retours le sont"
     >
       {!cases ? (
         <NotMeasured command="pnpm eval:triage --edge" />
@@ -178,7 +182,10 @@ export function JudgeCalibration({
   const kappa = metrics?.find((m) => m.key === "verdict_kappa");
   const calibrated = within?.met === true && kappa?.met === true;
   return (
-    <Panel title="Calibration du juge" subtitle="Opus face aux 15 éléments annotés par le PO">
+    <Panel
+      title="Calibration du juge"
+      subtitle="Opus note le backlog ; on vérifie d'abord qu'il note comme le PO, sur 15 éléments annotés à la main"
+    >
       {!metrics ? (
         <NotMeasured command="pnpm eval:judge-calibration" />
       ) : (
@@ -279,8 +286,8 @@ function Share({
 export function ProductionPanel({ metric }: { metric: ProductionMetric }) {
   return (
     <Panel
-      title="Utilité en production"
-      subtitle="Calculée depuis le journal des décisions du PO, au-delà des evals"
+      title="Ce que le PO garde des propositions de Signal"
+      subtitle="Calculé depuis le journal de ses décisions réelles, pas sur un jeu de test"
     >
       <dl className="grid grid-cols-3 gap-3">
         <Share
@@ -321,7 +328,6 @@ export function ProductionPanel({ metric }: { metric: ProductionMetric }) {
 }
 
 const NODE_LABELS: Record<string, string> = {
-  triage: "Triage (Haiku)",
   embed: "Vectorisation (Voyage)",
   cluster: "Regroupement et titres",
   estimate: "Estimation",
@@ -330,7 +336,14 @@ const NODE_LABELS: Record<string, string> = {
 };
 
 /** SPEC §15: the cost of the latest full pipeline run, split by node. */
-export function PipelineCost({ run }: { run: FullRunCost | null }) {
+export function PipelineCost({
+  run,
+  triageModel,
+}: {
+  run: FullRunCost | null;
+  /** Shown next to the triage node (« Sonnet »). */
+  triageModel: string;
+}) {
   if (!run) {
     return (
       <Panel title="Coût d'un run complet du pipeline">
@@ -345,7 +358,7 @@ export function PipelineCost({ run }: { run: FullRunCost | null }) {
   return (
     <Panel
       title="Coût d'un run complet du pipeline"
-      subtitle={`Dernier run complet : ${formatDateTime(run.startedAt)}`}
+      subtitle={`Tous les retours traités d'un coup (triage, regroupement, scores, digest) · dernier run : ${formatDateTime(run.startedAt)}`}
     >
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <span className="text-2xl font-semibold tabular-nums">{formatCost(run.costEur)}</span>
@@ -379,7 +392,9 @@ export function PipelineCost({ run }: { run: FullRunCost | null }) {
         <ul className="flex flex-col gap-1.5">
           {nodes.map(([node, eur]) => (
             <li key={node} className="grid grid-cols-[14rem_1fr_auto] items-center gap-3 text-sm">
-              <span>{NODE_LABELS[node] ?? node}</span>
+              <span>
+                {node === "triage" ? `Triage (${triageModel})` : (NODE_LABELS[node] ?? node)}
+              </span>
               <span aria-hidden className="h-2 rounded-full bg-muted">
                 <span
                   className="block h-2 rounded-full bg-signal"

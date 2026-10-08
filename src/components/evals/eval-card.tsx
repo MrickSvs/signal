@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import type { EvalCard as EvalCardData, EvalStatus, TrendPoint } from "@/lib/evals/dashboard";
+import { METRIC_HELP } from "@/lib/evals/catalog";
 import type { Metric } from "@/lib/evals/types";
 import { formatCost, formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,14 @@ export const STATUS_LABELS: Record<EvalStatus, string> = {
   vert: "Toutes les cibles atteintes",
   orange: "Cibles en partie atteintes",
   rouge: "Aucune cible atteinte",
+  aucun: "Sans cible",
+};
+
+/** One or two words next to the dot of a card. */
+const STATUS_SHORT: Record<EvalStatus, string> = {
+  vert: "Cibles atteintes",
+  orange: "En partie",
+  rouge: "Cibles manquées",
   aucun: "Sans cible",
 };
 
@@ -62,7 +71,12 @@ export function MetricsTable({ metrics, notes = [] }: { metrics: Metric[]; notes
         <tbody>
           {metrics.map((m) => (
             <tr key={m.key} className="border-b last:border-0 align-top">
-              <td className="py-1 pr-2">{m.label}</td>
+              <td className="py-1 pr-2">
+                {m.label}
+                {METRIC_HELP[m.key] && (
+                  <span className="block text-muted-foreground">{METRIC_HELP[m.key]}</span>
+                )}
+              </td>
               <td className="py-1 pr-2 font-medium whitespace-nowrap tabular-nums">{m.display}</td>
               <td className="py-1 pr-2 whitespace-nowrap text-muted-foreground">
                 {m.target ?? "—"}
@@ -154,7 +168,8 @@ export function EvalCard({ card }: { card: EvalCardData }) {
     return (
       <article className="flex flex-col gap-2 rounded-lg border border-dashed p-4">
         <h3 className="font-medium">{card.title}</h3>
-        <p className="text-muted-foreground">Pas encore mesuré.</p>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">{card.measures}</p>
+        <p className="font-medium text-muted-foreground">Pas encore mesuré.</p>
         <code className="w-fit rounded bg-muted px-1.5 py-0.5 text-[13px]">{card.command}</code>
       </article>
     );
@@ -167,9 +182,15 @@ export function EvalCard({ card }: { card: EvalCardData }) {
         STATUS_BORDERS[latest.status],
       )}
     >
-      <header className="flex items-start justify-between gap-2">
-        <h3 className="font-medium">{card.title}</h3>
-        <StatusDot status={latest.status} className="mt-1.5" />
+      <header className="flex flex-col gap-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-medium">{card.title}</h3>
+          <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-muted-foreground">
+            {STATUS_SHORT[latest.status]}
+            <StatusDot status={latest.status} />
+          </span>
+        </div>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">{card.measures}</p>
       </header>
 
       {headline && (
@@ -187,6 +208,11 @@ export function EvalCard({ card }: { card: EvalCardData }) {
               <span className="text-muted-foreground">cible {headline.target}</span>
             )}
           </span>
+          {METRIC_HELP[headline.key] && (
+            <span className="text-[12px] leading-snug text-muted-foreground">
+              {METRIC_HELP[headline.key]}
+            </span>
+          )}
         </div>
       )}
 
@@ -196,8 +222,8 @@ export function EvalCard({ card }: { card: EvalCardData }) {
         </p>
       )}
 
-      <p className="text-[13px] leading-relaxed text-muted-foreground">
-        <span className="font-medium text-foreground">Jeu :</span> {latest.dataset}
+      <p className="text-[12px] leading-relaxed text-muted-foreground">
+        <span className="font-medium">Mesuré sur :</span> {latest.dataset}
       </p>
 
       <Trend points={card.trend} />
@@ -211,7 +237,7 @@ export function EvalCard({ card }: { card: EvalCardData }) {
         {latest.gitSha && (
           <>
             <span>·</span>
-            <span title="Commit mesuré" className="font-mono">
+            <span title="Version du code mesurée (commit)" className="font-mono">
               {latest.gitSha}
             </span>
           </>

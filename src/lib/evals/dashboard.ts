@@ -31,6 +31,8 @@ export type EvalCard = {
   name: EvalName;
   title: string;
   command: string;
+  /** What the eval checks, in plain words (catalog). */
+  measures: string;
   /** null: never measured (or only failed runs). */
   latest: {
     runId: string;
