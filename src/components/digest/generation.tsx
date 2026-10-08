@@ -569,10 +569,6 @@ export function FirstDigest() {
                 <Radio aria-hidden />
                 Générer le premier digest
               </Button>
-              <p className="text-[13px] text-muted-foreground">
-                Une vingtaine de secondes et quelques centimes. Ensuite, il s&apos;écrit chaque
-                nuit.
-              </p>
             </motion.div>
           ) : (
             <motion.div
