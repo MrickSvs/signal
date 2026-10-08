@@ -282,9 +282,9 @@ describe("estimateInsight", () => {
     const rerun = await estimateInsight(db, "I-07", {}, d);
     expect(rerun.cached).toBe(false);
     expect(d.invoke).toHaveBeenCalledTimes(2);
-    expect((await loadCachedInsightEstimates(db, [insight()])).get("I-07")).toEqual(
-      expect.not.objectContaining({ stale: true }),
-    );
+    const after = (await loadCachedInsightEstimates(db, [insight()])).get("I-07");
+    expect(after).toMatchObject({ id: rerun.id, cached: true });
+    expect(after).not.toHaveProperty("stale");
   });
 
   it("prefers an estimate of the current statement over a newer stale one", async () => {
