@@ -207,7 +207,7 @@ export function BacklogItemCard({
               ) : (
                 <span
                   className="text-[13px] text-muted-foreground"
-                  title="NOTION_TOKEN et NOTION_DS_BACKLOG manquent (pnpm notion:setup)."
+                  title="Il est validé ; tu pourras l'envoyer dans Notion une fois Notion branché."
                 >
                   Prêt à partir : Notion n&apos;est pas branché.
                 </span>
