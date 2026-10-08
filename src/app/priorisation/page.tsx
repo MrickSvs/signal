@@ -5,7 +5,7 @@ import { CapacityGauge } from "@/components/prioritization/capacity-gauge";
 import { DecisionJournal } from "@/components/prioritization/decision-journal";
 import { RankingTable } from "@/components/prioritization/ranking-table";
 import { RecommendationsPanel } from "@/components/prioritization/recommendations-panel";
-import { EmptyState } from "@/components/shell/states";
+import { DevNote, EmptyState } from "@/components/shell/states";
 import { InsightChip } from "@/components/signal/chips";
 import { loadContextPack } from "@/lib/context";
 import { getDb } from "@/lib/db/client";
@@ -51,9 +51,10 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-6">
         <EmptyState icon={ListOrdered} title="Pas encore de classement">
           <p>
-            Le classement naît du scoring des insights classés. Lance le pipeline avec{" "}
-            <code className="font-mono">pnpm pipeline:run</code>, ou ajoute un sujet hors retours.
+            Le classement naît du scoring des insights. Il apparaîtra dès que Signal aura traité les
+            premiers retours ; en attendant, tu peux ajouter un sujet hors retours.
           </p>
+          <DevNote command="pnpm pipeline:run" />
         </EmptyState>
         <div className="flex justify-center">{toolbar}</div>
       </div>
@@ -100,7 +101,9 @@ export default async function PrioritizationPage({ searchParams }: PageProps<"/p
           {screen.pending.map((p) => (
             <span key={p.id} className="inline-flex items-center gap-1">
               <InsightChip id={p.id} />
-              <span>({p.missing === "jugement" ? "jugement manquant" : "estimation manquante"})</span>
+              <span>
+                ({p.missing === "jugement" ? "jugement manquant" : "estimation manquante"})
+              </span>
             </span>
           ))}
         </div>

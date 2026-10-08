@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Eye, Layers, SearchX } from "lucide-react";
-import { EmptyState } from "@/components/shell/states";
+import { DevNote, EmptyState } from "@/components/shell/states";
 import { InsightFilterBar } from "@/components/insights/filter-bar";
 import { InsightRow } from "@/components/insights/insight-card";
 import { ReviewPanel } from "@/components/insights/review-panel";
@@ -43,9 +43,10 @@ export default async function InsightsPage({ searchParams }: PageProps<"/insight
     return (
       <EmptyState icon={Layers} title="Pas encore d'insights">
         <p>
-          Les insights naissent du regroupement des retours par problème. Lance le pipeline avec{" "}
-          <code className="font-mono">pnpm pipeline:run</code>.
+          Les insights naissent du regroupement des retours par problème. Tu les verras ici dès que
+          Signal aura traité les premiers retours.
         </p>
+        <DevNote command="pnpm pipeline:run" />
       </EmptyState>
     );
   }

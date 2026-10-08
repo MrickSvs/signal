@@ -22,6 +22,15 @@ export function EmptyState({
   );
 }
 
+/** The command behind a state, for whoever runs the app: Léa reads the sentence above it. */
+export function DevNote({ command }: { command: string }) {
+  return (
+    <p className="mt-3 text-[12px] text-muted-foreground/80">
+      Note développeur : <code className="font-mono">{command}</code>
+    </p>
+  );
+}
+
 export function PageSkeleton() {
   return (
     <div className="flex flex-col gap-4 p-8" aria-busy="true" aria-label="Chargement">

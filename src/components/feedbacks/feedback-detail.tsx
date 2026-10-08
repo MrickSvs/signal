@@ -1,3 +1,4 @@
+import { DevNote } from "@/components/shell/states";
 import { InsightChip } from "@/components/signal/chips";
 import { ChannelBadge, HealthBadge, ModelBadge, PlanBadge, Pill } from "@/components/signal/badges";
 import { explainItem, type WhyOptions } from "@/lib/feedbacks/why";
@@ -191,10 +192,10 @@ export function FeedbackDetail({
               <ModelBadge model={analysis.model} />
             </div>
             <p className="leading-relaxed text-muted-foreground">
-              Le triage a échoué après les nouvelles tentatives (CL-11). Le retour sera repris par{" "}
-              <code className="font-mono text-[13px]">pnpm pipeline:triage --retry-failed</code> ou
-              le prochain run.
+              Signal n&apos;a pas pu analyser ce retour, même après plusieurs essais. Il le
+              reprendra au prochain traitement complet des retours.
             </p>
+            <DevNote command="pnpm pipeline:triage --retry-failed" />
             {analysis.error && (
               <p className="rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px] break-words">
                 {analysis.error}

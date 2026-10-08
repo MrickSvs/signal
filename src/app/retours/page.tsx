@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Inbox, SearchX } from "lucide-react";
-import { EmptyState } from "@/components/shell/states";
+import { DevNote, EmptyState } from "@/components/shell/states";
 import { AddFeedbackDialog } from "@/components/feedbacks/add-feedback-dialog";
 import { DetailSheet } from "@/components/feedbacks/detail-sheet";
 import { FeedbackDetail } from "@/components/feedbacks/feedback-detail";
@@ -79,9 +79,10 @@ export default async function FeedbacksPage({ searchParams }: PageProps<"/retour
         ) : (
           <EmptyState icon={Inbox} title="Pas encore de retours">
             <p>
-              Charge le jeu de données avec <code className="font-mono">pnpm db:seed</code> ou
-              ajoute un retour à la main.
+              Les retours des clients arrivent ici. Tu peux aussi en ajouter un à la main avec «
+              Ajouter un retour ».
             </p>
+            <DevNote command="pnpm db:seed" />
           </EmptyState>
         )
       ) : (

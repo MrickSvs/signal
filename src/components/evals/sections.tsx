@@ -1,4 +1,5 @@
 import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
+import { DevNote } from "@/components/shell/states";
 import { BacklogItemChip, InsightChip } from "@/components/signal/chips";
 import { ModelBadge } from "@/components/signal/badges";
 import type { ModelComparisonRow } from "@/lib/evals/dashboard";
@@ -33,10 +34,10 @@ export function Panel({
 }
 
 const NotMeasured = ({ command }: { command: string }) => (
-  <p className="text-muted-foreground">
-    Pas encore mesuré :{" "}
-    <code className="rounded bg-muted px-1.5 py-0.5 text-[13px]">{command}</code>
-  </p>
+  <div>
+    <p className="text-muted-foreground">Pas encore mesuré.</p>
+    <DevNote command={command} />
+  </div>
 );
 
 const show = (metric: Metric | null) => metric?.display.replace(/\s*\(.*\)$/, "") ?? "—";
