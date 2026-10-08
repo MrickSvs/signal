@@ -38,13 +38,51 @@ describe("scenarioAnchor", () => {
 
 describe("computeShifts", () => {
   it("moves the scenario by whole days and the activity by the exact elapsed time", () => {
+    // Oct 3 at 19:00 Paris to Oct 20 at 11:00 Paris: 17 calendar days (16 whole 24-hour spans).
     const shifts = computeShifts(
       { scenario_now: "2026-10-03T17:00:00Z", taken_at: "2026-10-06T23:00:00Z" },
       new Date("2026-10-20T09:00:00Z"),
     );
-    expect(shifts.scenarioMs).toBe(16 * DAY);
+    expect(shifts.scenarioMs).toBe(17 * DAY);
     expect(shifts.activityMs).toBe(13 * DAY + 10 * 60 * 60 * 1000);
     expect(shifts.nowMs).toBe(Date.parse("2026-10-20T09:00:00Z"));
+  });
+
+  it("counts calendar days in Paris: a late-evening seed shown the next morning moves one day", () => {
+    // Seeded at 23:31 Paris (CEST), demo at 10:00 Paris the next day: 10.5 hours, one calendar day.
+    const shifts = computeShifts(
+      { scenario_now: "2026-10-06T21:31:00Z", taken_at: "2026-10-06T22:00:00Z" },
+      new Date("2026-10-07T08:00:00Z"),
+    );
+    expect(shifts.scenarioMs).toBe(DAY);
+  });
+
+  it("stays on the seed day when the demo is the same Paris day", () => {
+    const shifts = computeShifts(
+      { scenario_now: "2026-10-06T07:00:00Z", taken_at: "2026-10-06T07:30:00Z" },
+      new Date("2026-10-06T21:59:00Z"),
+    );
+    expect(shifts.scenarioMs).toBe(0);
+  });
+
+  it("keeps whole days across the switch to winter time", () => {
+    // 23:31 Paris on Oct 24 (CEST) to 10:00 Paris on Oct 26 (CET): two calendar days.
+    const shifts = computeShifts(
+      { scenario_now: "2026-10-24T21:31:00Z", taken_at: "2026-10-24T22:00:00Z" },
+      new Date("2026-10-26T09:00:00Z"),
+    );
+    expect(shifts.scenarioMs).toBe(2 * DAY);
+  });
+
+  it("never moves a scenario timestamp past now", () => {
+    // The seed day's 18:00 feedback, shown at 10:00 the next morning, is held at now.
+    const now = new Date("2026-10-07T08:00:00Z");
+    const shifts = computeShifts(
+      { scenario_now: "2026-10-06T21:31:00Z", taken_at: "2026-10-06T22:00:00Z" },
+      now,
+    );
+    const row = shiftRow("feedbacks", { id: "R-001", received_at: "2026-10-06T16:00:00Z" }, shifts);
+    expect(row.received_at).toBe(now.toISOString());
   });
 });
 

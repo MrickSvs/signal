@@ -2,6 +2,8 @@
 // is left out (rehearsal backlog), and how dates are moved so the demo always looks fresh.
 // Pure functions: the scripts demo-snapshot.ts and demo-reset.ts do the I/O.
 
+import { calendarDaysBetween } from "@/lib/format";
+
 export type Row = Record<string, unknown>;
 
 /** Restore order (foreign keys first). Customers are upserted, never deleted. */
@@ -119,15 +121,16 @@ export function scenarioAnchor(feedbacks: Row[]): string | null {
  * scenario). */
 export type Shifts = { scenarioMs: number; activityMs: number; nowMs: number };
 
-/** Scenario dates move by whole days, rounded down so that a date of the scenario never lands in
- * the future; activity dates move by the exact time elapsed since the snapshot, so the preparation
- * stays in the past, in its order, just before the demo. */
+/** Scenario dates move by whole calendar days in Paris, so that the seed day becomes today whatever
+ * the hour of the seed and of the demo (a late-evening seed shown the next morning is one day ahead,
+ * not zero); a scenario timestamp that would land after now is held at now (`shiftValue`). Activity
+ * dates move by the exact time elapsed since the snapshot, so the preparation stays in the past, in
+ * its order, just before the demo. */
 export function computeShifts(
   meta: Pick<SnapshotMeta, "taken_at" | "scenario_now">,
   now: Date,
 ): Shifts {
-  const scenarioMs =
-    Math.floor((now.getTime() - new Date(meta.scenario_now).getTime()) / DAY_MS) * DAY_MS;
+  const scenarioMs = calendarDaysBetween(meta.scenario_now, now) * DAY_MS;
   return {
     scenarioMs,
     activityMs: now.getTime() - new Date(meta.taken_at).getTime(),
