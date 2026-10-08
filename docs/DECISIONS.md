@@ -603,3 +603,15 @@ Gabarit ADR : copier le bloc ci-dessous pour chaque décision.
   - **Chaque carte dit en une phrase ce qu'elle mesure** (`EVALS[].measures`) ; les métriques jargonneuses portent une définition courte (`METRIC_HELP`), sous le chiffre et dans le détail. Le statut est écrit à côté de son point de couleur.
   - Le modèle « dans le pipeline » vient de `PIPELINE_TRIAGE_MODEL`, dans le comparatif comme dans le coût par nœud.
 - **Conséquences** : textes dans le catalogue (`src/lib/evals/catalog.ts`), partagé avec `docs/EVALS.md` ; aucun calcul déplacé.
+
+## ADR-043 — « Régénérer » réécrit le digest affiché sur sa période
+
+- **Date** : 2026-10-08
+- **Statut** : acceptée ; précise SPEC §12.2, remplace le point « Régénérer » de l'ADR-016 et sa première conséquence
+- **Contexte** : « Régénérer » ouvrait une nouvelle période, comme `pnpm digest`. La visite de l'écran ayant avancé `last_seen_at`, le digest régénéré ne couvrait que les secondes écoulées depuis : nouveaux retours et mouvements vides, et le digest que Léa lisait disparaissait.
+- **Décision** :
+  - **Même période** : le digest régénéré garde le début du digest affiché (le dernier par `period_end`) et finit maintenant. Un premier digest régénéré reste un premier digest (tout est nouveau). Sans digest, le bouton écrit le premier. Option `samePeriod` de `runDigest` et `generateDigest`, posée par la seule server action ; le cron et `pnpm digest` ouvrent toujours une nouvelle période.
+  - **Stockage : une nouvelle ligne** avec le même début, pas un remplacement. Les écritures restent des insertions, et les réponses de Léa aux recommandations (« fait », « écartée », ADR-036) restent attachées au digest et à la position qu'elles visaient : réécrire la ligne les ferait pointer vers d'autres recommandations. L'écran lit le dernier digest par `period_end` : c'est la nouvelle ligne.
+  - **Période suivante** inchangée : depuis la fin du dernier digest (la régénération), ou depuis la dernière visite si elle est plus ancienne.
+- **Alternatives écartées** : mettre à jour la ligne existante (perd la version lue et désaligne les réponses aux recommandations) ; repartir de la visite précédente (stockage en plus dans `po_state`, sans gain).
+- **Conséquences** : l'historique garde chaque version régénérée. Une recommandation traitée sur la version précédente n'est pas barrée sur la nouvelle, mais elle n'est pas reproposée sans fait nouveau (ADR-036).

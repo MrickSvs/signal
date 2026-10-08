@@ -192,7 +192,10 @@ export async function loadDigestFacts(
     weighting: Weighting;
     now: Date;
     clock: Date;
-    /** The agent's briefing (SPEC §10.8): changes since this date instead of the digest period. */
+    /**
+     * Changes since this date instead of the digest period (null: everything is new): the agent's
+     * briefing (SPEC §10.8), or a regenerated digest kept on its period (ADR-043).
+     */
     since?: string | null;
     /** Size of `ranking.top` (5 in the digest, 10 in the briefing). */
     topSize?: number;
@@ -735,6 +738,21 @@ export function renderDigest(facts: DigestFacts, writing: DigestWriting): string
 // Run
 // ---------------------------------------------------------------------------
 
+/**
+ * Start of the digest the Digest screen shows (the latest one), which « Régénérer » rewrites over
+ * the same period (ADR-043): null for a first digest (everything was new), undefined without any.
+ */
+export async function currentDigestStart(db: Db): Promise<string | null | undefined> {
+  const { data, error } = await db
+    .from("digests")
+    .select("content")
+    .order("period_end", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Digest : lecture du digest courant (${error.message})`);
+  return (data?.content as { facts?: DigestFacts } | undefined)?.facts?.period.start;
+}
+
 export type DigestResult = {
   id: string;
   facts: DigestFacts;
@@ -752,6 +770,12 @@ export async function runDigest(
     skill: string;
     now: Date;
     clock?: Date;
+    /**
+     * « Régénérer » (ADR-043): rewrites the current digest over its period (same start, end now)
+     * instead of opening a new one. The new row becomes the current digest; the next one starts
+     * at its end.
+     */
+    samePeriod?: boolean;
     runCost?: RunCost;
     /** Injected in tests: the API is never called there. */
     invoke?: typeof invokeStructured;
@@ -762,6 +786,7 @@ export async function runDigest(
     weighting: options.weighting,
     now: options.now,
     clock,
+    since: options.samePeriod ? await currentDigestStart(db) : undefined,
   });
   const handled = await loadHandledRecommendations(db, clock);
   const invoke = options.invoke ?? invokeStructured;

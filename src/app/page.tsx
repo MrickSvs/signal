@@ -35,7 +35,7 @@ export default async function DigestPage() {
           demande.
         </p>
         <div className="flex justify-center">
-          <RegenerateButton label="Générer le digest" />
+          <RegenerateButton first />
         </div>
       </EmptyState>
     );

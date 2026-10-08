@@ -18,11 +18,14 @@ export type DigestContext = IncrementalContext & {
   skills: IncrementalContext["skills"] & { digest: string };
 };
 
-/** Writes a digest as its own run (kind « digest »): cost, duration and trace in pipeline_runs. */
+/**
+ * Writes a digest as its own run (kind « digest »): cost, duration and trace in pipeline_runs.
+ * A new period by default (cron, `pnpm digest`); `samePeriod` rewrites the current one (ADR-043).
+ */
 export async function generateDigest(
   db: Db,
   ctx: DigestContext,
-  clock?: Date,
+  options: { clock?: Date; samePeriod?: boolean } = {},
 ): Promise<DigestResult & { runId: string; costEur: number }> {
   const started = Date.now();
   const { data: run, error } = await db
@@ -46,7 +49,8 @@ export async function generateDigest(
           weighting: ctx.pack.weighting,
           skill: ctx.skills.digest,
           now: ctx.now,
-          clock,
+          clock: options.clock,
+          samePeriod: options.samePeriod,
           runCost,
           invoke: ctx.invoke,
         });

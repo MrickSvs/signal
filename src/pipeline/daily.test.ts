@@ -1,7 +1,7 @@
 import { MemorySaver } from "@langchain/langgraph";
 import { describe, expect, it } from "vitest";
 import { loadContextPack } from "@/lib/context";
-import { runDailyDigest } from "./daily";
+import { generateDigest, runDailyDigest } from "./daily";
 import {
   fakeEmbed,
   fakeEstimateFn,
@@ -64,5 +64,22 @@ describe("runDailyDigest", () => {
     expect(result.postponed).toHaveLength(12);
     expect(result.digest.writer).toBe("modele");
     expect(tables.pipeline_runs.at(-1)).toMatchObject({ kind: "digest", status: "termine" });
+  });
+
+  it("opens a new period after a regenerated digest, which kept the current one (ADR-043)", async () => {
+    const { tables, ctx } = await seeded();
+    const db = memoryDb(tables);
+    const period = (i: number) =>
+      (tables.digests.at(i)!.content as { facts: { period: { start: string | null } } }).facts
+        .period;
+    const regenerated = await generateDigest(db, ctx, { samePeriod: true });
+    expect(regenerated.facts).toMatchObject({ first: true, period: { start: null } });
+    tables.po_state[0].last_seen_at = new Date().toISOString(); // the page reloads
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
+    const daily = await runDailyDigest(db, ctx, { budgetMs: 60_000 });
+    expect(tables.digests.at(-1)!.id).toBe(daily.digest.id);
+    expect(period(-1).start).toBe(tables.digests.at(-2)!.period_end);
+    expect(tables.digests.at(-2)!.id).toBe(regenerated.id);
   });
 });

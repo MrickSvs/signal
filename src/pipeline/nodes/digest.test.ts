@@ -347,6 +347,60 @@ describe("runDigest (in-memory database, simulated model)", () => {
     expect(tables.digests).toHaveLength(2);
   });
 
+  it("regenerated (ADR-043): keeps the current digest's start, ends now; the next one starts at its end", async () => {
+    const { tables } = await scenario();
+    const db = memoryDb(tables);
+    const t0 = Date.now();
+    const at = (ms: number) => new Date(t0 + ms);
+    const digest = (ms: number, samePeriod?: boolean) =>
+      runDigest(db, {
+        runId: null,
+        weighting,
+        skill: SKILLS.digest,
+        now: NOW,
+        clock: at(ms),
+        samePeriod,
+        invoke: fakeInvoke(),
+      });
+    const visit = (ms: number) => (tables.po_state[0].last_seen_at = at(ms).toISOString());
+    const original = (tables.digests[0].content as { facts: DigestFacts }).facts;
+
+    // The first digest regenerated twice stays a first digest: everything is still new.
+    visit(500);
+    for (const ms of [1000, 2000]) {
+      const again = await digest(ms, true);
+      expect(again.facts.period).toEqual({ start: null, end: at(ms).toISOString() });
+      expect({ ...again.facts, period: null }).toEqual({ ...original, period: null });
+    }
+
+    // The cron opens a new period from the regenerated digest's end.
+    visit(2500);
+    const next = await digest(3000);
+    expect(next.facts.period).toEqual({
+      start: at(2000).toISOString(),
+      end: at(3000).toISOString(),
+    });
+
+    // Regenerated twice after a visit: the period still starts where that digest started.
+    visit(3500);
+    for (const ms of [4000, 5000]) {
+      const again = await digest(ms, true);
+      expect(again.facts.first).toBe(false);
+      expect(again.facts.period).toEqual({
+        start: at(2000).toISOString(),
+        end: at(ms).toISOString(),
+      });
+      expect(tables.po_state[0].last_digest_id).toBe(again.id);
+    }
+    expect(tables.digests.at(-1)).toMatchObject({
+      period_start: at(2000).toISOString(),
+      period_end: at(5000).toISOString(),
+    });
+    // The page reloads after a regeneration (a visit): the next digest starts at its end.
+    visit(5500);
+    expect((await digest(6000)).facts.period.start).toBe(at(5000).toISOString());
+  });
+
   it("does not propose again a recommendation Léa answered, unless it cites a new id (ADR-036)", async () => {
     const { tables } = await scenario();
     const previous = (tables.digests[0].content as { writing: DigestWriting }).writing;

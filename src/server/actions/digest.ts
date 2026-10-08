@@ -17,8 +17,9 @@ export type RegenerateResult =
   | { ok: false; message: string };
 
 /**
- * « Régénérer » (SPEC §12.2, on demand): writes a new digest from the facts as they are now, like
- * `pnpm digest`. One reasoning call (~0.03 €); feedbacks not processed yet are left to the cron.
+ * « Régénérer » (SPEC §12.2, on demand): rewrites the digest shown over the same period (same
+ * start, end now) from the facts as they are now (ADR-043); without a digest, writes the first
+ * one. One reasoning call (~0.03 €); feedbacks not processed yet are left to the cron.
  */
 export async function regenerateDigest(): Promise<RegenerateResult> {
   after(flushTracing);
@@ -32,16 +33,20 @@ export async function regenerateDigest(): Promise<RegenerateResult> {
       loadSkill("digest"),
     ]);
     const result = await withPipelineLock(() =>
-      generateDigest(getDb(), {
-        pack,
-        skills: {
-          triage: triage.content,
-          riceScoring: riceScoring.content,
-          moscow: moscow.content,
-          digest: digest.content,
+      generateDigest(
+        getDb(),
+        {
+          pack,
+          skills: {
+            triage: triage.content,
+            riceScoring: riceScoring.content,
+            moscow: moscow.content,
+            digest: digest.content,
+          },
+          now: getDemoNow(),
         },
-        now: getDemoNow(),
-      }),
+        { samePeriod: true },
+      ),
     );
     revalidatePath("/");
     return {
