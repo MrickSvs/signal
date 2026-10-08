@@ -5,20 +5,20 @@
 Signal est l'agent IA du Product Owner de Jalon, un SaaS fictif de gestion de projet pour agences. Il traite les retours clients, les regroupe par problème, aide à prioriser (RICE + MoSCoW) et rédige le backlog (stories, bugs, tâches techniques). **Signal recommande, le PO décide.**
 
 - `SPEC.md` : quoi et pourquoi. Source de vérité fonctionnelle. Les « § » y renvoient.
-- `PLAN.md` : l'ordre de construction, étape par étape.
+- `docs/process/PLAN.md` : l'ordre de construction, étape par étape.
 - Ce fichier : comment travailler dans ce repo.
 
 ## Comment on travaille
 
-1. **Une session = une étape de PLAN.md.** Ne commence jamais l'étape suivante sans qu'on te le demande.
+1. **Une session = une étape de `docs/process/PLAN.md`.** Ne commence jamais l'étape suivante sans qu'on te le demande.
 2. **Au début :** lance `date` et note l'heure ; lis l'étape, les sections de SPEC citées et les cas limites `CL-xx` listés pour l'étape (SPEC §19) ; annonce ton plan en 5 lignes maximum ; signale toute contradiction entre SPEC, PLAN et le code existant **avant** de coder.
 3. **Doc à jour d'abord.** Pour les librairies qui évoluent vite (LangChain v1, LangGraph.js, Langfuse JS, API Notion, Voyage, Supabase, Next.js, SDK MCP), consulte la documentation actuelle avant d'écrire du code. Ne te fie pas à ta mémoire. Note dans `docs/DECISIONS.md` toute version ou tout choix qui touche l'architecture. Pour Next.js, lis aussi `AGENTS.md` s'il a été généré à la création du projet (il renvoie aux docs embarquées dans `node_modules/next/dist/docs/`).
 4. **À la fin :**
    - `pnpm lint && pnpm typecheck && pnpm test` passent ;
    - chaque cas limite de l'étape est traité et testé, ou explicitement signalé comme non traité ;
    - coche dans ta réponse ce que tu as pu vérifier dans la checklist « Test » de l'étape, et liste ce qui reste à vérifier à la main ;
-   - ajoute une ligne à `docs/BUILD_LOG.md` : date, étape, début, fin, durée, coût LLM éventuel, choix faits, dettes ;
-   - commit avec le message indiqué dans PLAN.md.
+   - ajoute une ligne à `docs/process/BUILD_LOG.md` : date, étape, début, fin, durée, coût LLM éventuel, choix faits, dettes ;
+   - commit avec le message indiqué dans `docs/process/PLAN.md`.
 5. **Choix non couvert par SPEC :** prends l'option la plus simple qui respecte les principes P1 à P7 (SPEC §2) et écris-le dans ta réponse finale.
 6. **Ne sur-construis pas.** Pas d'abstraction « pour plus tard », pas de fonctionnalité hors étape.
 
@@ -72,7 +72,7 @@ Les identifiants ne vivent que dans `src/lib/llm/models.ts`.
 - **Outils de l'agent :** quinze outils, chacun conforme à son contrat de SPEC §10.5 (quand l'utiliser, pas quand, entrées, sortie compacte avec ID, effet). Pas de nouvel outil qui recouvre un outil existant : étendre le contrat plutôt que dupliquer.
 - **UI :** sobre, desktop d'abord ; tout chiffre et tout ID sont cliquables vers leur preuve (SPEC §12.1) ; états vides, de chargement et d'erreur systématiques.
 - **Tests :** à côté du code (`*.test.ts`). Tout code déterministe est testé.
-- **Commits :** Conventional Commits, message fourni par PLAN.md.
+- **Commits :** Conventional Commits, message fourni par `docs/process/PLAN.md`.
 
 ## Commandes
 

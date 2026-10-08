@@ -1,7 +1,7 @@
 # SPEC — Signal, l'agent du Product Owner de Jalon
 
 > Document de référence produit et technique : il dit **quoi** construire et **pourquoi**.
-> L'ordre de construction est dans `PLAN.md`, les règles de travail dans `CLAUDE.md`.
+> L'ordre de construction est dans `docs/process/PLAN.md`, les règles de travail dans `CLAUDE.md`.
 > Version 1.0 — octobre 2026. Les éléments marqués _(à valider)_ seront revus pendant le build.
 
 ---
@@ -302,7 +302,7 @@ Le PO modifie une skill (par exemple le gabarit de story) : le pipeline et l'age
 
 ```
 .
-├── CLAUDE.md · PLAN.md · SPEC.md · README.md
+├── CLAUDE.md · SPEC.md · README.md
 ├── src/
 │   ├── app/                     # pages + routes API
 │   ├── agent/                   # agent unique, outils, prompt système
@@ -316,7 +316,7 @@ Le PO modifie une skill (par exemple le gabarit de story) : le pipeline et l'age
 ├── data/                        # scénario, clients, retours, tickets de référence, démo
 ├── evals/                       # ground-truth/, holdout/, human-labels/, reports/ (données uniquement)
 ├── supabase/migrations/
-└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT, BUILD_LOG
+└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT ; process/ : PLAN, BUILD_LOG
 ```
 
 ---
@@ -903,7 +903,7 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 
 ## 19. Registre des cas limites
 
-Chaque cas a un traitement, une étape du plan qui l'implémente et une façon de le vérifier. Les étapes de `PLAN.md` citent les cas qui les concernent.
+Chaque cas a un traitement, une étape du plan qui l'implémente et une façon de le vérifier. Les étapes de `docs/process/PLAN.md` citent les cas qui les concernent.
 
 ### Données d'entrée
 

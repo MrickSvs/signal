@@ -2,5 +2,5 @@
 node_modules
 pnpm-lock.yaml
 SPEC.md
-PLAN.md
+docs/process/PLAN.md
 CLAUDE.md

@@ -10,7 +10,7 @@
 1. Ouvre Claude Code à la racine du repo et colle le **Prompt** de l'étape.
 2. Claude Code note l'heure de début, lit les sections de SPEC citées et les cas limites de l'étape, annonce son plan en quelques lignes, puis code.
 3. Tu passes la checklist **Test**. Tout est vert → commit avec le message indiqué.
-4. Claude Code ajoute une ligne à `docs/BUILD_LOG.md` (début, fin, durée, coûts LLM, choix faits).
+4. Claude Code ajoute une ligne à `docs/process/BUILD_LOG.md` (début, fin, durée, coûts LLM, choix faits).
 5. Nouvelle session pour l'étape suivante. On n'enchaîne jamais deux étapes dans la même session.
 
 Légende : `[Cœur]` indispensable à la démo · `[Signature]` moment fort de la démo · `[Bonus]` si le temps le permet.
@@ -86,7 +86,7 @@ Crée un projet Next.js unique à la racine du repo :
 - Next.js (dernière version stable, App Router, TypeScript strict, dossier src/, alias @/*), Tailwind, shadcn/ui initialisé (thème neutre).
 - Outillage : ESLint, Prettier, Vitest (tests en src/**/*.test.ts et scripts/**/*.test.ts), tsx pour les scripts.
 - Dossiers avec un README d'une ligne : context/jalon/skills, data, evals/ground-truth, evals/holdout, evals/human-labels, evals/reports, docs, scripts, supabase/migrations.
-- docs/BUILD_LOG.md (tableau : date | étape | début | fin | durée | coût LLM | notes) ; docs/DECISIONS.md (gabarit ADR vide).
+- docs/process/BUILD_LOG.md (tableau : date | étape | début | fin | durée | coût LLM | notes) ; docs/DECISIONS.md (gabarit ADR vide).
 - .env.example avec toutes les variables de SPEC §16 (valeurs vides, une ligne de commentaire chacune). .gitignore (env, .next, node_modules).
 - src/proxy.ts (Next.js 16 : ancien middleware) : Basic Auth sur SITE_PASSWORD (désactivée si la variable est vide). Exclusions : /api/cron/*, /api/mcp (protégées par leur propre secret).
 - Page d'accueil temporaire « Signal — en construction ».
@@ -1229,14 +1229,14 @@ Consulte la doc actuelle du SDK MCP TypeScript et de l'adaptateur MCP pour Next.
 **Prompt** :
 
 ```
-Étape 8.2 — Documentation. Lis SPEC en entier, docs/DECISIONS.md et docs/BUILD_LOG.md.
+Étape 8.2 — Documentation. Lis SPEC en entier, docs/DECISIONS.md et docs/process/BUILD_LOG.md.
 
 1. README.md : pitch en 5 lignes, captures (fournies dans docs/img/), lien vers la démo déployée (mot de passe communiqué à part), installation pas à pas (comptes, variables, migrations, seed, pipeline, Notion), commandes, structure, tests et evals, limites connues (SPEC §17.2 et cas limites non traités s'il y en a).
 2. docs/ARCHITECTURE.md : schéma global (Mermaid), graphe du pipeline, agent et outils, flux de validation humaine, envoi vers Notion, routage des modèles et coûts mesurés, budgets de latence mesurés.
 3. docs/DECISIONS.md : ADR 001 à 012 de SPEC §6.5, format court (contexte, décision, alternatives écartées, conséquences).
 4. docs/EVALS.md : régénéré.
 5. docs/DEMO_SCRIPT.md : trame minute par minute (SPEC §18), phrases clés, clics exacts, et un plan B pour chaque moment (SPEC §18, « Plans B »).
-6. scripts/build-time.ts : agrège docs/BUILD_LOG.md → temps total par phase.
+6. scripts/build-time.ts : agrège docs/process/BUILD_LOG.md → temps total par phase.
 ```
 
 **Test** :
