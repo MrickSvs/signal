@@ -13,22 +13,17 @@ Signal recommande, le PO décide : toute décision et toute écriture externe pa
 
 ## Captures
 
-Les captures vont dans `docs/img/`, qui n'existe pas encore. Emplacements attendus, sur la base de démo (`pnpm demo:reset`, puis `pnpm digest`), à 1 280 × 800 :
+Sur la base de démo (`pnpm demo:reset`), à 1 280 × 800.
 
-| Fichier | Écran | État |
-| --- | --- | --- |
-| `docs/img/01-digest.png` | Digest | Après le digest du matin : « À traiter » (trois recommandations) et « Ce qui bouge » (I-57 et I-56 émergents, comptes à risque) |
-| `docs/img/02-digest-generation.png` | Digest | Pendant « Régénérer ce digest » : le panneau des étapes (Période, Faits, Mémoire, Rédaction, Enregistré) |
-| `docs/img/03-insight-s1.png` | Détail de I-55 | Bande de chiffres clés et répartition sur quatre canaux |
-| `docs/img/04-insight-s3.png` | Détail de I-56 | « Ce qu'ils demandent / Ce dont ils ont besoin » |
-| `docs/img/05-priorisation-comptes.png` | Priorisation | Reach « Comptes » : I-54 (Gantt) 2e, I-59 (permissions) 8e, Must |
-| `docs/img/06-priorisation-mrr.png` | Priorisation | Reach « MRR » : I-59 3e, I-54 7e |
-| `docs/img/07-chat-trace.png` | Chat, onglet Trace | « Prépare les stories des permissions » : outils, skills, coût du tour |
-| `docs/img/08-carte-approbation.png` | Chat | Carte d'approbation d'un envoi dans Notion, avec l'aperçu des pages |
-| `docs/img/09-backlog.png` | Backlog | Epic de I-59 et une story dépliée (Gherkin, estimation, badge du juge) |
-| `docs/img/10-notion-kanban.png` | Notion | Vue Kanban de la base Backlog, colonne « Prêt » |
-| `docs/img/11-alerte-dossier.png` | En-tête, liste des alertes | Alerte churn de Studio Bastide (retour 2 de `data/demo/retours-a-coller.md`) et son dossier |
-| `docs/img/12-evals.png` | Évals | Les quatre groupes de cartes |
+| | |
+| --- | --- |
+| <img src="docs/img/01-digest.png" alt="Digest du matin" width="420"><br>**Digest du matin** · « À traiter » (trois recommandations avec leurs preuves), comptes à risque, 214 nouveaux retours. | <img src="docs/img/02-digest-generation.png" alt="Génération du digest en direct" width="420"><br>**Génération du digest en direct** · « Régénérer ce digest » : les vraies étapes et leurs chiffres pendant que Sonnet rédige (ADR-044). |
+| <img src="docs/img/03-insight-s1.png" alt="Détail d'un insight (I-55)" width="420"><br>**Détail d'un insight (I-55)** · Chiffres clés, ce qu'ils demandent face à ce dont ils ont besoin, répartition sur quatre canaux. | <img src="docs/img/04-insight-s3.png" alt="Le problème, pas la solution (I-56)" width="420"><br>**Le problème, pas la solution (I-56)** · Cinq demandes différentes, un seul besoin : c'est lui que Signal regroupe et score. |
+| <img src="docs/img/05-priorisation-comptes.png" alt="Priorisation, Reach en comptes" width="420"><br>**Priorisation, Reach en comptes** · I-54 (Gantt) 2e, I-59 (permissions) 8e mais Must par règle dure. | <img src="docs/img/06-priorisation-mrr.png" alt="Priorisation, Reach en MRR" width="420"><br>**Priorisation, Reach en MRR** · Le même classement pondéré par le revenu : I-59 monte en 3e, I-54 descend en 7e. |
+| <img src="docs/img/07-chat-trace.png" alt="Chat, onglet Trace" width="420"><br>**Chat, onglet Trace** · « Prépare les stories des permissions » : outils appelés, skills chargées, coût du tour. | <img src="docs/img/09-backlog.png" alt="Backlog" width="420"><br>**Backlog** · Epic de I-59, une story dépliée : règles de gestion, Gherkin avec cas limites, badge du juge. |
+| <img src="docs/img/11-alerte-dossier.png" alt="Alerte et dossier d'enquête" width="420"><br>**Alerte et dossier d'enquête** · Retour collé de Studio Bastide : alerte churn et dossier écrit en lecture seule, faits avec ID. | <img src="docs/img/12-evals.png" alt="Évals" width="420"><br>**Évals** · Est-ce que Signal fait bien son travail ? Chaque éval face à sa cible. |
+
+À compléter : `08-carte-approbation` (carte d'approbation d'un envoi dans Notion) et `10-notion-kanban` (vue Kanban de la base Backlog), qui demandent un envoi réel vers Notion.
 
 ## Ce qu'il y a dedans
 
@@ -96,7 +91,7 @@ pnpm demo:reset     # ~15 s, dates recalées sur aujourd'hui (jours du calendrie
 pnpm digest         # ~15 s, ~0,03 €
 ```
 
-Lancer `pnpm digest` avant d'ouvrir l'écran Digest : chaque visite de cet écran compte comme une visite de Léa, et le digest suivant ne couvre que ce qui s'est passé depuis.
+Le premier digest peut aussi s'écrire depuis l'écran Digest (« Générer le premier digest ») : une page sans digest ne compte pas comme une visite de Léa, donc il couvre tout le scénario.
 
 **Ou tout recalculer** : `pnpm pipeline:run` (mesuré le 7 octobre : 214 retours, 410 s, **2,52 €** ; `--resume <run_id>` reprend un run interrompu). Les insights naissent « à valider » : écran Insights, « Tout accepter » ou revue une à une.
 
@@ -207,7 +202,6 @@ Relevées dans [BUILD_LOG](docs/process/BUILD_LOG.md) et dans le suivi de la rev
 - `loadBriefingFacts` mélange deux horloges (scénario et heure réelle) si `DEMO_NOW` est défini ; `touchThread` et `answerAlert` datent en heure réelle.
 - La recherche de l'écran Retours est lexicale (`ilike`) ; seul l'agent cherche par le sens.
 - « Ajouter un retour » n'a pas de champ e-mail : le rattachement par domaine d'e-mail est impossible depuis l'écran, on choisit le compte à la main.
-- La page Digest vide enregistre la visite de Léa : un premier digest généré depuis cette page ne couvre que les secondes écoulées depuis l'ouverture. Contournement : `pnpm digest` avant toute visite (procédure de [DEMO_SCRIPT](docs/DEMO_SCRIPT.md)).
 - La description de l'outil `load_skill` cite encore « rédaction » parmi les tâches qui demandent une skill, contrairement au prompt système (SPEC §10.5 suit le prompt) : à aligner, puis à mesurer avec `eval:guardrails --tools`.
 - Latences au-dessus du budget de SPEC §15 : ajout d'un retour 15 à 25 s mesurés en local (budget 15 s, jamais remesuré depuis Vercel) ; rédaction du backlog ~34 s (30 s). Le premier token du chat (< 3 s) n'a pas été mesuré.
 - Écritures du pipeline non transactionnelles ; pas de transaction entre une décision et son désaccord ; une alerte enrichie garde son premier dossier.

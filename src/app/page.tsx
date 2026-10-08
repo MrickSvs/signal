@@ -25,11 +25,10 @@ export const dynamic = "force-dynamic";
 export default async function DigestPage() {
   const db = getDb();
   const digest = await getDigest(db);
-  // Every visit moves the start of the next digest's period (after the response is sent).
-  after(() => markSeen(db, new Date()).catch((error) => console.error(error)));
   const now = getDemoNow();
 
   // The same provider on both branches: a first generation flows into the digest it wrote.
+  // An empty page is not a visit: Léa has read nothing, so the first digest still covers everything.
   if (!digest) {
     return (
       <DigestGenerationProvider first>
@@ -37,6 +36,8 @@ export default async function DigestPage() {
       </DigestGenerationProvider>
     );
   }
+  // Every visit of a digest moves the start of the next one's period (after the response is sent).
+  after(() => markSeen(db, new Date()).catch((error) => console.error(error)));
 
   const { facts } = digest;
   const recommendations = digest.writing.recommandations;

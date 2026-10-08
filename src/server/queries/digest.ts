@@ -91,7 +91,7 @@ export async function getCustomersMrr(
   return new Map(data.map((c) => [c.id, Number(c.mrr_eur)]));
 }
 
-/** Each visit of the Digest screen moves the start of the next digest's period (SPEC §12.2). */
+/** Each visit of a digest on the Digest screen moves the start of the next digest's period (SPEC §12.2). */
 export async function markSeen(db: Db, at: Date): Promise<void> {
   const { error } = await db
     .from("po_state")

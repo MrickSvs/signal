@@ -322,7 +322,12 @@ function CountUp({ value }: { value: number }) {
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    // Frames stop in a background tab: the final figure lands anyway, never a figure frozen midway.
+    const settle = setTimeout(() => setShown(value), 700);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(settle);
+    };
   }, [value, reduce]);
   return <>{reduce ? value : shown}</>;
 }
@@ -473,7 +478,7 @@ export function GenerationPanel() {
               style={{ background: "radial-gradient(circle, var(--signal-soft), transparent 70%)" }}
             />
             <div className="relative flex gap-6 p-5">
-              <SignalEmitter active={running} size={76} className="mt-0.5 hidden @2xl:block" />
+              <SignalEmitter active={running} size={76} className="mt-0.5 hidden @xl:block" />
               <div className="flex min-w-0 flex-1 flex-col gap-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex flex-col gap-0.5">
