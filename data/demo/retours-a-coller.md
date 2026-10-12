@@ -1,10 +1,10 @@
-# Retours à coller pendant la démo
+# Retours de test
 
 Écran **Retours** → **Ajouter un retour**. Choisis le canal et le compte indiqués, colle le texte, valide. Chaque retour traverse le pipeline incrémental en direct (triage, rattachement au compte, vectorisation, rattachement à un insight ou file « à surveiller », re-score, alertes).
 
-L'évaluateur choisit dans la liste, ou écrit le sien. Les numéros d'insights ne sont pas cités : ils dépendent du snapshot. Le sujet du scénario (S1 à S7) est donné pour le retrouver.
+Dix cas difficiles, chacun avec le comportement attendu : à coller tels quels, ou à adapter. Les numéros d'insights ne sont pas cités : ils dépendent du snapshot. Le sujet du scénario (S1 à S7) est donné pour le retrouver.
 
-Ces textes ont été écrits pour la démo : ils ne viennent ni du jeu de développement ni du jeu réservé aux evals. Un `pnpm demo:reset` les efface.
+Ces textes ont été écrits à part : ils ne viennent ni du jeu de développement ni du jeu réservé aux evals. Un `pnpm demo:reset` les efface.
 
 ---
 

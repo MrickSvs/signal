@@ -8,7 +8,7 @@ Il chiffre chaque sujet (RICE calculé en code, valeur business, MoSCoW sous rè
 Il rédige le backlog (stories, bugs, tâches techniques, critères Gherkin, points estimés par analogie) et l'envoie dans le kanban Notion de l'équipe.
 Signal recommande, le PO décide : toute décision et toute écriture externe passent par sa validation, et chaque chiffre ouvre sa preuve.
 
-- **Démo en ligne** : [signal-coral-two.vercel.app](https://signal-coral-two.vercel.app), protégée par mot de passe (communiqué à part ; n'importe quel nom d'utilisateur). **Pas besoin d'installer quoi que ce soit** : la [visite guidée](#visite-guidée-5-minutes) ci-dessous suffit.
+- **Démo en ligne** : [signal-coral-two.vercel.app](https://signal-coral-two.vercel.app), protégée par mot de passe (communiqué à part ; n'importe quel nom d'utilisateur). **Pas besoin d'installer quoi que ce soit** : la [visite libre](#visite-libre-5-minutes) ci-dessous suffit.
 - **Pour aller plus loin** : [SPEC.md](SPEC.md) (quoi et pourquoi), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DECISIONS.md](docs/DECISIONS.md) (44 décisions d'architecture), [docs/EVALS.md](docs/EVALS.md). La méthode de construction est dans [docs/process/](docs/process/) (plan, journal, revue).
 
 ## En deux minutes
@@ -53,16 +53,24 @@ Et : **829 tests**, sans aucun appel réseau ; un run complet sur 214 retours en
 
 **Les livrables** : le code (ce dépôt) · la démonstration ([démo en ligne](https://signal-coral-two.vercel.app), [captures](#captures)) · la documentation ([architecture](docs/ARCHITECTURE.md), [décisions](docs/DECISIONS.md), [evals](docs/EVALS.md)) · les tests ([tests et evals](#tests-et-evals)).
 
-## Visite guidée (5 minutes)
+## Visite libre (5 minutes)
 
-Sur la [démo en ligne](https://signal-coral-two.vercel.app). Les étapes 1 à 5 ne font qu'afficher ; l'étape 6 appelle Claude.
+Sur la [démo en ligne](https://signal-coral-two.vercel.app). Chaque écran répond à une question de PO ; tout chiffre et tout ID s'ouvrent sur leur preuve.
 
-1. **[Digest](https://signal-coral-two.vercel.app/)** : ce que Léa voit le matin. Les faits (tendances, comptes à risque, classement) sont calculés en code ; Signal ne rédige que les recommandations, et chaque ID cité est vérifié. Survolez un ID : la preuve s'ouvre.
-2. **[Retours → R-013](https://signal-coral-two.vercel.app/retours?retour=R-013)** : un e-mail découpé en deux sujets. Sur le second, la demande exprimée (« un export Excel ») face au problème sous-jacent (« rendre compte de l'avancement à mon client »). Puis **[le filtre « Injection »](https://signal-coral-two.vercel.app/retours?injection=1)** : un ticket qui contient une consigne adressée à l'IA est signalé, et classé normalement.
-3. **[Insights → I-56](https://signal-coral-two.vercel.app/insights/I-56)** : cinq solutions demandées (export Excel, lien de partage, PDF, tableau de bord, e-mail récapitulatif), un seul besoin.
-4. **[Priorisation, en nombre de comptes](https://signal-coral-two.vercel.app/priorisation?reach=comptes)** : le Gantt (I-54) est 2e, mais hors stratégie et fragile ; les permissions (I-59) sont 8e, mais Must (engagement contractuel, comptes Enterprise à risque). Cliquez sur R, I, C ou E pour voir le calcul ou les preuves. Puis **[en MRR](https://signal-coral-two.vercel.app/priorisation?reach=mrr)** : les permissions montent 3e, le Gantt tombe 7e.
-5. **[Évals](https://signal-coral-two.vercel.app/evals)** et **[Contexte](https://signal-coral-two.vercel.app/contexte)** : ce qui est mesuré et ce qui rate ; le pack de contexte (stratégie, engagements, pondérations) et les 9 skills que Signal lit.
-6. **Le chat** (appelle Claude, quelques centimes par message) : « Passe I-62 en Must : Forgeval signe si on a la facturation. » Signal objecte une fois, faits et simulation à l'appui, puis vous laisse trancher. Ou : « Prépare les stories des permissions » (environ 35 s), puis l'onglet **Trace** pour voir les outils et les skills utilisés. Rien ne part dans Notion sans validation explicite.
+1. **Digest** : qu'est-ce qui a changé depuis ma dernière visite ? Les faits sont calculés en code ; Signal ne rédige que les recommandations, et chaque ID cité est vérifié.
+2. **Retours** : qu'ont écrit les clients ? Ouvrez un retour : la demande exprimée face au problème sous-jacent, et pourquoi il a été classé ainsi.
+3. **Insights** : de quoi parlent-ils, et est-ce que ça monte ? Un insight regroupe des retours par problème, quels que soient les mots et le canal.
+4. **Priorisation** : dans quel ordre, et pourquoi ? Comparez le classement en nombre de comptes et en MRR ; ouvrez R, I, C ou E pour voir le calcul ou les preuves.
+5. **Évals** et **Contexte** : ce qui est mesuré, ce qui rate, et ce que Signal sait de Jalon (stratégie, engagements, pondérations, skills).
+
+Ces écrans ne font qu'afficher.
+
+### Tester avec vos propres données
+
+Ceci appelle Claude (quelques centimes par action) ; rien ne part dans Notion sans validation explicite.
+
+- **Ajouter un retour** (écran Retours) : collez un texte de votre invention, en français ou en anglais, et regardez où Signal le range, avec quel signal. Pour aller plus vite, [dix retours de test](data/demo/retours-a-coller.md) couvrent les cas difficiles, chacun avec le comportement attendu : un compte Enterprise qui menace de partir, un retour en anglais, deux sujets dans le même message, une fonctionnalité qui existe déjà, une tentative d'injection, un sujet inédit, un prospect, de l'ironie, une réponse automatique.
+- **Le chat** : demandez pourquoi un sujet est classé là, qui il concerne, ce qui change en MRR ; ou prenez une décision contraire aux chiffres, et voyez Signal la contester avant de vous laisser trancher. L'onglet **Trace** montre les outils et les skills utilisés, et le coût du tour.
 
 ## Captures
 
@@ -73,7 +81,7 @@ Sur la base de démo (`pnpm demo:reset`), à 1 280 × 800.
 | <img src="docs/img/01-digest.png" alt="Digest du matin" width="420"><br>**Digest du matin** · « À traiter » (trois recommandations avec leurs preuves), comptes à risque, 214 nouveaux retours. | <img src="docs/img/02-digest-generation.png" alt="Génération du digest en direct" width="420"><br>**Génération du digest en direct** · « Régénérer ce digest » : les vraies étapes et leurs chiffres pendant que Sonnet rédige (ADR-044). |
 | <img src="docs/img/03-insight-s1.png" alt="Détail d'un insight (I-55)" width="420"><br>**Détail d'un insight (I-55)** · Chiffres clés, ce qu'ils demandent face à ce dont ils ont besoin, répartition sur quatre canaux. | <img src="docs/img/04-insight-s3.png" alt="Le problème, pas la solution (I-56)" width="420"><br>**Le problème, pas la solution (I-56)** · Cinq demandes différentes, un seul besoin : c'est lui que Signal regroupe et score. |
 | <img src="docs/img/05-priorisation-comptes.png" alt="Priorisation, Reach en comptes" width="420"><br>**Priorisation, Reach en comptes** · I-54 (Gantt) 2e, I-59 (permissions) 8e mais Must par règle dure. | <img src="docs/img/06-priorisation-mrr.png" alt="Priorisation, Reach en MRR" width="420"><br>**Priorisation, Reach en MRR** · Le même classement pondéré par le revenu : I-59 monte en 3e, I-54 descend en 7e. |
-| <img src="docs/img/07-chat-trace.png" alt="Chat, onglet Trace" width="420"><br>**Chat, onglet Trace** · « Prépare les stories des permissions » : outils appelés, skills chargées, coût du tour. | <img src="docs/img/09-backlog.png" alt="Backlog" width="420"><br>**Backlog** · Epic de I-59, une story dépliée : règles de gestion, Gherkin avec cas limites, badge du juge. |
+| <img src="docs/img/07-chat-trace.png" alt="Chat, onglet Trace" width="420"><br>**Chat, onglet Trace** · Rédaction des stories d'un insight : outils appelés, skills chargées, coût du tour. | <img src="docs/img/09-backlog.png" alt="Backlog" width="420"><br>**Backlog** · Epic de I-59, une story dépliée : règles de gestion, Gherkin avec cas limites, badge du juge. |
 | <img src="docs/img/11-alerte-dossier.png" alt="Alerte et dossier d'enquête" width="420"><br>**Alerte et dossier d'enquête** · Retour collé de Studio Bastide : alerte churn et dossier écrit en lecture seule, faits avec ID. | <img src="docs/img/12-evals.png" alt="Évals" width="420"><br>**Évals** · Est-ce que Signal fait bien son travail ? Chaque éval face à sa cible. |
 
 ## Ce qu'il y a dedans
