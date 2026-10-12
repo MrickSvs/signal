@@ -175,7 +175,6 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
           {!insight.ranked && live && <span>· signal faible, hors classement</span>}
         </p>
         <h2 className="text-xl leading-snug font-semibold tracking-tight">{insight.title}</h2>
-        <p className="max-w-3xl leading-relaxed">{insight.problem_statement}</p>
         {insight.status === "fusionne" && insight.merged_into && (
           <p className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-muted/50 px-4 py-2.5">
             Fusionné dans <InsightChip id={insight.merged_into} /> : ses retours y sont désormais
@@ -277,11 +276,8 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
             <h4 className="text-[13px] font-medium text-muted-foreground uppercase">
               Ce dont ils ont besoin
             </h4>
-            <p className="text-base font-medium">{insight.title}</p>
-            <p className="text-muted-foreground">
-              Le problème commun à {formatNumber(insight.feedbacks.length)} retours de{" "}
-              {formatNumber(insight.accounts_count)} comptes : c&apos;est lui que Signal regroupe et
-              score, pas les solutions demandées.
+            <p className="text-base leading-relaxed font-medium">
+              {insight.problem_statement ?? insight.title}
             </p>
           </div>
         </div>
