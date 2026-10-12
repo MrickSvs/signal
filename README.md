@@ -57,13 +57,13 @@ Et : **829 tests**, sans aucun appel réseau ; un run complet sur 214 retours en
 
 Sur la [démo en ligne](https://signal-coral-two.vercel.app). Chaque écran répond à une question de PO ; tout chiffre et tout ID s'ouvrent sur leur preuve.
 
-1. **Digest** : qu'est-ce qui a changé depuis ma dernière visite ? Les faits sont calculés en code ; Signal ne rédige que les recommandations, et chaque ID cité est vérifié.
+1. **Digest** : qu'est-ce qui a changé depuis ma dernière visite ? S'il n'est pas encore écrit, cliquez sur « Générer le premier digest » (environ 20 s) : l'écran montre les vraies étapes, les faits calculés en code, puis la rédaction par Signal, puis la vérification de chaque ID cité.
 2. **Retours** : qu'ont écrit les clients ? Ouvrez un retour : la demande exprimée face au problème sous-jacent, et pourquoi il a été classé ainsi.
 3. **Insights** : de quoi parlent-ils, et est-ce que ça monte ? Un insight regroupe des retours par problème, quels que soient les mots et le canal.
 4. **Priorisation** : dans quel ordre, et pourquoi ? Comparez le classement en nombre de comptes et en MRR ; ouvrez R, I, C ou E pour voir le calcul ou les preuves.
 5. **Évals** et **Contexte** : ce qui est mesuré, ce qui rate, et ce que Signal sait de Jalon (stratégie, engagements, pondérations, skills).
 
-Ces écrans ne font qu'afficher.
+Ces écrans ne font qu'afficher, sauf la génération du digest, qui appelle Claude (quelques centimes).
 
 ### Tester avec vos propres données
 
