@@ -8,8 +8,61 @@ Il chiffre chaque sujet (RICE calculé en code, valeur business, MoSCoW sous rè
 Il rédige le backlog (stories, bugs, tâches techniques, critères Gherkin, points estimés par analogie) et l'envoie dans le kanban Notion de l'équipe.
 Signal recommande, le PO décide : toute décision et toute écriture externe passent par sa validation, et chaque chiffre ouvre sa preuve.
 
-- **Démo déployée** : [signal-coral-two.vercel.app](https://signal-coral-two.vercel.app), protégée par mot de passe (communiqué à part ; n'importe quel nom d'utilisateur).
-- **Pour aller plus loin** : [SPEC.md](SPEC.md) (quoi et pourquoi), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DECISIONS.md](docs/DECISIONS.md) (44 ADR), [docs/EVALS.md](docs/EVALS.md). La méthode de construction est dans [docs/process/](docs/process/) (plan, journal, revue).
+- **Démo en ligne** : [signal-coral-two.vercel.app](https://signal-coral-two.vercel.app), protégée par mot de passe (communiqué à part ; n'importe quel nom d'utilisateur). **Pas besoin d'installer quoi que ce soit** : la [visite guidée](#visite-guidée-5-minutes) ci-dessous suffit.
+- **Pour aller plus loin** : [SPEC.md](SPEC.md) (quoi et pourquoi), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DECISIONS.md](docs/DECISIONS.md) (44 décisions d'architecture), [docs/EVALS.md](docs/EVALS.md). La méthode de construction est dans [docs/process/](docs/process/) (plan, journal, revue).
+
+## En deux minutes
+
+**Le problème.** Léa reçoit plus de 150 retours par mois, sur sept canaux : e-mails, tickets, commentaires in-app, NPS, notes des CSM et des sales, Slack. Personne ne lit tout ; c'est le plus bruyant qui gagne : trente comptes gratuits qui demandent un Gantt pèsent plus que trois comptes Enterprise sur le point de partir ; et transformer un problème en stories prend des heures.
+
+**La réponse.** Un copilote, pas un pilote automatique :
+
+1. **Comprendre** : chaque retour est trié et découpé en sujets ; Signal distingue la demande exprimée (« un export Excel ») du problème sous-jacent (« rendre compte de l'avancement à mon client »), et regroupe les retours par problème.
+2. **Décider** : chaque problème est chiffré en RICE, avec un Reach pondéré par le plan ou par le MRR, puis classé en MoSCoW sous des règles dures (engagements contractuels, risque de départ, stratégie). Signal objecte, preuves à l'appui, quand une décision les contredit.
+3. **Livrer** : Signal rédige le backlog au bon format, estime chaque élément par analogie avec les tickets déjà livrés, et l'envoie dans Notion après validation.
+
+**Le principe qui tient le tout** : le modèle lit, juge et rédige ; le code compte, calcule et vérifie ; Léa décide. Aucun score n'est produit par un LLM : le modèle ne fournit que l'Impact, avec ses preuves, et tout le reste est calculé en code.
+
+**Mesuré, pas supposé** ([docs/EVALS.md](docs/EVALS.md)) :
+
+| Ce qu'on mesure | Résultat | Cible |
+| --- | --- | --- |
+| Triage, sur un jeu réservé jamais utilisé pour régler les prompts | type juste 90,3 % · domaine (macro-F1) 0,91 · injections détectées 100 % | 90 % · 0,85 · 100 % |
+| Garde-fous de l'agent (injection, chiffres sourcés, ID existants, validation avant Notion…) | 6 / 6 | 6 / 6 |
+| Juge qualité du backlog (Opus), calibré à l'aveugle sur des annotations humaines | 86 % des notes à 1 point ou moins de l'humain · κ de Cohen 0,71 | 80 % · 0,60 |
+| Détection des sept problèmes cachés dans le jeu de données | 7 / 8 ❌ (réglée et mesurée sur le même jeu : chiffre optimiste) | 8 / 8 |
+| Estimation, en leave-one-out sur les tickets livrés | 70 % des points réels dans la fourchette ✅, mais 0,9 cran d'erreur contre 0,3 pour l'équipe ❌ | 70 % |
+
+Et : **829 tests**, sans aucun appel réseau ; un run complet sur 214 retours en 7 minutes pour **2,52 €** ; un tour de chat à environ 2 centimes.
+
+## Couverture du sujet
+
+| Attendu | Où dans Signal | Comment on le prouve |
+| --- | --- | --- |
+| **Traiter les retours** (e-mails, tickets, commentaires) | Pipeline : triage et découpage en sujets, rattachement au compte ; écran Retours ; ajout en direct | `eval:triage` sur un jeu réservé |
+| **Identifier patterns et tendances** | Regroupement par problème (vecteurs du problème extrait, seuil mesuré) ; tendance émergente ; alertes ; digest du matin | `eval:detection` |
+| **Extraire les demandes de fonctionnalités** | « Ce qu'ils demandent » face à « ce dont ils ont besoin » sur chaque insight | `eval:triage`, `eval:detection` |
+| **Scorer selon plusieurs critères** | RICE hybride : Reach pondéré (plan ou MRR), Impact jugé, Confidence calculée, Effort estimé ; alignement sur les OKRs ; robustesse du rang | tests à 100 % sur le calcul, `eval:stability` |
+| **Appliquer des frameworks** (MoSCoW, RICE) | RICE en code ; MoSCoW recommandé par le modèle, contrôlé par des règles dures ; capacité des Must ≤ 60 % ; règles dans des skills éditables | tests unitaires |
+| **Expliquer et justifier** | Chaque chiffre s'ouvre sur son calcul ou ses retours ; recommandations de Signal ; challenge dans le chat ; journal des décisions | `eval:guardrails` |
+| **Générer des user stories** | Backlog au format adapté : epic et stories, story seule, bugs, tâche technique, ou rien quand la fonctionnalité existe déjà | badge du juge calibré sur chaque élément |
+| **Proposer des critères d'acceptation** | Gherkin en français, avec au moins un cas limite ; règles de gestion | juge (critère « testabilité ») |
+| **Estimer la complexité** | Par analogie : carte d'architecture, tickets livrés les plus proches, biais de l'équipe corrigé en code | `eval:estimation` (leave-one-out) |
+
+**Au-delà du sujet** : digest du matin, alertes avec enquête préparée en lecture seule, validation humaine de toute écriture, envoi dans Notion, écran des évals, sujets hors retours (dette technique, pari stratégique).
+
+**Les livrables** : le code (ce dépôt) · la démonstration ([démo en ligne](https://signal-coral-two.vercel.app), [captures](#captures)) · la documentation ([architecture](docs/ARCHITECTURE.md), [décisions](docs/DECISIONS.md), [evals](docs/EVALS.md)) · les tests ([tests et evals](#tests-et-evals)).
+
+## Visite guidée (5 minutes)
+
+Sur la [démo en ligne](https://signal-coral-two.vercel.app). Les étapes 1 à 5 ne font qu'afficher ; l'étape 6 appelle Claude.
+
+1. **[Digest](https://signal-coral-two.vercel.app/)** : ce que Léa voit le matin. Les faits (tendances, comptes à risque, classement) sont calculés en code ; Signal ne rédige que les recommandations, et chaque ID cité est vérifié. Survolez un ID : la preuve s'ouvre.
+2. **[Retours → R-013](https://signal-coral-two.vercel.app/retours?retour=R-013)** : un e-mail découpé en deux sujets. Sur le second, la demande exprimée (« un export Excel ») face au problème sous-jacent (« rendre compte de l'avancement à mon client »). Puis **[le filtre « Injection »](https://signal-coral-two.vercel.app/retours?injection=1)** : un ticket qui contient une consigne adressée à l'IA est signalé, et classé normalement.
+3. **[Insights → I-56](https://signal-coral-two.vercel.app/insights/I-56)** : cinq solutions demandées (export Excel, lien de partage, PDF, tableau de bord, e-mail récapitulatif), un seul besoin.
+4. **[Priorisation, en nombre de comptes](https://signal-coral-two.vercel.app/priorisation?reach=comptes)** : le Gantt (I-54) est 2e, mais hors stratégie et fragile ; les permissions (I-59) sont 8e, mais Must (engagement contractuel, comptes Enterprise à risque). Cliquez sur R, I, C ou E pour voir le calcul ou les preuves. Puis **[en MRR](https://signal-coral-two.vercel.app/priorisation?reach=mrr)** : les permissions montent 3e, le Gantt tombe 7e.
+5. **[Évals](https://signal-coral-two.vercel.app/evals)** et **[Contexte](https://signal-coral-two.vercel.app/contexte)** : ce qui est mesuré et ce qui rate ; le pack de contexte (stratégie, engagements, pondérations) et les 9 skills que Signal lit.
+6. **Le chat** (appelle Claude, quelques centimes par message) : « Passe I-62 en Must : Forgeval signe si on a la facturation. » Signal objecte une fois, faits et simulation à l'appui, puis vous laisse trancher. Ou : « Prépare les stories des permissions » (environ 35 s), puis l'onglet **Trace** pour voir les outils et les skills utilisés. Rien ne part dans Notion sans validation explicite.
 
 ## Captures
 
@@ -23,8 +76,6 @@ Sur la base de démo (`pnpm demo:reset`), à 1 280 × 800.
 | <img src="docs/img/07-chat-trace.png" alt="Chat, onglet Trace" width="420"><br>**Chat, onglet Trace** · « Prépare les stories des permissions » : outils appelés, skills chargées, coût du tour. | <img src="docs/img/09-backlog.png" alt="Backlog" width="420"><br>**Backlog** · Epic de I-59, une story dépliée : règles de gestion, Gherkin avec cas limites, badge du juge. |
 | <img src="docs/img/11-alerte-dossier.png" alt="Alerte et dossier d'enquête" width="420"><br>**Alerte et dossier d'enquête** · Retour collé de Studio Bastide : alerte churn et dossier écrit en lecture seule, faits avec ID. | <img src="docs/img/12-evals.png" alt="Évals" width="420"><br>**Évals** · Est-ce que Signal fait bien son travail ? Chaque éval face à sa cible. |
 
-À compléter : `08-carte-approbation` (carte d'approbation d'un envoi dans Notion) et `10-notion-kanban` (vue Kanban de la base Backlog), qui demandent un envoi réel vers Notion.
-
 ## Ce qu'il y a dedans
 
 - **Un pipeline** (workflow LangGraph) : triage et découpage des retours en items (Sonnet), rattachement aux comptes, vecteurs Voyage, regroupement agglomératif sur le problème, appariement entre deux runs, étiquetage, estimation par analogie, score, alertes, digest. Run complet en CLI, mode incrémental par route API.
@@ -33,6 +84,40 @@ Sur la base de démo (`pnpm demo:reset`), à 1 280 × 800.
 - **Des evals** rejouables (triage sur un jeu réservé, détection des patterns, estimation en leave-one-out, stabilité, garde-fous, juge Opus calibré sur les annotations du PO).
 
 Détail : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Tests et evals
+
+- `pnpm lint && pnpm typecheck && pnpm test` : **829 tests dans 101 fichiers**, sans aucun appel réseau (modèles, Voyage, Notion et Supabase simulés). `pnpm test:coverage` impose 100 % de couverture sur `lib/scoring`, `lib/clustering`, `match.ts` et `mappers.ts`. La CI (GitHub Actions) lance lint, typecheck et couverture, sans aucun secret.
+- Les données d'évaluation (`evals/ground-truth/`, `evals/holdout/`) ne sont lisibles que par `scripts/evals/` : règle ESLint et test.
+- Evals : `pnpm eval:triage` (`--compare`, `--edge`, `--model sonnet`), `eval:detection`, `eval:estimation`, `eval:stability`, `eval:guardrails` (`--tools`), `eval:judge-calibration`, `eval:backlog`. Elles appellent les vrais modèles : chaque runner annonce son coût et exige `--yes` au-delà de 1 €. Résultats, dates et ce qui n'est pas mesuré : [docs/EVALS.md](docs/EVALS.md), et l'écran Évals.
+
+## Comment il a été construit
+
+Avec un agent de code (Claude Code), piloté comme une équipe :
+
+- **Une spec** ([SPEC.md](SPEC.md)) qui dit quoi et pourquoi, avec sept principes produit et un registre des cas limites ; **un plan** ([PLAN](docs/process/PLAN.md)) découpé en étapes, **une étape par session**.
+- **Des règles non négociables** ([CLAUDE.md](CLAUDE.md)) : les calculs sont en code ; tout appel de modèle passe par une seule couche ; la vérité terrain des evals est illisible depuis l'application ; on ne modifie jamais une cible ni un test pour faire passer une étape.
+- **Chaque session journalisée** ([BUILD_LOG](docs/process/BUILD_LOG.md) : durée, coût, choix, dettes) et **chaque choix d'architecture écrit** ([44 décisions](docs/DECISIONS.md)) ; une revue complète avant la démo ([REVIEW_NOTES](docs/process/REVIEW_NOTES.md)).
+
+Au total : **50 sessions, environ 21 heures**, et **14 €** d'appels aux modèles de l'application pendant le build (runs du pipeline, evals, essais). `pnpm tsx scripts/build-time.ts` refait ce décompte par phase depuis le journal.
+
+## Limites connues
+
+**Pour passer en production** : masquer les données personnelles avant les modèles (ici, tout est fictif) ; héberger les traitements dans l'UE ; de vrais connecteurs (Zendesk, Intercom, e-mail) ; un pack de contexte par produit et des droits d'accès ; une synchronisation retour avec Notion ; calibrer les hypothèses (facteurs d'extrapolation du Reach) sur de vraies données.
+
+**Échelle** : le classement relit tous les retours à chaque affichage (instantané à 214, linéaire au-delà : il faudrait des agrégats matérialisés) ; le regroupement agglomératif tient jusqu'à quelques milliers de retours ; à fort volume, le triage passerait sur Haiku 5.5, quatorze fois moins cher, après une mesure plus large ([ADR-041](docs/DECISIONS.md)).
+
+**Non construit** : le prototype visuel d'une story et l'exposition MCP, coupés pour tenir le périmètre ([ADR-031](docs/DECISIONS.md)) ; le retour du statut depuis Notion.
+
+**Ce qui reste fragile** :
+
+- **Evals partielles** : le choix d'outil de l'agent et la qualité agrégée du backlog ne sont pas mesurés ; l'estimation porte sur 10 tickets sur 40, la stabilité sur un seul rejugement ; les cas limites du triage ont été mesurés sur l'ancien modèle de triage.
+- **Latences au-dessus du budget** : ajout d'un retour en 15 à 25 s (budget 15 s), rédaction du backlog en ~34 s (budget 30 s).
+- **Validation humaine** : sur deux cartes d'approbation, le modèle a rédigé la raison du PO à sa place ; la consigne a été durcie, sans revérification en réel.
+- **Les contrôles** empêchent un ID inventé ou un chiffre sans source, pas une affirmation fausse : le texte du digest n'a pas encore d'éval dédiée.
+- **Le biais de l'équipe** est moyenné sur tous les composants touchés, ce qui dilue un biais fort (× 1,31 au lieu de × 1,65 pour les permissions).
+
+Le détail, cas limites non traités et dettes techniques compris : [BUILD_LOG](docs/process/BUILD_LOG.md), [REVIEW_NOTES](docs/process/REVIEW_NOTES.md) et SPEC §19.
 
 ## Installation
 
@@ -162,56 +247,3 @@ Le tableau complet, avec les options, est dans [CLAUDE.md](CLAUDE.md#commandes).
 ├── supabase/migrations/     # 8 migrations, en ajout seulement
 └── docs/                    # ARCHITECTURE, DECISIONS, EVALS, img/ ; process/ : PLAN, BUILD_LOG, REVIEW_NOTES
 ```
-
-## Tests et evals
-
-- `pnpm lint && pnpm typecheck && pnpm test` : **829 tests dans 101 fichiers**, sans aucun appel réseau (modèles, Voyage, Notion et Supabase simulés). `pnpm test:coverage` impose 100 % de couverture sur `lib/scoring`, `lib/clustering`, `match.ts` et `mappers.ts`. La CI (GitHub Actions) lance lint, typecheck et couverture, sans aucun secret.
-- Les données d'évaluation (`evals/ground-truth/`, `evals/holdout/`) ne sont lisibles que par `scripts/evals/` : règle ESLint et test.
-- Evals : `pnpm eval:triage` (`--compare`, `--edge`, `--model sonnet`), `eval:detection`, `eval:estimation`, `eval:stability`, `eval:guardrails` (`--tools`), `eval:judge-calibration`, `eval:backlog`. Elles appellent les vrais modèles : chaque runner annonce son coût et exige `--yes` au-delà de 1 €. Résultats, dates et ce qui n'est pas mesuré : [docs/EVALS.md](docs/EVALS.md), et l'écran Évals.
-
-## Limites connues
-
-### Pour passer en production (SPEC §17.2)
-
-Masquage des données personnelles avant les modèles et registre RGPD (ici tout est fictif) ; souveraineté (API hors UE) ; connecteurs réels (Zendesk, Intercom, Gmail) ; un pack de contexte par produit et des droits d'accès ; synchronisation retour avec l'outil de l'équipe (champs, conflits, pages archivées) ; d'autres sources que les retours (analytics, dette technique) ; recalibrage des recommandations sur les décisions du PO ; estimation affinée par la lecture du vrai code.
-
-**Échelle** (`REVIEW_NOTES` §12.6). Le classement (`computeStoredRanking`, appelé par l'écran Priorisation, `get_priority` et chaque override) relit à chaque appel tous les retours, texte brut compris, les items, les comptes, les analyses et les overrides : instantané à 214 retours, linéaire au-delà (à 10 000 retours, des dizaines de Mo par affichage). L'écran Insights et `query_customers` lisent aussi des tables entières. Il faudrait des agrégats matérialisés et des signaux stockés. Le clustering agglomératif convient jusqu'à quelques milliers d'items ; au-delà, un clustering incrémental.
-
-### Non construit
-
-- **Prototype** d'une story (SPEC §13) et l'outil `generate_prototype` : reportés (ADR-031). L'agent a 14 outils sur les 15 prévus.
-- **Exposition MCP** (SPEC §10.9) et page **`/status`** : coupées (ADR-031). La mise en pause de Supabase est évitée par le cron quotidien.
-- **Retour du statut Notion** (SPEC §11.3) : rien ne revient de Notion ; `list_backlog` rend `statut_notion: null`.
-
-### Cas limites non traités (SPEC §19)
-
-- Notion hors périmètre (ADR-026) : page archivée ou supprimée dans Notion (CL-37), page créée directement dans Notion (CL-38), points hors Fibonacci (CL-39).
-- Un sujet rejeté qui revient avec de nouveaux retours ne lève aucune alerte (CL-62).
-- Rédaction concurrente du même insight depuis le chat et l'écran : la rédaction insère hors du verrou, deux backlogs peuvent coexister (CL-65).
-- Une alerte ignorée puis un nouveau retour du même compte dans les 24 h créent une nouvelle alerte et une nouvelle enquête (CL-66, assumé).
-- Conversation de plus de 30 messages : le résumé réécrit l'historique ; testé en simulation seulement, à vérifier à la main sur Sonnet 5.5 (CL-30).
-
-### Dettes ouvertes
-
-Relevées dans [BUILD_LOG](docs/process/BUILD_LOG.md) et dans le suivi de la revue ([REVIEW_NOTES](docs/process/REVIEW_NOTES.md) §13) :
-
-- La carte d'approbation du chat ne signale pas les brouillons d'un insight qu'on rejette ou fusionne (l'écran Insights les nomme).
-- On peut valider, sans l'envoyer, un brouillon dont l'insight est rejeté (seul l'envoi est refusé).
-- Le remplacement d'un override de Reach saisi dans l'autre mode n'est pas journalisé.
-- La CLI `pnpm pipeline:cluster` écrit des fusions que le digest ne lit pas.
-- `loadBriefingFacts` mélange deux horloges (scénario et heure réelle) si `DEMO_NOW` est défini ; `touchThread` et `answerAlert` datent en heure réelle.
-- La recherche de l'écran Retours est lexicale (`ilike`) ; seul l'agent cherche par le sens.
-- « Ajouter un retour » n'a pas de champ e-mail : le rattachement par domaine d'e-mail est impossible depuis l'écran, on choisit le compte à la main.
-- La description de l'outil `load_skill` cite encore « rédaction » parmi les tâches qui demandent une skill, contrairement au prompt système (SPEC §10.5 suit le prompt) : à aligner, puis à mesurer avec `eval:guardrails --tools`.
-- Latences au-dessus du budget de SPEC §15 : ajout d'un retour 15 à 25 s mesurés en local (budget 15 s, jamais remesuré depuis Vercel) ; rédaction du backlog ~34 s (30 s). Le premier token du chat (< 3 s) n'a pas été mesuré.
-- Écritures du pipeline non transactionnelles ; pas de transaction entre une décision et son désaccord ; une alerte enrichie garde son premier dossier.
-- Validation humaine : sur deux cartes, le modèle a inventé la raison de Léa ; la consigne a été durcie, sans revérification en réel.
-- Evals non mesurées : choix d'outil et enquête, backlog ; estimation sur 10 tickets sur 40 et stabilité sur 1 run ; cas limites E1 à E8 mesurés avec l'ancien Haiku 4.5, pas avec Sonnet qui trie aujourd'hui (détail dans [EVALS.md](docs/EVALS.md)).
-- Couverture à 100 % sur le cœur déterministe seulement ; les autres modules déterministes sont testés sans seuil.
-- Le message d'erreur d'envoi « NOTION_DS_BACKLOG manque » reste technique.
-- L'en-tête de `scripts/pipeline-run.ts` annonce ~1,5 € par run complet (triage sur Haiku) ; mesuré sur Sonnet : 2,52 €.
-- La navigation du détail d'un retour s'arrête aux bords de la page affichée (25 retours) ; pas de thème sombre.
-
-## Comment il a été construit
-
-Avec un agent de code (Claude Code), une étape de [PLAN](docs/process/PLAN.md) par session, chaque session notée dans le [journal](docs/process/BUILD_LOG.md) (durée, coût LLM, choix, dettes) et chaque choix d'architecture dans une ADR. `pnpm tsx scripts/build-time.ts` agrège le journal par phase.
