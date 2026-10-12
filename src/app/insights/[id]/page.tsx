@@ -276,9 +276,7 @@ export default async function InsightPage({ params }: PageProps<"/insights/[id]"
             <h4 className="text-[13px] font-medium text-muted-foreground uppercase">
               Ce dont ils ont besoin
             </h4>
-            <p className="text-base leading-relaxed font-medium">
-              {insight.problem_statement ?? insight.title}
-            </p>
+            <p className="leading-relaxed">{insight.problem_statement ?? insight.title}</p>
           </div>
         </div>
       </Section>
