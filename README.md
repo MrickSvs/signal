@@ -113,7 +113,11 @@ Au total : **50 sessions, environ 21 heures**, et **14 €** d'appels aux modèl
 
 **Pour passer en production** : masquer les données personnelles avant les modèles (ici, tout est fictif) ; héberger les traitements dans l'UE ; de vrais connecteurs (Zendesk, Intercom, e-mail) ; un pack de contexte par produit et des droits d'accès ; une synchronisation retour avec Notion ; calibrer les hypothèses (facteurs d'extrapolation du Reach) sur de vraies données.
 
-**Échelle** : le classement relit tous les retours à chaque affichage (instantané à 214, linéaire au-delà : il faudrait des agrégats matérialisés) ; le regroupement agglomératif tient jusqu'à quelques milliers de retours ; à fort volume, le triage passerait sur Haiku 5.5, quatorze fois moins cher, après une mesure plus large ([ADR-041](docs/DECISIONS.md)).
+**Échelle** : Signal est dimensionné pour quelques centaines de retours par mois. Trois points cèdent au-delà, chacun avec sa solution :
+
+- **Le classement est recalculé à chaque affichage.** La Priorisation, chaque override et l'outil `get_priority` de l'agent relisent tous les retours (texte compris), items, comptes, analyses et overrides, puis recalculent tout en code. C'est simple et toujours à jour, instantané à 214 retours ; mais le coût grandit avec le volume : à 10 000 retours, chaque affichage transférerait des dizaines de mégaoctets. Solution : stocker les agrégats de chaque insight (comptes par plan, MRR, canaux) et ne les mettre à jour qu'à l'arrivée d'un retour.
+- **Le regroupement compare chaque item à tous les autres.** Le clustering agglomératif garde une matrice de distances n × n et la reparcourt à chaque fusion : la mémoire croît en n², le temps en n³. Instantané sur ~250 items, quelques secondes à quelques dizaines de secondes vers 2 000, hors de portée à 10 000 (~100 millions de paires). Solution : un regroupement incrémental qui compare un nouveau retour aux centres des insights existants, comme le fait déjà le mode incrémental, appuyé sur l'index HNSW de pgvector.
+- **Le coût du triage** : 0,78 € pour 100 retours avec Sonnet. Haiku 5.5 atteint les cibles pour quatorze fois moins cher, avec un domaine un peu moins juste : à fort volume, il prendrait le relais après une mesure plus large ([ADR-041](docs/DECISIONS.md)). Le traitement de masse passerait aussi par une file d'attente plutôt que par la ligne de commande.
 
 **Non construit** : le prototype visuel d'une story et l'exposition MCP, coupés pour tenir le périmètre ([ADR-031](docs/DECISIONS.md)) ; le retour du statut depuis Notion.
 
