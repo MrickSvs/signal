@@ -236,8 +236,7 @@ export default async function BacklogPage({ searchParams }: PageProps<"/backlog"
     return (
       <EmptyState icon={ScrollText} title="Le backlog est vide">
         <p>
-          Ouvre un insight et clique sur « Rédiger le backlog », ou demande à Signal dans le chat («
-          Prépare les stories des permissions »).
+          Ouvre un insight et clique sur « Rédiger le backlog », ou demande à Signal dans le chat.
         </p>
       </EmptyState>
     );
