@@ -9,7 +9,7 @@ Il rédige le backlog (stories, bugs, tâches techniques, critères Gherkin, poi
 Signal recommande, le PO décide : toute décision et toute écriture externe passent par sa validation, et chaque chiffre ouvre sa preuve.
 
 - **Démo déployée** : [signal-coral-two.vercel.app](https://signal-coral-two.vercel.app), protégée par mot de passe (communiqué à part ; n'importe quel nom d'utilisateur).
-- **Pour aller plus loin** : [SPEC.md](SPEC.md) (quoi et pourquoi), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DECISIONS.md](docs/DECISIONS.md) (44 ADR), [docs/EVALS.md](docs/EVALS.md), [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). La méthode de construction est dans [docs/process/](docs/process/) (plan, journal, revue).
+- **Pour aller plus loin** : [SPEC.md](SPEC.md) (quoi et pourquoi), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DECISIONS.md](docs/DECISIONS.md) (44 ADR), [docs/EVALS.md](docs/EVALS.md). La méthode de construction est dans [docs/process/](docs/process/) (plan, journal, revue).
 
 ## Captures
 
@@ -91,7 +91,7 @@ pnpm demo:reset     # ~15 s, dates recalées sur aujourd'hui (jours du calendrie
 pnpm digest         # ~15 s, ~0,03 €
 ```
 
-Le premier digest peut aussi s'écrire depuis l'écran Digest (« Générer le premier digest ») : une page sans digest ne compte pas comme une visite de Léa, donc il couvre tout le scénario.
+Le premier digest peut aussi s'écrire depuis l'écran Digest (« Générer le premier digest ») : une page sans digest ne compte pas comme une visite de Léa, donc il couvre tout le scénario. Le cron quotidien (04:00 UTC) écrit aussi un digest : faire le reset après son passage, ou le désactiver ce jour-là, sinon l'écran montre le digest d'une nuit presque vide.
 
 **Ou tout recalculer** : `pnpm pipeline:run` (mesuré le 7 octobre : 214 retours, 410 s, **2,52 €** ; `--resume <run_id>` reprend un run interrompu). Les insights naissent « à valider » : écran Insights, « Tout accepter » ou revue une à une.
 
@@ -160,7 +160,7 @@ Le tableau complet, avec les options, est dans [CLAUDE.md](CLAUDE.md#commandes).
 ├── data/                    # scénario, clients, retours, tickets ; demo/ et demo-snapshot/
 ├── evals/                   # ground-truth/, holdout/, human-labels/, reports/ (lus par scripts/evals seulement)
 ├── supabase/migrations/     # 8 migrations, en ajout seulement
-└── docs/                    # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT ; process/ : PLAN, BUILD_LOG, REVIEW_NOTES
+└── docs/                    # ARCHITECTURE, DECISIONS, EVALS, img/ ; process/ : PLAN, BUILD_LOG, REVIEW_NOTES
 ```
 
 ## Tests et evals

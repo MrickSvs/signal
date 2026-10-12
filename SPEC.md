@@ -316,7 +316,7 @@ Le PO modifie une skill (par exemple le gabarit de story) : le pipeline et l'age
 ├── data/                        # scénario, clients, retours, tickets de référence, démo
 ├── evals/                       # ground-truth/, holdout/, human-labels/, reports/ (données uniquement)
 ├── supabase/migrations/
-└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT, img/ (captures)
+└── docs/                        # ARCHITECTURE, DECISIONS, EVALS, img/ (captures)
     └── process/                 # PLAN, BUILD_LOG, REVIEW_NOTES : la méthode de construction
 ```
 
@@ -883,25 +883,9 @@ Sécurité : données entièrement fictives, clés uniquement côté serveur, ap
 
 ---
 
-## 18. Démo (trame)
+## 18. Démo
 
-15 minutes en visio : démo 8 à 10 min, architecture 3 à 4 min, challenges 2 à 3 min. Script minuté dans `docs/DEMO_SCRIPT.md`.
-
-| Temps | Moment                                           | Ce qu'on voit                                                                                                                                                                                                                  |
-| ----- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0:00  | Ouverture                                        | Le problème du PO, vécu.                                                                                                                                                                                                       |
-| 0:40  | **9 h — Digest**                                 | Tendance émergente (S7), comptes à risque (S2b), trois recommandations.                                                                                                                                                        |
-| 1:40  | **Un problème, quatre canaux**                   | Insight S1 : quatre formulations, une cause ; preuves en un clic.                                                                                                                                                              |
-| 2:30  | **Ce qu'ils demandent / ce dont ils ont besoin** | S3 : « export Excel » → besoin de reporting client.                                                                                                                                                                            |
-| 3:20  | **Le signal et le bruit**                        | Priorisation : le Gantt devant en mode comptes ; bascule MRR + engagement Atelier Mercure → les permissions passent devant. Override de Léa, re-classement, robustesse. Signal challenge la demande Forgeval (hors stratégie). |
-| 5:30  | **Signal rédige**                                | Dans le chat : « Prépare les stories des permissions. » Trace en direct : skills, carte d'architecture, tickets analogues → une fourchette justifiée, puis epic, stories, Gherkin, points choisis dans la fourchette.                                    |
-| 7:20  | **Visualiser**                                   | Prototype de la story dans l'interface de Jalon.                                                                                                                                                                               |
-| 8:00  | **Valider → Notion**                             | Carte d'approbation → la story apparaît dans le kanban Notion, colonne « Prêt », corps complet. Dans Signal, elle n'est plus modifiable : « Ouvrir dans Notion ».                                                                                           |
-| 9:00  | **Le fil continu**                               | Coller deux e-mails : le premier rejoint I-01 en silence (+1) ; le second, de Studio Bastide, déclenche une alerte churn : Signal a déjà enquêté et présente son dossier.                                                                                                                                                               |
-| 10:00 | Architecture                                     | Schéma, choix agent unique / workflow, routage et coûts, evals, Langfuse.                                                                                                                                                      |
-| 13:00 | Challenges                                       | Non-déterminisme et scoring hybride ; problème vs solution ; validation humaine en serverless ; injection ; évaluer un livrable subjectif (juge calibré).                                                                      |
-
-**Plans B**, détaillés dans `docs/DEMO_SCRIPT.md` : toutes les données de démo sont précalculées (snapshot) ; le backlog est rédigé en direct, et se relance depuis la fiche insight si la rédaction échoue (pas de backlog de secours dans le snapshot, ADR-032 révisé) ; le dossier d'une alerte se relance par `pnpm investigate --pending` ; une vidéo de la démo complète est prête ; l'app peut tourner en local. Le moment « Visualiser » (7:20) n'existe pas : le prototype est reporté (ADR-031).
+La démo s'appuie sur une base restaurable en une vingtaine de secondes, sans appel de modèle (`pnpm demo:reset`, ADR-032) : 214 retours triés, insights revus, scores et estimations précalculés. Le backlog, le chat, l'ajout de retours et les enquêtes tournent en direct. Dix retours écrits pour la démo, aucun issu du jeu réservé, sont prêts à coller dans `data/demo/retours-a-coller.md`, avec le comportement attendu. Procédure dans le README (« Base de démo »).
 
 ---
 
@@ -1018,7 +1002,7 @@ Chaque cas a un traitement, une étape du plan qui l'implémente et une façon d
 |---|---|---|---|---|
 | CL-59 | Reformulation d'un insight classé (son énoncé change, donc la clé du cache d'estimation) | L'insight garde sa dernière estimation, marquée « énoncé modifié », et reste classé ; le run suivant réestime (F1) | revue, lot A | test |
 | CL-60 | Digest régénéré deux fois de suite | « Régénérer » réécrit le digest affiché sur sa période, au lieu d'en ouvrir une de quelques secondes (F2, ADR-043) | revue, lot C | test |
-| CL-61 | Cron de 04:00 UTC passé entre le reset de démo et la démo | Procédure : reset et digest le matin même, après le cron, ou cron coupé ce jour-là (F3) | 8.2 | `docs/DEMO_SCRIPT.md` |
+| CL-61 | Cron de 04:00 UTC passé entre le reset de démo et la démo | Procédure : reset et digest le matin même, après le cron, ou cron coupé ce jour-là (F3) | 8.2 | README (« Base de démo ») |
 | CL-62 | Retour collé qui rejoint un insight rejeté | Absorbé par l'insight rejeté (CL-53) ; le résultat le dit (« rejoint I-xx, rejeté : hors classement ») (F4). Limite connue : aucune alerte quand un sujet rejeté revient | revue, lot A | test |
 | CL-63 | Insight rejeté ou fusionné qui a un backlog | Statut de l'insight dans l'en-tête du groupe ; l'envoi Notion d'un de ses éléments est refusé ; les confirmations de rejet et de fusion de l'écran nomment ses éléments non envoyés (F7). Limites connues : la carte d'approbation du chat ne les nomme pas ; « Valider » sans envoi reste possible | revue, lot C | test |
 | CL-64 | Notion non configuré (évaluateur en local) | « Valider » et « Rejeter » dans l'écran Backlog ; « Valider et envoyer » masqué sans `NOTION_TOKEN` et `NOTION_DS_BACKLOG` (G2) | revue, lot C | test |

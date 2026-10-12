@@ -1,1 +1,1 @@
-Documentation du projet : ARCHITECTURE, DECISIONS, EVALS, DEMO_SCRIPT, BUILD_LOG.
+Documentation du projet : ARCHITECTURE, DECISIONS, EVALS ; process/ : PLAN, BUILD_LOG, REVIEW_NOTES.
